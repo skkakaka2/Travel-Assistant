@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Trip {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  userCount   Int      @default(0)
+  budget      Int      @default(0)
+  startDate   String
+  endDate     String
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      Int
+
+  @@index([userId])
+  @@index([startDate])
+  @@map("trips")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique(map: "User_email_key")
+  username  String   @unique(map: "User_username_key")
+  password  String
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user")
+}
