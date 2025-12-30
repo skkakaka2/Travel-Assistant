@@ -18,26 +18,16 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class HttpResponseInterceptor<T>
-  implements NestInterceptor<T, Response<T>>
-{
+export class HttpResponseInterceptor<T> implements NestInterceptor<
+  T,
+  Response<T>
+> {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<Response<T>> {
-    return next.handle().pipe(
-      map((data) => {
-        // 获取响应对象
-        const response = context.switchToHttp().getResponse();
-        const statusCode = response.statusCode;
+    const request = context.switchToHttp().getRequest();
 
-        return {
-          code: statusCode,
-          message: 'Success',
-          data: data,
-          timestamp: new Date().toISOString(),
-        };
-      }),
-    );
+    return next.handle();
   }
 }

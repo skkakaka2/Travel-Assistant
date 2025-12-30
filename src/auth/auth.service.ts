@@ -4,6 +4,10 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import {
+  errorResponse,
+  successResponse,
+} from 'src/http-response/http-response';
 
 @Injectable()
 export class AuthService {
@@ -16,14 +20,14 @@ export class AuthService {
       },
     });
     if (!user) {
-      throw new UnauthorizedException('Invalid username or password');
+      return errorResponse('Invalid username or password', null);
     }
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
       user.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid username or password');
+      return errorResponse('Invalid username or password', null);
     }
     // 设置 token 过期时间（默认 7 天）
     const expiresIn = process.env.TOKEN_EXP || '7d'; // 支持 '7d', '24h', '3600' 等格式
@@ -38,6 +42,6 @@ export class AuthService {
         expiresIn, // 使用 expiresIn 选项，而不是在 payload 中设置 exp
       },
     );
-    return token;
+    return successResponse(token);
   }
 }

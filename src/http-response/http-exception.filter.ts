@@ -12,7 +12,7 @@ import { Response } from 'express';
  */
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -27,41 +27,44 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message = 'Internal server error';
     let errors: any = null;
 
-    if (isHttpException) {
-      const exceptionResponse = exception.getResponse();
-      if (typeof exceptionResponse === 'string') {
-        message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object') {
-        const responseObj = exceptionResponse as any;
-        message = responseObj.message || message;
-        errors = responseObj.errors || responseObj.error || null;
+    if (status === 500) {
+      if (isHttpException) {
+        const exceptionResponse = exception.getResponse();
+        if (typeof exceptionResponse === 'string') {
+          message = exceptionResponse;
+        } else if (typeof exceptionResponse === 'object') {
+          const responseObj = exceptionResponse as any;
+          message = responseObj.message || message;
+          errors = responseObj.errors || responseObj.error || null;
+        }
+      } else if (exception instanceof Error) {
+        message = exception.message;
       }
-    } else if (exception instanceof Error) {
-      message = exception.message;
+
+      // 统一的错误响应格式
+      const errorResponse = {
+        code: status,
+        message: message,
+        data: null,
+        errors: errors,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+      };
+
+      // 记录错误日志
+      console.error('❌ Exception caught:', {
+        status,
+        message,
+        path: request.url,
+        exception: exception instanceof Error ? exception.message : exception,
+      });
+      console.error(
+        '❌ Exception stack:',
+        exception instanceof Error ? exception.stack : exception,
+      );
+      response.status(status).send(errorResponse);
+    } else {
+      response.status(status).send(exception.response);
     }
-
-    // 统一的错误响应格式
-    const errorResponse = {
-      code: status,
-      message: message,
-      data: null,
-      errors: errors,
-      timestamp: new Date().toISOString(),
-      path: request.url,
-    };
-
-    // 记录错误日志
-    console.error('❌ Exception caught:', {
-      status,
-      message,
-      path: request.url,
-      exception: exception instanceof Error ? exception.message : exception,
-    });
-    console.error(
-      '❌ Exception stack:',
-      exception instanceof Error ? exception.stack : exception,
-    );
-
-    response.status(status).send(errorResponse);
   }
 }

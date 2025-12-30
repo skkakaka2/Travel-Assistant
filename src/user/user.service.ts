@@ -1,37 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+import {
+  errorResponse,
+  successResponse,
+} from 'src/http-response/http-response';
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.prisma.user.create({
-      data: createUserDto,
+  async create(createUserDto: CreateUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username: createUserDto.username,
+      },
     });
+    if (user) {
+      return errorResponse('User already exists', null);
+    }
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const result = await this.prisma.user.create({
+      data: {
+        ...createUserDto,
+        password: hashedPassword,
+      },
+    });
+    return successResponse(result);
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  async findAll() {
+    const result = await this.prisma.user.findMany();
+    return successResponse(result);
   }
 
-  findOne(id: number) {
-    return this.prisma.user.findUnique({
+  async findOne(id: number) {
+    const result = await this.prisma.user.findUnique({
       where: { id },
     });
+    return successResponse(result);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const result = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
+    return successResponse(result);
   }
 
-  remove(id: number) {
-    return this.prisma.user.delete({
+  async remove(id: number) {
+    const result = await this.prisma.user.delete({
       where: { id },
     });
+    return successResponse(result);
   }
 }

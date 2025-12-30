@@ -6,6 +6,7 @@ import { Public } from './decorators/public.decorator';
 import type { FastifyReply } from 'fastify';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { successResponse } from 'src/http-response/http-response';
 
 @ApiTags('认证')
 @Controller('auth')
@@ -24,7 +25,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
     const result = await this.authService.login(loginDto);
-    res.setCookie('token', result, {
+    res.setCookie('token', result.data, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 7天（秒）
