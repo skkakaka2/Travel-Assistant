@@ -7,16 +7,17 @@ datasource db {
 }
 
 model Trip {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
-  userCount   Int      @default(0)
-  budget      Int      @default(0)
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(255)
+  userCount   Int       @default(0)
+  budget      Int       @default(0)
   startDate   String
   endDate     String
-  description String?  @db.Text
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  description String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   userId      Int
+  dayPlans    DayPlan[]
 
   @@index([userId])
   @@index([startDate])
@@ -34,4 +35,58 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@map("user")
+}
+
+// 每日计划表
+model DayPlan {
+  id        Int      @id @default(autoincrement())
+  tripId    Int
+  date      String // 计划日期
+  dayNumber Int // 第几天（1, 2, 3...）
+  notes     String?  @db.Text // 当天备注
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联关系
+  trip  Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  items DayPlanItem[] // 当天的计划项（酒店、景点等）
+
+  @@unique([tripId, date]) // 同一行程同一天只能有一条记录
+  @@index([tripId])
+  @@index([date])
+  @@map("day_plans")
+}
+
+// 计划项类型枚举（酒店、景点、餐厅等）
+enum PlanItemType {
+  HOTEL // 酒店
+  ATTRACTION // 景点
+  RESTAURANT // 餐厅
+  TRANSPORT // 交通
+  ACTIVITY // 活动
+  OTHER // 其他
+}
+
+// 每日计划项表（酒店、景点等）
+model DayPlanItem {
+  id        Int          @id @default(autoincrement())
+  dayPlanId Int
+  type      PlanItemType // 类型：酒店、景点等
+  name      String       @db.VarChar(255) // 名称
+  address   String?      @db.VarChar(500) // 地址
+  startTime DateTime? // 开始时间
+  endTime   DateTime? // 结束时间
+  duration  Int? // 预计时长（分钟）
+  cost      Int?         @default(0) // 费用
+  notes     String?      @db.Text // 备注
+  order     Int          @default(0) // 排序顺序
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // 关联关系
+  dayPlan DayPlan @relation(fields: [dayPlanId], references: [id], onDelete: Cascade)
+
+  @@index([dayPlanId])
+  @@index([type])
+  @@map("day_plan_items")
 }

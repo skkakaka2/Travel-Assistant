@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   Req,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +22,7 @@ import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import type { FastifyRequest } from 'fastify';
 import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
+import { PaginationQuery } from 'src/common/pagination';
 
 @ApiTags('行程管理')
 @ApiBearerAuth()
@@ -40,8 +42,8 @@ export class TripController {
 
   @Get()
   @ApiOperation({ summary: '获取所有行程' })
-  findAll() {
-    return this.tripService.findAll();
+  findAll(@Query() paginationQuery: PaginationQuery) {
+    return this.tripService.findAll(paginationQuery);
   }
 
   @Get(':id')

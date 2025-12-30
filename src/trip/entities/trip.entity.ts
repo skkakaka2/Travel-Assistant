@@ -1,13 +1,4 @@
+import { Trip as TripModel } from '@prisma/client';
 
-export class Trip {
-  id: number;
-  name: string;
-  userCount: number;
-  budget: number;
-  startDate: string;
-  endDate: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  userId: number;
-}
+export type TripEntity = TripModel;
+

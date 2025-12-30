@@ -3,7 +3,11 @@ import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
-import { errorResponse, successResponse } from 'src/http-response/http-response';
+import {
+  errorResponse,
+  successResponse,
+} from 'src/http-response/http-response';
+import { PaginationQuery, PaginationResponse } from 'src/common/pagination';
 
 @Injectable()
 export class TripService {
@@ -27,8 +31,19 @@ export class TripService {
     return successResponse(trip);
   }
 
-  findAll() {
-    return `This action returns all trip`;
+  async findAll(paginationQuery: PaginationQuery) {
+    const result = await this.prisma.trip.findMany({
+      skip: (paginationQuery.page - 1) * paginationQuery.pageSize,
+      take: paginationQuery.pageSize,
+    });
+    const total = await this.prisma.trip.count();
+    const paginationResponse = new PaginationResponse(
+      result,
+      total,
+      paginationQuery.page,
+      paginationQuery.pageSize,
+    );
+    return successResponse(paginationResponse);
   }
 
   findOne(id: number) {
