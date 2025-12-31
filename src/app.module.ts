@@ -11,10 +11,11 @@ import { UserModule } from './user/user.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DayPlanModule } from './day-plan/day-plan.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DayPlanItem } from './day-plan/entities/day-plan-item.entity';
+import { DayPlanItem } from './day-plan-item/entities/day-plan-item.entity';
 import { DayPlan } from './day-plan/entities/day-plan.entity';
 import { Trip } from './trip/entities/trip.entity';
 import { User } from './user/entities/user.entity';
+import { DayPlanItemModule } from './day-plan-item/day-plan-item.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { User } from './user/entities/user.entity';
     TripModule,
     UserModule,
     DayPlanModule,
+    DayPlanItemModule,
   ],
   controllers: [AppController],
   providers: [

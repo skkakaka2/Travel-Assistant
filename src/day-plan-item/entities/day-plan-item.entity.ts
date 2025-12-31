@@ -8,7 +8,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { DayPlan } from './day-plan.entity';
+import { DayPlan } from '../../day-plan/entities/day-plan.entity';
+import { Trip } from 'src/trip/entities/trip.entity';
 
 export enum PlanItemType {
   HOTEL = 'HOTEL',
@@ -27,7 +28,12 @@ export class DayPlanItem {
   id: number;
 
   @Column({ type: 'int' })
+  @ManyToOne(() => DayPlan, (dayPlan) => dayPlan.id, { onDelete: 'CASCADE' })
   dayPlanId: number;
+
+  @Column({ type: 'int' })
+  @ManyToOne(() => Trip, (trip) => trip.id, { onDelete: 'CASCADE' })
+  tripId: number;
 
   @Column({ type: 'enum', enum: PlanItemType })
   type: PlanItemType;
@@ -38,11 +44,11 @@ export class DayPlanItem {
   @Column({ type: 'varchar', length: 500, nullable: true })
   address?: string | null;
 
-  @Column({ type: 'datetime', precision: 3, nullable: true })
-  startTime?: Date | null;
+  @Column({ type: 'varchar', length: 5, nullable: true })
+  startTime?: string | null;
 
-  @Column({ type: 'datetime', precision: 3, nullable: true })
-  endTime?: Date | null;
+  @Column({ type: 'varchar', length: 5, nullable: true })
+  endTime?: string | null;
 
   @Column({ type: 'int', nullable: true })
   duration?: number | null;
@@ -72,11 +78,4 @@ export class DayPlanItem {
     onUpdate: 'CURRENT_TIMESTAMP(3)',
   })
   updatedAt: Date;
-
-  @ManyToOne(() => DayPlan, (dayPlan) => dayPlan.items, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'dayPlanId' })
-  dayPlan: DayPlan;
 }
-

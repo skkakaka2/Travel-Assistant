@@ -33,6 +33,18 @@ export class DayPlanController {
     return this.dayPlanService.findAll(query);
   }
 
+  @Get(':id/items')
+  @ApiOperation({ summary: 'Get all items of a day plan' })
+  @ApiParam({
+    name: 'id',
+    description: 'Day plan ID',
+    type: Number,
+    example: 1,
+  })
+  findAllItems(@Param('id', ParseIntPipe) id: number) {
+    return this.dayPlanService.findAllItems(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a day plan by id' })
   @ApiParam({

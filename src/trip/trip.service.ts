@@ -41,6 +41,9 @@ export class TripService {
       order: {
         createdAt: 'DESC',
       },
+      relations: {
+        dayPlans: true,
+      },
     });
     const paginationResponse = new PaginationResponse(
       result,

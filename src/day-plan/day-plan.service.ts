@@ -9,16 +9,34 @@ import { PaginationQuery, PaginationResponse } from 'src/common/pagination';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DayPlan } from './entities/day-plan.entity';
 import { Repository } from 'typeorm';
-import { DayPlanItem } from './entities/day-plan-item.entity';
+import { Trip } from 'src/trip/entities/trip.entity';
+import { DayPlanItemService } from 'src/day-plan-item/day-plan-item.service';
 
 @Injectable()
 export class DayPlanService {
   constructor(
     @InjectRepository(DayPlan)
     private readonly dayPlanRepository: Repository<DayPlan>,
+    @InjectRepository(Trip)
+    private readonly tripRepository: Repository<Trip>,
+    private readonly dayPlanItemService: DayPlanItemService,
   ) {}
 
   async create(createDayPlanDto: CreateDayPlanDto) {
+    const trip = await this.tripRepository.findOne({
+      where: {
+        id: createDayPlanDto.tripId,
+      },
+    });
+    if (!trip) {
+      return errorResponse('Trip not found', null);
+    }
+    if (
+      createDayPlanDto.date < trip.startDate ||
+      createDayPlanDto.date > trip.endDate
+    ) {
+      return errorResponse('Date is not in the trip range', null);
+    }
     const exist = await this.dayPlanRepository.findOne({
       where: {
         tripId: createDayPlanDto.tripId,
@@ -29,21 +47,11 @@ export class DayPlanService {
       return errorResponse('Day plan already exists', null);
     }
 
-    const items =
-      createDayPlanDto.items?.map((item) =>
-        this.dayPlanRepository.manager.create(DayPlanItem, {
-          ...item,
-          startTime: item.startTime ? new Date(item.startTime) : undefined,
-          endTime: item.endTime ? new Date(item.endTime) : undefined,
-        }),
-      ) ?? [];
-
     const dayPlan = this.dayPlanRepository.create({
       tripId: createDayPlanDto.tripId,
       date: createDayPlanDto.date,
       dayNumber: createDayPlanDto.dayNumber,
       notes: createDayPlanDto.notes,
-      items,
     });
 
     const result = await this.dayPlanRepository.save(dayPlan);
@@ -57,7 +65,6 @@ export class DayPlanService {
       order: {
         date: 'DESC',
       },
-      relations: ['items'],
     });
     const paginationResponse = new PaginationResponse(
       result,
@@ -68,8 +75,18 @@ export class DayPlanService {
     return successResponse(paginationResponse);
   }
 
+  async findAllItems(dayPlanId: number) {
+    const result = await this.dayPlanItemService.findAllByDayPlanId(dayPlanId);
+    return successResponse(result);
+  }
+
   async findOne(id: number) {
-    return `This action returns a #${id} dayPlan`;
+    const result = await this.dayPlanRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    return successResponse(result);
   }
 
   async update(id: number, updateDayPlanDto: UpdateDayPlanDto) {

@@ -11,7 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Trip } from 'src/trip/entities/trip.entity';
-import { DayPlanItem } from './day-plan-item.entity';
+import { DayPlanItem } from '../../day-plan-item/entities/day-plan-item.entity';
 
 @Entity('day_plans')
 @Index('day_plans_tripId_idx', ['tripId'])
@@ -20,9 +20,6 @@ import { DayPlanItem } from './day-plan-item.entity';
 export class DayPlan {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ type: 'int' })
-  tripId: number;
 
   @Column({ type: 'varchar', length: 191 })
   date: string;
@@ -50,10 +47,10 @@ export class DayPlan {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => Trip, (trip) => trip.dayPlans, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Trip, (trip) => trip.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'tripId' })
   trip: Trip;
 
-  @OneToMany(() => DayPlanItem, (item) => item.dayPlan, { cascade: true })
-  items: DayPlanItem[];
+  @Column({ type: 'int' })
+  tripId: number;
 }
