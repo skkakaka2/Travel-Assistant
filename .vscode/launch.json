@@ -5,6 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Debug Frontend (pnpm)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///src/*": "${cwd}/src/*"
+      }
+    },
+    {
       "name": "Debug NestJS (pnpm)",
       "type": "node",
       "request": "launch",
@@ -14,7 +27,7 @@
       "restart": true,
       "protocol": "inspector",
       "sourceMaps": true,
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/backend/",
       "env": {
         "NODE_ENV": "development"
       },
