@@ -54,8 +54,19 @@ export class TripService {
     return successResponse(paginationResponse);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} trip`;
+  async findOne(id: number) {
+    const result = await this.tripRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        dayPlans: true,
+      },
+    });
+    if (!result) {
+      return errorResponse('Trip not found', null);
+    }
+    return successResponse(result);
   }
 
   update(id: number, updateTripDto: UpdateTripDto) {

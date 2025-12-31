@@ -14,8 +14,8 @@ export const useTripStore = defineStore('trip', () => {
     try {
       const response = await tripApi.getAll(params)
       const data = response.data.data
-      trips.value = data.items
-      total.value = data.total
+      trips.value = data.list
+      total.value = data.pagination.total
       return data
     } finally {
       loading.value = false

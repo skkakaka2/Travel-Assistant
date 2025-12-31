@@ -6,16 +6,12 @@
   "configurations": [
     {
       "name": "Debug Frontend (pnpm)",
-      "type": "node",
+      "type": "chrome",
       "request": "launch",
-      "cwd": "${workspaceFolder}/frontend",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["run", "dev"],
-      "console": "integratedTerminal",
-      "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///src/*": "${cwd}/src/*"
-      }
+      "skipFiles": ["${workspaceFolder}/frontend/node_modules/**/*.js"],
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend/",
+      "preLaunchTask": "npm: dev"
     },
     {
       "name": "Debug NestJS (pnpm)",
@@ -25,7 +21,6 @@
       "runtimeArgs": ["run", "start:debug"],
       "console": "integratedTerminal",
       "restart": true,
-      "protocol": "inspector",
       "sourceMaps": true,
       "cwd": "${workspaceFolder}/backend/",
       "env": {

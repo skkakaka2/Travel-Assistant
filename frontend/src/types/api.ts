@@ -11,12 +11,16 @@ export interface PaginationQuery {
   pageSize?: number
 }
 
-export interface PaginationResponse<T> {
-  items: T[]
+export interface Pagination {
   total: number
   page: number
   pageSize: number
   totalPages: number
+}
+
+export interface PaginationResponse<T> {
+  list: T[]
+  pagination: Pagination
 }
 
 // Auth Types
