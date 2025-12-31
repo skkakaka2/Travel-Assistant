@@ -1,19 +1,24 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
 import {
   errorResponse,
   successResponse,
 } from 'src/http-response/http-response';
 import { PaginationQuery, PaginationResponse } from 'src/common/pagination';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Trip } from './entities/trip.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TripService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectRepository(Trip)
+    private readonly tripRepository: Repository<Trip>,
+  ) {}
   async create(createTripDto: CreateTripDto, user: ContextUser) {
-    const existTrip = await this.prisma.trip.findFirst({
+    const existTrip = await this.tripRepository.findOne({
       where: {
         name: createTripDto.name,
       },
@@ -21,22 +26,22 @@ export class TripService {
     if (existTrip) {
       return errorResponse('Trip already exists', null);
     }
-    const data = {
+    const data = this.tripRepository.create({
       ...createTripDto,
-      userId: user.userId,
-    };
-    const trip = await this.prisma.trip.create({
-      data,
+      userId: Number(user.userId),
     });
+    const trip = await this.tripRepository.save(data);
     return successResponse(trip);
   }
 
   async findAll(paginationQuery: PaginationQuery) {
-    const result = await this.prisma.trip.findMany({
+    const [result, total] = await this.tripRepository.findAndCount({
       skip: (paginationQuery.page - 1) * paginationQuery.pageSize,
       take: paginationQuery.pageSize,
+      order: {
+        createdAt: 'DESC',
+      },
     });
-    const total = await this.prisma.trip.count();
     const paginationResponse = new PaginationResponse(
       result,
       total,

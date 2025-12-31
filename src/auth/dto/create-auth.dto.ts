@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAuthDto {
   @ApiProperty({
-    description: '用户名',
+    description: 'Username',
     example: 'john_doe',
     minLength: 3,
   })
@@ -13,7 +13,7 @@ export class CreateAuthDto {
   username: string;
 
   @ApiProperty({
-    description: '邮箱',
+    description: 'Email address',
     example: 'john@example.com',
   })
   @IsEmail()
@@ -21,7 +21,7 @@ export class CreateAuthDto {
   email: string;
 
   @ApiProperty({
-    description: '密码',
+    description: 'Password',
     example: 'password123',
     minLength: 6,
   })
@@ -31,7 +31,7 @@ export class CreateAuthDto {
   password: string;
 
   @ApiProperty({
-    description: '姓名',
+    description: 'Full name',
     example: 'John Doe',
     required: false,
   })
@@ -41,7 +41,7 @@ export class CreateAuthDto {
 
 export class LoginDto {
   @ApiProperty({
-    description: '用户名',
+    description: 'Username',
     example: 'admin',
   })
   @IsString()
@@ -49,7 +49,7 @@ export class LoginDto {
   username: string;
 
   @ApiProperty({
-    description: '密码',
+    description: 'Password',
     example: 'admin123',
   })
   @IsString()

@@ -4,16 +4,45 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER, APP_PIPE } from '@nestjs/core';
-import { PrismaModule } from './prisma/prisma.module';
 import { HttpResponseInterceptor } from './http-response/http-response.interceptor';
 import { HttpExceptionFilter } from './http-response/http-exception.filter';
 import { TripModule } from './trip/trip.module';
 import { UserModule } from './user/user.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DayPlanModule } from './day-plan/day-plan.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DayPlanItem } from './day-plan/entities/day-plan-item.entity';
+import { DayPlan } from './day-plan/entities/day-plan.entity';
+import { Trip } from './trip/entities/trip.entity';
+import { User } from './user/entities/user.entity';
 
 @Module({
-  imports: [PrismaModule, AuthModule, TripModule, UserModule, DayPlanModule],
+  imports: [
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        const baseConfig = {
+          type: 'mysql' as const,
+          entities: [User, Trip, DayPlan, DayPlanItem],
+          synchronize: false,
+          logging: process.env.NODE_ENV === 'development',
+          autoLoadEntities: true,
+        };
+
+        if (process.env.DATABASE_URL) {
+          return {
+            ...baseConfig,
+            url: process.env.DATABASE_URL,
+          };
+        } else {
+          throw new Error('DATABASE_URL is not set');
+        }
+      },
+    }),
+    AuthModule,
+    TripModule,
+    UserModule,
+    DayPlanModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

@@ -4,8 +4,11 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
+import { DataSource } from 'typeorm';
+import { seedAdmin } from './seeds/seed';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import fastifyCookie from '@fastify/cookie';
+import 'reflect-metadata';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -25,13 +28,13 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3000;
 
-  // 配置 Swagger
+  // Configure Swagger
   const config = new DocumentBuilder()
     .setTitle('Travel Assistant API')
-    .setDescription('Travel Assistant API 文档')
+    .setDescription('Travel Assistant API Documentation')
     .setVersion('1.0')
-    .addServer(`http://localhost:${port}`, '本地开发环境')
-    .addServer(`http://127.0.0.1:${port}`, '本地开发环境 (127.0.0.1)')
+    .addServer(`http://localhost:${port}`, 'Local Development')
+    .addServer(`http://127.0.0.1:${port}`, 'Local Development (127.0.0.1)')
     .addTag('app')
     .addTag('trip')
     .addCookieAuth('token', {
@@ -45,6 +48,10 @@ async function bootstrap() {
   httpAdapter.get('/apijson', (req, res) => {
     httpAdapter.reply(res, document, 200);
   });
+
+  const dataSource = app.get(DataSource);
+
+  await seedAdmin(dataSource);
 
   await app.listen(port, '0.0.0.0');
 

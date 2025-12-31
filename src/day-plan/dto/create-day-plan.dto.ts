@@ -1,4 +1,3 @@
-import { PlanItemType } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   IsString,
@@ -11,39 +10,47 @@ import {
   ValidateNested,
   IsEnum,
 } from 'class-validator';
-
-export type PlanItemTypeEnum = PlanItemType;
-export const PlanItemTypeEnum = Object.values(PlanItemType);
+import { PlanItemType } from '../entities/day-plan-item.entity';
 
 export class CreateDayPlanItemDto {
   @IsString()
   @IsNotEmpty()
   name: string;
+
   @IsString()
   @IsOptional()
   notes?: string;
-  @IsEnum(PlanItemTypeEnum)
+
+  @IsEnum(PlanItemType)
   @IsNotEmpty()
-  type: PlanItemTypeEnum;
+  type: PlanItemType;
+
   @IsString()
   @IsOptional()
   address?: string;
+
   @IsString()
   @IsOptional()
   startTime?: string;
+
   @IsString()
   @IsOptional()
   endTime?: string;
+
   @IsNumber()
   @IsOptional()
   duration?: number;
+
   @IsNumber()
   @IsOptional()
   cost?: number;
 }
 
 export class CreateDayPlanDto {
-    
+  @IsNumber()
+  @IsInt()
+  @IsNotEmpty()
+  @Type(() => Number)
   tripId: number;
 
   @IsString()
@@ -54,9 +61,16 @@ export class CreateDayPlanDto {
   @IsNumber()
   @IsNotEmpty()
   @IsInt()
+  @Type(() => Number)
   dayNumber: number;
 
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateDayPlanItemDto)
+  items?: CreateDayPlanItemDto[];
 }

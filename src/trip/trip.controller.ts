@@ -24,14 +24,14 @@ import type { FastifyRequest } from 'fastify';
 import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
 import { PaginationQuery } from 'src/common/pagination';
 
-@ApiTags('行程管理')
+@ApiTags('Trip Management')
 @ApiBearerAuth()
 @Controller('trip')
 export class TripController {
   constructor(private readonly tripService: TripService) {}
 
   @Post()
-  @ApiOperation({ summary: '创建行程' })
+  @ApiOperation({ summary: 'Create a trip' })
   @ApiBody({ type: CreateTripDto })
   create(
     @Body() createTripDto: CreateTripDto,
@@ -41,16 +41,16 @@ export class TripController {
   }
 
   @Get()
-  @ApiOperation({ summary: '获取所有行程' })
+  @ApiOperation({ summary: 'Get all trips' })
   findAll(@Query() paginationQuery: PaginationQuery) {
     return this.tripService.findAll(paginationQuery);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: '获取单个行程详情' })
+  @ApiOperation({ summary: 'Get a trip by id' })
   @ApiParam({
     name: 'id',
-    description: '行程 ID',
+    description: 'Trip ID',
     example: 1,
     type: Number,
   })
@@ -59,10 +59,10 @@ export class TripController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: '更新行程' })
+  @ApiOperation({ summary: 'Update a trip' })
   @ApiParam({
     name: 'id',
-    description: '行程 ID',
+    description: 'Trip ID',
     example: 1,
     type: Number,
   })
@@ -75,10 +75,10 @@ export class TripController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: '删除行程' })
+  @ApiOperation({ summary: 'Delete a trip' })
   @ApiParam({
     name: 'id',
-    description: '行程 ID',
+    description: 'Trip ID',
     example: 1,
     type: Number,
   })

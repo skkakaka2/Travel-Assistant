@@ -1,14 +1,14 @@
 import { Controller, Post, Body, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { CreateAuthDto, LoginDto } from './dto/create-auth.dto';
+import { LoginDto } from './dto/create-auth.dto';
 import { Public } from './decorators/public.decorator';
 import type { FastifyReply } from 'fastify';
 import { UserService } from 'src/user/user.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { successResponse } from 'src/http-response/http-response';
 
-@ApiTags('认证')
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -18,7 +18,7 @@ export class AuthController {
 
   @Post('login')
   @Public()
-  @ApiOperation({ summary: '用户登录' })
+  @ApiOperation({ summary: 'User login' })
   @ApiBody({ type: LoginDto })
   async login(
     @Body() loginDto: LoginDto,
@@ -28,7 +28,7 @@ export class AuthController {
     res.setCookie('token', result.data, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 7天（秒）
+      maxAge: 60 * 60 * 24 * 7, // 7 days (seconds)
       path: '/',
       sameSite: 'strict',
     });
@@ -37,7 +37,7 @@ export class AuthController {
 
   @Post('register')
   @Public()
-  @ApiOperation({ summary: '用户注册' })
+  @ApiOperation({ summary: 'User registration' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);

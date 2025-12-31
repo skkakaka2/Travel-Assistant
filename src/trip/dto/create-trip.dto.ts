@@ -10,15 +10,15 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateTripDto {
   @ApiProperty({
-    description: '行程名称',
-    example: '东京5日游',
+    description: 'Trip name',
+    example: 'Tokyo 5-Day Tour',
   })
   @IsString()
   @IsNotEmpty()
   name: string;
 
   @ApiPropertyOptional({
-    description: '出行人数',
+    description: 'Number of travelers',
     example: 2,
     minimum: 1,
   })
@@ -28,7 +28,7 @@ export class CreateTripDto {
   userCount?: number;
 
   @ApiPropertyOptional({
-    description: '预算（单位：元）',
+    description: 'Budget (in cents)',
     example: 10000,
     minimum: 0,
   })
@@ -38,7 +38,7 @@ export class CreateTripDto {
   budget?: number;
 
   @ApiProperty({
-    description: '计划开始时间（ISO 8601 格式）',
+    description: 'Start date (ISO 8601 format)',
     example: '2025-01-01T00:00:00.000Z',
   })
   @IsDateString()
@@ -46,7 +46,7 @@ export class CreateTripDto {
   startDate: string;
 
   @ApiProperty({
-    description: '计划结束时间（ISO 8601 格式）',
+    description: 'End date (ISO 8601 format)',
     example: '2025-01-05T00:00:00.000Z',
   })
   @IsDateString()
@@ -54,8 +54,8 @@ export class CreateTripDto {
   endDate: string;
 
   @ApiPropertyOptional({
-    description: '行程备注',
-    example: '这是一次愉快的旅行',
+    description: 'Trip description',
+    example: 'A wonderful trip',
   })
   @IsString()
   @IsOptional()
