@@ -5,35 +5,56 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     redirect: '/trips',
   },
+  // Auth layout routes
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/pages/login/index.vue'),
-    meta: { public: true, title: 'Login' },
+    path: '/',
+    component: () => import('@/layouts/AuthLayout.vue'),
+    meta: { public: true },
+    children: [
+      {
+        path: 'login',
+        name: 'Login',
+        component: () => import('@/pages/login/index.vue'),
+        meta: { public: true, title: 'Login' },
+      },
+      {
+        path: 'register',
+        name: 'Register',
+        component: () => import('@/pages/register/index.vue'),
+        meta: { public: true, title: 'Register' },
+      },
+    ],
   },
+  // Default layout routes
   {
-    path: '/register',
-    name: 'Register',
-    component: () => import('@/pages/register/index.vue'),
-    meta: { public: true, title: 'Register' },
-  },
-  {
-    path: '/trips',
-    name: 'Trips',
-    component: () => import('@/pages/trips/index.vue'),
-    meta: { title: 'My Trips' },
-  },
-  {
-    path: '/trips/:id',
-    name: 'TripDetail',
-    component: () => import('@/pages/trips/[id]/index.vue'),
-    meta: { title: 'Trip Detail' },
-  },
-  {
-    path: '/trips/:id/day/:dayId',
-    name: 'DayPlanDetail',
-    component: () => import('@/pages/trips/[id]/day/[dayId].vue'),
-    meta: { title: 'Day Plan' },
+    path: '/',
+    component: () => import('@/layouts/DefaultLayout.vue'),
+    children: [
+      {
+        path: 'trips',
+        name: 'Trips',
+        component: () => import('@/pages/trips/index.vue'),
+        meta: { title: 'My Trips' },
+      },
+      {
+        path: 'trips/:id',
+        name: 'TripDetail',
+        component: () => import('@/pages/trips/[id]/index.vue'),
+        meta: { title: 'Trip Detail' },
+      },
+      {
+        path: 'trips/:id/day/:dayId',
+        name: 'DayPlanDetail',
+        component: () => import('@/pages/trips/[id]/day/[dayId].vue'),
+        meta: { title: 'Day Plan' },
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('@/pages/settings/index.vue'),
+        meta: { title: 'Settings' },
+      },
+    ],
   },
   {
     path: '/:pathMatch(.*)*',
@@ -60,4 +81,3 @@ router.beforeEach((to, _from, next) => {
 })
 
 export default router
-

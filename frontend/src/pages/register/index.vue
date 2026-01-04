@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { NForm, NFormItem, NInput, NButton, NSpace, useMessage } from 'naive-ui'
-import AuthLayout from '@/layouts/AuthLayout.vue'
 import { useAuthStore } from '@/stores'
 import type { RegisterDto } from '@/types/api'
 
@@ -51,8 +50,7 @@ async function handleRegister() {
 </script>
 
 <template>
-  <AuthLayout>
-    <NForm :model="formData" :rules="formRules" @submit.prevent="handleRegister">
+  <NForm :model="formData" :rules="formRules" @submit.prevent="handleRegister">
       <NFormItem path="name" label="Full Name">
         <NInput
           v-model:value="formData.name"
@@ -107,8 +105,7 @@ async function handleRegister() {
           <RouterLink to="/login" class="auth-link">Sign in</RouterLink>
         </div>
       </NSpace>
-    </NForm>
-  </AuthLayout>
+  </NForm>
 </template>
 
 <style scoped>

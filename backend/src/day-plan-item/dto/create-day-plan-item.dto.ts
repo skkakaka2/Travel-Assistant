@@ -67,13 +67,13 @@ export class CreateDayPlanItemDto {
   @IsNotEmpty()
   endTime: string;
 
-  @ApiProperty({
-    description: 'Item duration',
-    example: 180,
-  })
-  @IsNumber()
-  @IsNotEmpty()
-  duration: number;
+  // @ApiProperty({
+  //   description: 'Item duration',
+  //   example: 180,
+  // })
+  // @IsNumber()
+  // @IsNotEmpty()
+  // duration: number;
 
   @ApiProperty({
     description: 'Item cost',
@@ -90,4 +90,20 @@ export class CreateDayPlanItemDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  //经纬度
+  @ApiProperty({
+    description: 'Item latitude',
+    example: 39.90872,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  latitude: number;
+  @ApiProperty({
+    description: 'Item longitude',
+    example: 116.39749,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  longitude: number;
 }

@@ -53,4 +53,7 @@ export class DayPlan {
 
   @Column({ type: 'int' })
   tripId: number;
+
+  @OneToMany(() => DayPlanItem, (dayPlanItem) => dayPlanItem.dayPlanId)
+  dayPlanItems: DayPlanItem[];
 }

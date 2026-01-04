@@ -1,107 +1,112 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import {
-  NButton,
-  NIcon,
-  NSpace,
-  NCard,
-  NSpin,
-  NInput,
-  NEmpty,
-  useMessage,
-} from 'naive-ui'
-import { ArrowBackOutline, AddOutline, SaveOutline } from '@vicons/ionicons5'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import DayPlanItemCard from '@/components/dayPlanItem/DayPlanItemCard.vue'
-import DayPlanItemForm from '@/components/dayPlanItem/DayPlanItemForm.vue'
-import { dayPlanApi, dayPlanItemApi } from '@/api'
-import type { DayPlan, DayPlanItem, CreateDayPlanItemDto, UpdateDayPlanItemDto } from '@/types/api'
-import { formatDate, getDayOfWeek } from '@/utils/date'
+import { ref, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { NButton, NIcon, NSpace, NCard, NSpin, NInput, NEmpty, useMessage } from "naive-ui";
+import { ArrowBackOutline, AddOutline, SaveOutline } from "@vicons/ionicons5";
+import DayPlanItemCard from "@/components/dayPlanItem/DayPlanItemCard.vue";
+import DayPlanItemForm from "@/components/dayPlanItem/DayPlanItemForm.vue";
+import { dayPlanApi, dayPlanItemApi } from "@/api";
+import type { DayPlan, DayPlanItem, CreateDayPlanItemDto, UpdateDayPlanItemDto } from "@/types/api";
+import { formatDate, getDayOfWeek } from "@/utils/date";
 
-const route = useRoute()
-const router = useRouter()
-const message = useMessage()
+const route = useRoute();
+const router = useRouter();
+const message = useMessage();
 
-const tripId = computed(() => Number(route.params.id))
-const dayPlanId = computed(() => Number(route.params.dayId))
+const tripId = computed(() => Number(route.params.id));
+const dayPlanId = computed(() => Number(route.params.dayId));
 
-const loading = ref(true)
-const saving = ref(false)
-const dayPlan = ref<DayPlan | null>(null)
-const items = ref<DayPlanItem[]>([])
-const notes = ref('')
-const showItemForm = ref(false)
-const editingItem = ref<DayPlanItem | null>(null)
+const loading = ref(true);
+const saving = ref(false);
+const dayPlan = ref<DayPlan | null>(null);
+const items = ref<DayPlanItem[]>([]);
+const notes = ref("");
+const showItemForm = ref(false);
+const editingItem = ref<DayPlanItem | null>(null);
 
 onMounted(() => {
-  loadDayPlan()
-})
+  loadDayPlan();
+});
 
 async function loadDayPlan() {
-  loading.value = true
+  loading.value = true;
   try {
     const [planResponse, itemsResponse] = await Promise.all([
       dayPlanApi.getById(dayPlanId.value),
       dayPlanApi.getItems(dayPlanId.value),
-    ])
-    dayPlan.value = planResponse.data.data
-    notes.value = dayPlan.value.notes || ''
-    items.value = itemsResponse.data.data || []
+    ]);
+    dayPlan.value = planResponse.data.data;
+    notes.value = dayPlan.value.notes || "";
+    items.value = itemsResponse.data.data || [];
   } catch (error) {
-    message.error('Failed to load day plan')
-    router.push(`/trips/${tripId.value}`)
+    message.error("Failed to load day plan");
+    router.push(`/trips/${tripId.value}`);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function handleSaveNotes() {
-  if (!dayPlan.value) return
+  if (!dayPlan.value) return;
 
-  saving.value = true
+  saving.value = true;
   try {
-    await dayPlanApi.update(dayPlanId.value, { notes: notes.value })
-    message.success('Notes saved')
+    await dayPlanApi.update(dayPlanId.value, { notes: notes.value });
+    message.success("Notes saved");
   } catch (error) {
-    message.error('Failed to save notes')
+    message.error("Failed to save notes");
   } finally {
-    saving.value = false
+    saving.value = false;
   }
 }
 
 function handleAddItem() {
-  editingItem.value = null
-  showItemForm.value = true
+  editingItem.value = null;
+  showItemForm.value = true;
 }
 
 function handleEditItem(item: DayPlanItem) {
-  editingItem.value = item
-  showItemForm.value = true
+  editingItem.value = item;
+  showItemForm.value = true;
 }
 
 async function handleItemFormSubmit(data: CreateDayPlanItemDto | UpdateDayPlanItemDto) {
   try {
     if (editingItem.value) {
-      await dayPlanItemApi.update(editingItem.value.id, data as UpdateDayPlanItemDto)
-      message.success('Item updated')
+      const result = await dayPlanItemApi.update(editingItem.value.id, data as UpdateDayPlanItemDto);
+      if (result.data.code === 200) {
+        message.success("Item updated");
+        loadDayPlan();
+        showItemForm.value = false;
+      } else {
+        message.error(result.data.message);
+      }
     } else {
-      await dayPlanItemApi.create(data as CreateDayPlanItemDto)
-      message.success('Item added')
+      const result = await dayPlanItemApi.create(data as CreateDayPlanItemDto);
+      if (result.data.code === 200) {
+        message.success("Item added");
+        loadDayPlan();
+        showItemForm.value = false;
+      } else {
+        message.error(result.data.message);
+      }
     }
-    loadDayPlan()
-  } catch (error) {
-    message.error('Operation failed')
+  } catch (error: any) {
+    message.error(String(error.message));
   }
 }
 
 async function handleDeleteItem(id: number) {
   try {
-    await dayPlanItemApi.delete(id)
-    message.success('Item deleted')
-    loadDayPlan()
+    const result = await dayPlanItemApi.delete(id);
+    if (result.data.code === 200) {
+      message.success("Item deleted");
+      loadDayPlan();
+    } else {
+      message.error(result.data.message);
+    }
   } catch (error) {
-    message.error('Failed to delete item')
+    message.error("Failed to delete item");
   }
 }
 
@@ -109,18 +114,17 @@ const sortedItems = computed(() => {
   return [...items.value].sort((a, b) => {
     // Sort by start time, then by order
     if (a.startTime && b.startTime) {
-      return a.startTime.localeCompare(b.startTime)
+      return a.startTime.localeCompare(b.startTime);
     }
-    if (a.startTime) return -1
-    if (b.startTime) return 1
-    return a.order - b.order
-  })
-})
+    if (a.startTime) return -1;
+    if (b.startTime) return 1;
+    return a.order - b.order;
+  });
+});
 </script>
 
 <template>
-  <DefaultLayout>
-    <NSpin :show="loading">
+  <NSpin :show="loading">
       <div v-if="dayPlan" class="day-plan-detail">
         <header class="page-header">
           <NButton quaternary @click="router.push(`/trips/${tripId}`)">
@@ -134,26 +138,15 @@ const sortedItems = computed(() => {
         <div class="day-header">
           <div class="day-title-section">
             <h1 class="day-title">Day {{ dayPlan.dayNumber }}</h1>
-            <p class="day-date">
-              {{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }})
-            </p>
+            <p class="day-date">{{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }})</p>
           </div>
         </div>
 
         <NCard class="notes-card">
           <h3 class="section-title">Notes</h3>
           <NSpace vertical :size="12">
-            <NInput
-              v-model:value="notes"
-              type="textarea"
-              placeholder="Add notes for this day..."
-              :rows="3"
-            />
-            <NButton
-              type="primary"
-              :loading="saving"
-              @click="handleSaveNotes"
-            >
+            <NInput v-model:value="notes" type="textarea" placeholder="Add notes for this day..." :rows="3" />
+            <NButton type="primary" :loading="saving" @click="handleSaveNotes">
               <template #icon>
                 <NIcon><SaveOutline /></NIcon>
               </template>
@@ -204,7 +197,6 @@ const sortedItems = computed(() => {
         />
       </div>
     </NSpin>
-  </DefaultLayout>
 </template>
 
 <style scoped>
@@ -283,4 +275,3 @@ const sortedItems = computed(() => {
   }
 }
 </style>
-

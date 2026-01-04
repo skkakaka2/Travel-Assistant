@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   NButton,
   NIcon,
@@ -13,7 +13,7 @@ import {
   NEmpty,
   NPopconfirm,
   useMessage,
-} from 'naive-ui'
+} from "naive-ui";
 import {
   ArrowBackOutline,
   AddOutline,
@@ -22,123 +22,171 @@ import {
   WalletOutline,
   CreateOutline,
   TrashOutline,
-} from '@vicons/ionicons5'
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import TripForm from '@/components/trip/TripForm.vue'
-import { useTripStore } from '@/stores'
-import { tripApi, dayPlanApi } from '@/api'
-import type { Trip, DayPlan, CreateDayPlanDto, UpdateTripDto } from '@/types/api'
-import { formatDate, getDaysDiff, getDayOfWeek, dayjs } from '@/utils/date'
-import { formatCurrency } from '@/utils/format'
+  BedOutline,
+  LocationOutline,
+  RestaurantOutline,
+  CarOutline,
+  GameControllerOutline,
+  EllipsisHorizontalOutline,
+  TimeOutline,
+} from "@vicons/ionicons5";
+import TripForm from "@/components/trip/TripForm.vue";
+import { useTripStore } from "@/stores";
+import { tripApi, dayPlanApi } from "@/api";
+import type { Trip, DayPlan, CreateDayPlanDto, UpdateTripDto, DayPlanItem } from "@/types/api";
+import { PlanItemType } from "@/types/api";
+import { formatDate, getDaysDiff, getDayOfWeek, dayjs } from "@/utils/date";
+import { formatCurrency } from "@/utils/format";
 
-const route = useRoute()
-const router = useRouter()
-const message = useMessage()
-const tripStore = useTripStore()
+const route = useRoute();
+const router = useRouter();
+const message = useMessage();
+const tripStore = useTripStore();
 
-const tripId = computed(() => Number(route.params.id))
-const loading = ref(true)
-const trip = ref<Trip | null>(null)
-const dayPlans = ref<DayPlan[]>([])
-const showEditForm = ref(false)
+const tripId = computed(() => Number(route.params.id));
+const loading = ref(true);
+const trip = ref<Trip | null>(null);
+const dayPlans = ref<DayPlan[]>([]);
+const showEditForm = ref(false);
 
 onMounted(() => {
-  loadTrip()
-})
+  loadTrip();
+});
 
 async function loadTrip() {
-  loading.value = true
+  loading.value = true;
   try {
-    const response = await tripApi.getById(tripId.value)
-    trip.value = response.data.data
-    dayPlans.value = trip.value.dayPlans || []
+    const response = await tripApi.getById(tripId.value);
+    trip.value = response.data.data;
+    dayPlans.value = trip.value.dayPlans || [];
   } catch (error) {
-    message.error('Failed to load trip')
-    router.push('/trips')
+    message.error("Failed to load trip");
+    router.push("/trips");
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function handleUpdateTrip(data: UpdateTripDto) {
   try {
-    await tripStore.updateTrip(tripId.value, data)
-    message.success('Trip updated successfully')
-    loadTrip()
+    await tripStore.updateTrip(tripId.value, data);
+    message.success("Trip updated successfully");
+    loadTrip();
   } catch (error) {
-    message.error('Failed to update trip')
+    message.error("Failed to update trip");
   }
 }
 
 async function handleDeleteTrip() {
   try {
-    await tripStore.deleteTrip(tripId.value)
-    message.success('Trip deleted successfully')
-    router.push('/trips')
+    await tripStore.deleteTrip(tripId.value);
+    message.success("Trip deleted successfully");
+    router.push("/trips");
   } catch (error) {
-    message.error('Failed to delete trip')
+    message.error("Failed to delete trip");
   }
 }
 
 async function handleAddDayPlan() {
-  if (!trip.value) return
+  if (!trip.value) return;
 
   // Find the next available date
-  const existingDates = new Set(dayPlans.value.map((dp) => dp.date))
-  let nextDate = dayjs(trip.value.startDate)
-  const endDate = dayjs(trip.value.endDate)
+  const existingDates = new Set(dayPlans.value.map((dp) => dp.date));
+  let nextDate = dayjs(trip.value.startDate);
+  const endDate = dayjs(trip.value.endDate);
 
   while (nextDate.isBefore(endDate) || nextDate.isSame(endDate)) {
-    const dateStr = nextDate.format('YYYY-MM-DD')
+    const dateStr = nextDate.format("YYYY-MM-DD");
     if (!existingDates.has(dateStr)) {
-      break
+      break;
     }
-    nextDate = nextDate.add(1, 'day')
+    nextDate = nextDate.add(1, "day");
   }
 
   if (nextDate.isAfter(endDate)) {
-    message.warning('All dates in the trip range already have day plans')
-    return
+    message.warning("All dates in the trip range already have day plans");
+    return;
   }
 
   const newDayPlan: CreateDayPlanDto = {
     tripId: tripId.value,
-    date: nextDate.format('YYYY-MM-DD'),
+    date: nextDate.format("YYYY-MM-DD"),
     dayNumber: dayPlans.value.length + 1,
-  }
+  };
 
   try {
-    await dayPlanApi.create(newDayPlan)
-    message.success('Day plan added')
-    loadTrip()
+    await dayPlanApi.create(newDayPlan);
+    message.success("Day plan added");
+    loadTrip();
   } catch (error) {
-    message.error('Failed to add day plan')
+    message.error("Failed to add day plan");
   }
 }
 
 async function handleDeleteDayPlan(id: number) {
   try {
-    await dayPlanApi.delete(id)
-    message.success('Day plan deleted')
-    loadTrip()
+    await dayPlanApi.delete(id);
+    message.success("Day plan deleted");
+    loadTrip();
   } catch (error) {
-    message.error('Failed to delete day plan')
+    message.error("Failed to delete day plan");
   }
 }
 
 function goToDayPlan(dayPlan: DayPlan) {
-  router.push(`/trips/${tripId.value}/day/${dayPlan.id}`)
+  router.push(`/trips/${tripId.value}/day/${dayPlan.id}`);
 }
 
 const duration = computed(() => {
-  if (!trip.value) return 0
-  return getDaysDiff(trip.value.startDate, trip.value.endDate)
-})
+  if (!trip.value) return 0;
+  return getDaysDiff(trip.value.startDate, trip.value.endDate);
+});
+
+// 获取类型对应的图标组件
+const typeIconMap = {
+  [PlanItemType.HOTEL]: BedOutline,
+  [PlanItemType.ATTRACTION]: LocationOutline,
+  [PlanItemType.RESTAURANT]: RestaurantOutline,
+  [PlanItemType.TRANSPORT]: CarOutline,
+  [PlanItemType.ACTIVITY]: GameControllerOutline,
+  [PlanItemType.OTHER]: EllipsisHorizontalOutline,
+};
+
+// 获取类型对应的中文名称
+const typeNameMap = {
+  [PlanItemType.HOTEL]: "住宿",
+  [PlanItemType.ATTRACTION]: "景点",
+  [PlanItemType.RESTAURANT]: "餐饮",
+  [PlanItemType.TRANSPORT]: "交通",
+  [PlanItemType.ACTIVITY]: "活动",
+  [PlanItemType.OTHER]: "其他",
+};
+
+// 获取类型对应的标签类型
+const typeTagMap: Record<PlanItemType, "default" | "success" | "warning" | "error" | "info"> = {
+  [PlanItemType.HOTEL]: "info",
+  [PlanItemType.ATTRACTION]: "success",
+  [PlanItemType.RESTAURANT]: "warning",
+  [PlanItemType.TRANSPORT]: "default",
+  [PlanItemType.ACTIVITY]: "error",
+  [PlanItemType.OTHER]: "default",
+};
+
+function getTypeIcon(type: PlanItemType) {
+  return typeIconMap[type] || EllipsisHorizontalOutline;
+}
+
+function getTypeName(type: PlanItemType) {
+  return typeNameMap[type] || "Other";
+}
+
+function getTypeTagType(type: PlanItemType) {
+  return typeTagMap[type] || "default";
+}
 </script>
 
 <template>
-  <DefaultLayout>
-    <NSpin :show="loading">
+  <NSpin :show="loading">
       <div v-if="trip" class="trip-detail">
         <header class="page-header">
           <NButton quaternary @click="router.push('/trips')">
@@ -204,33 +252,47 @@ const duration = computed(() => {
           </div>
 
           <NTimeline v-if="dayPlans.length > 0" class="day-timeline">
-            <NTimelineItem
-              v-for="dayPlan in dayPlans"
-              :key="dayPlan.id"
-              type="success"
-            >
+            <NTimelineItem v-for="dayPlan in dayPlans" :key="dayPlan.id" type="success">
               <template #header>
                 <div class="timeline-header" @click="goToDayPlan(dayPlan)">
-                  <span class="day-number">Day {{ dayPlan.dayNumber }}</span>
-                  <span class="day-date">
-                    {{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }})
-                  </span>
+                  <span class="day-number">第 {{ dayPlan.dayNumber }} 天</span>
+                  <span class="day-date"> {{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }}) </span>
                 </div>
               </template>
 
               <NCard class="day-card" hoverable @click="goToDayPlan(dayPlan)">
                 <div class="day-card-content">
                   <div class="day-info">
-                    <p v-if="dayPlan.notes" class="day-notes">{{ dayPlan.notes }}</p>
-                    <p v-else class="day-notes-empty">No notes for this day</p>
+                    <!-- 备注信息 -->
+                    <!-- <p v-if="dayPlan.notes" class="day-notes">{{ dayPlan.notes }}</p> -->
+
+                    <!-- 行程项目列表 -->
+                    <div v-if="dayPlan.dayPlanItems && dayPlan.dayPlanItems.length > 0" class="day-items">
+                      <div v-for="item in dayPlan.dayPlanItems.slice(0, 4)" :key="item.id" class="day-item">
+                        <NTag :type="getTypeTagType(item.type)" size="small" round>
+                          <template #icon>
+                            <NIcon :component="getTypeIcon(item.type)" />
+                          </template>
+                          {{ getTypeName(item.type) }}
+                        </NTag>
+                        <span class="item-name">{{ item.name }}</span>
+                        <span v-if="item.startTime" class="item-time">
+                          <NIcon :size="12"><TimeOutline /></NIcon>
+                          {{ item.startTime }}
+                          <template v-if="item.endTime">- {{ item.endTime }}</template>
+                        </span>
+                      </div>
+                      <!-- 如果超过4项，显示省略提示 -->
+                      <div v-if="dayPlan.dayPlanItems.length > 4" class="day-items-more">
+                        +{{ dayPlan.dayPlanItems.length - 4 }} more items...
+                      </div>
+                    </div>
+
+                    <!-- 没有行程项目时的提示 -->
+                    <p v-else class="day-notes-empty">No activities planned yet</p>
                   </div>
-                  <NSpace>
-                    <NButton
-                      quaternary
-                      circle
-                      size="small"
-                      @click.stop="goToDayPlan(dayPlan)"
-                    >
+                  <NSpace class="day-actions">
+                    <NButton quaternary circle size="small" @click.stop="goToDayPlan(dayPlan)">
                       <template #icon>
                         <NIcon><CreateOutline /></NIcon>
                       </template>
@@ -263,14 +325,9 @@ const duration = computed(() => {
           </NEmpty>
         </section>
 
-        <TripForm
-          v-model:show="showEditForm"
-          :trip="trip"
-          @submit="handleUpdateTrip"
-        />
+        <TripForm v-model:show="showEditForm" :trip="trip" @submit="handleUpdateTrip" />
       </div>
     </NSpin>
-  </DefaultLayout>
 </template>
 
 <style scoped>
@@ -357,12 +414,6 @@ const duration = computed(() => {
   margin-top: var(--spacing-sm);
 }
 
-.day-card-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .day-notes {
   margin: 0;
   color: var(--text-color);
@@ -372,6 +423,61 @@ const duration = computed(() => {
   margin: 0;
   color: var(--text-color-tertiary);
   font-style: italic;
+}
+
+.day-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.day-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+}
+
+.item-name {
+  color: var(--text-color);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-time {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-color-tertiary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.day-items-more {
+  color: var(--text-color-tertiary);
+  font-size: 0.8rem;
+  font-style: italic;
+  padding-left: var(--spacing-sm);
+}
+
+.day-actions {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.day-card-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing);
+}
+
+.day-info {
+  flex: 1;
+  min-width: 0;
 }
 
 @media (max-width: 768px) {
@@ -387,4 +493,3 @@ const duration = computed(() => {
   }
 }
 </style>
-

@@ -26,7 +26,8 @@ export const getDaysDiff = (start: string | Date, end: string | Date): number =>
 }
 
 export const getDayOfWeek = (date: string | Date): string => {
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  //换成中文
+  const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
   return days[dayjs(date).day()]
 }
 

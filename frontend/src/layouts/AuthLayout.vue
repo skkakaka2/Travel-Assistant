@@ -35,7 +35,7 @@ const themeStore = useThemeStore()
         </div>
 
         <div class="auth-content">
-          <slot />
+          <router-view />
         </div>
       </div>
     </div>

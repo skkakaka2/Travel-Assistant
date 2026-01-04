@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BaiduMapPicker: typeof import('./components/map/BaiduMapPicker.vue')['default']
     DayPlanItemCard: typeof import('./components/dayPlanItem/DayPlanItemCard.vue')['default']
     DayPlanItemForm: typeof import('./components/dayPlanItem/DayPlanItemForm.vue')['default']
     EmptyState: typeof import('./components/common/EmptyState.vue')['default']

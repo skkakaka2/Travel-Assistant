@@ -62,6 +62,15 @@ export class DayPlanItem {
   @Column({ type: 'int', default: 0 })
   order: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 8, nullable: true })
+  latitude?: number | null;
+
+  @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
+  longitude?: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  distance?: number | null;
+
   @CreateDateColumn({
     name: 'createdAt',
     type: 'datetime',

@@ -1,25 +1,36 @@
 <script setup lang="ts">
-import { NLayout, NLayoutHeader, NLayoutContent, NButton, NIcon, NDropdown, NAvatar, NSpace } from 'naive-ui'
-import { SunnyOutline, MoonOutline, PersonCircleOutline, LogOutOutline } from '@vicons/ionicons5'
-import { useThemeStore, useAuthStore } from '@/stores'
-import { useRouter } from 'vue-router'
+import { NLayout, NLayoutHeader, NLayoutContent, NButton, NIcon, NDropdown, NAvatar, NSpace } from "naive-ui";
+import { SunnyOutline, MoonOutline, PersonCircleOutline, LogOutOutline, SettingsOutline } from "@vicons/ionicons5";
+import { useThemeStore, useAuthStore } from "@/stores";
+import { useRouter } from "vue-router";
 
-const themeStore = useThemeStore()
-const authStore = useAuthStore()
-const router = useRouter()
+const themeStore = useThemeStore();
+const authStore = useAuthStore();
+const router = useRouter();
 
 const userOptions = [
   {
-    label: 'Logout',
-    key: 'logout',
+    label: "Settings",
+    key: "settings",
+    icon: () => h(NIcon, null, { default: () => h(SettingsOutline) }),
+  },
+  {
+    type: "divider",
+    key: "d1",
+  },
+  {
+    label: "Logout",
+    key: "logout",
     icon: () => h(NIcon, null, { default: () => h(LogOutOutline) }),
   },
-]
+];
 
 function handleUserAction(key: string) {
-  if (key === 'logout') {
-    authStore.logout()
-    router.push('/login')
+  if (key === "settings") {
+    router.push("/settings");
+  } else if (key === "logout") {
+    authStore.logout();
+    router.push("/login");
   }
 }
 </script>
@@ -34,11 +45,7 @@ function handleUserAction(key: string) {
         </RouterLink>
 
         <NSpace align="center" :size="12">
-          <NButton
-            quaternary
-            circle
-            @click="themeStore.toggleTheme"
-          >
+          <NButton quaternary circle @click="themeStore.toggleTheme">
             <template #icon>
               <NIcon :size="20">
                 <MoonOutline v-if="!themeStore.isDark" />
@@ -47,10 +54,7 @@ function handleUserAction(key: string) {
             </template>
           </NButton>
 
-          <NDropdown
-            :options="userOptions"
-            @select="handleUserAction"
-          >
+          <NDropdown :options="userOptions" @select="handleUserAction">
             <NButton quaternary circle>
               <template #icon>
                 <NIcon :size="20">
@@ -65,7 +69,7 @@ function handleUserAction(key: string) {
 
     <NLayoutContent class="content">
       <div class="page-container container">
-        <slot />
+        <router-view />
       </div>
     </NLayoutContent>
   </NLayout>
@@ -112,7 +116,8 @@ function handleUserAction(key: string) {
 
 .content {
   padding-top: var(--spacing-lg);
-  padding-bottom: var(--spacing-2xl);
+  /* padding-bottom: var(--spacing-xl); */
+  height: calc(100vh - var(--header-height));
 }
 
 .page-container {
@@ -125,4 +130,3 @@ function handleUserAction(key: string) {
   }
 }
 </style>
-

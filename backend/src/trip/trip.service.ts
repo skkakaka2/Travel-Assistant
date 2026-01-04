@@ -10,12 +10,15 @@ import { PaginationQuery, PaginationResponse } from 'src/common/pagination';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Trip } from './entities/trip.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TripService {
   constructor(
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
   async create(createTripDto: CreateTripDto, user: ContextUser) {
     const existTrip = await this.tripRepository.findOne({
@@ -25,6 +28,19 @@ export class TripService {
     });
     if (existTrip) {
       return errorResponse('Trip already exists', null);
+    }
+
+    const userInfo = await this.userRepository.findOne({
+      where: {
+        id: user.userId,
+      },
+    });
+    if (
+      !userInfo?.homeLatitude ||
+      !userInfo?.homeLongitude ||
+      !userInfo?.homeAddress
+    ) {
+      return errorResponse('请先在用户设置中设置家的位置', null);
     }
     const data = this.tripRepository.create({
       ...createTripDto,
@@ -60,7 +76,9 @@ export class TripService {
         id,
       },
       relations: {
-        dayPlans: true,
+        dayPlans: {
+          dayPlanItems: true,
+        },
       },
     });
     if (!result) {
@@ -69,11 +87,29 @@ export class TripService {
     return successResponse(result);
   }
 
-  update(id: number, updateTripDto: UpdateTripDto) {
-    return `This action updates a #${id} trip`;
+  async update(id: number, updateTripDto: UpdateTripDto) {
+    const exist = await this.tripRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!exist) {
+      return errorResponse('Trip not found', null);
+    }
+    const result = await this.tripRepository.update(id, updateTripDto);
+    return successResponse(result);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} trip`;
+  async remove(id: number) {
+    const exist = await this.tripRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!exist) {
+      return errorResponse('Trip not found', null);
+    }
+    const result = await this.tripRepository.delete(id);
+    return successResponse(result);
   }
 }

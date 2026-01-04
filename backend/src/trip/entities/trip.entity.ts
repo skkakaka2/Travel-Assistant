@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { DayPlan } from 'src/day-plan/entities/day-plan.entity';
+import { DayPlanItem } from 'src/day-plan-item/entities/day-plan-item.entity';
 
 @Entity('trips')
 @Index('trips_userId_idx', ['userId'])
@@ -63,4 +64,7 @@ export class Trip {
 
   @OneToMany(() => DayPlan, (dayPlan) => dayPlan.trip)
   dayPlans: DayPlan[];
+
+  @OneToMany(() => DayPlanItem, (dayPlanItem) => dayPlanItem.tripId)
+  dayPlanItems: DayPlanItem[];
 }

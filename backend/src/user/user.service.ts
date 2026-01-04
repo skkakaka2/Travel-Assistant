@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, SetHomeDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import {
@@ -9,6 +9,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
 @Injectable()
 export class UserService {
   constructor(
@@ -59,5 +60,21 @@ export class UserService {
     }
     await this.userRepository.delete({ id });
     return successResponse(user);
+  }
+
+  async setHome(setHomeDto: SetHomeDto, user: ContextUser) {
+    await this.userRepository.update({ id: user.userId }, setHomeDto);
+    return successResponse(setHomeDto);
+  }
+
+  async hasHome(user: ContextUser) {
+    const result = await this.userRepository.findOne({
+      where: { id: user.userId },
+    });
+    return successResponse(
+      result?.homeAddress && result?.homeLatitude && result?.homeLongitude
+        ? true
+        : false,
+    );
   }
 }

@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, SetHomeDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
 
 @Controller('user')
 export class UserController {
@@ -30,5 +39,20 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  @Post('set-home')
+  setHome(@Body() setHomeDto: SetHomeDto, @ContextUser() user: ContextUser) {
+    return this.userService.setHome(setHomeDto, user);
+  }
+
+  @Get('me')
+  me(@ContextUser() user: ContextUser) {
+    return this.userService.findOne(user.userId);
+  }
+
+  @Get('has-home')
+  hasHome(@ContextUser() user: ContextUser) {
+    return this.userService.hasHome(user);
   }
 }

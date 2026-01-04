@@ -43,8 +43,25 @@ export interface User {
   email: string
   name?: string
   avatar?: string
+  homeAddress?: string
+  homeLatitude?: string
+  homeLongitude?: string
   createdAt: string
   updatedAt: string
+}
+
+export interface SetHomeDto {
+  homeAddress?: string
+  homeLatitude?: string
+  homeLongitude?: string
+}
+
+export interface UpdateUserDto {
+  name?: string
+  avatar?: string
+  homeAddress?: string
+  homeLatitude?: string
+  homeLongitude?: string
 }
 
 // Trip Types
@@ -80,7 +97,7 @@ export interface DayPlan {
   date: string
   dayNumber: number
   notes?: string
-  items?: DayPlanItem[]
+  dayPlanItems?: DayPlanItem[]
   createdAt: string
   updatedAt: string
 }
@@ -117,6 +134,8 @@ export interface DayPlanItem {
   cost?: number
   notes?: string
   order: number
+  latitude?: string
+  longitude?: string
   createdAt: string
   updatedAt: string
 }
@@ -133,6 +152,8 @@ export interface CreateDayPlanItemDto {
   cost?: number
   notes?: string
   order?: number
+  latitude?: string
+  longitude?: string
 }
 
 export interface UpdateDayPlanItemDto extends Partial<Omit<CreateDayPlanItemDto, 'dayPlanId' | 'tripId'>> {}

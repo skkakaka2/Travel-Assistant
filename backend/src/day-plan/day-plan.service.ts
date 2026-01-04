@@ -90,10 +90,28 @@ export class DayPlanService {
   }
 
   async update(id: number, updateDayPlanDto: UpdateDayPlanDto) {
-    return `This action updates a #${id} dayPlan`;
+    const exist = await this.dayPlanRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!exist) {
+      return errorResponse('Day plan not found', null);
+    }
+    const result = await this.dayPlanRepository.update(id, updateDayPlanDto);
+    return successResponse(result);
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} dayPlan`;
+    const exist = await this.dayPlanRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!exist) {
+      return errorResponse('Day plan not found', null);
+    }
+    const result = await this.dayPlanRepository.delete(id);
+    return successResponse(result);
   }
 }

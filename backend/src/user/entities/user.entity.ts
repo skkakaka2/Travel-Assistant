@@ -31,6 +31,15 @@ export class User {
   @Column({ type: 'varchar', length: 191, nullable: true })
   avatar?: string | null;
 
+  @Column({ type: 'varchar', length: 191, nullable: true })
+  homeAddress?: string | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 8, nullable: true })
+  homeLatitude?: number | null;
+
+  @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
+  homeLongitude?: number | null;
+
   @CreateDateColumn({
     name: 'createdAt',
     type: 'datetime',

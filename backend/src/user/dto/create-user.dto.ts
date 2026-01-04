@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsEmail, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEmail,
+  MinLength,
+  IsNumber,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ApiExtraModels } from '@nestjs/swagger';
@@ -42,4 +48,28 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   avatar: string;
+}
+
+export class SetHomeDto {
+  @ApiProperty({
+    description: 'Home address',
+    example: '123 Main St, Anytown, USA',
+  })
+  @IsString()
+  @IsNotEmpty()
+  homeAddress: string;
+  @ApiProperty({
+    description: 'Home latitude',
+    example: 39.90872,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  homeLatitude: number;
+  @ApiProperty({
+    description: 'Home longitude',
+    example: 123.456789,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  homeLongitude: number;
 }
