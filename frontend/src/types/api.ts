@@ -97,6 +97,8 @@ export interface DayPlan {
   date: string
   dayNumber: number
   notes?: string
+  distance?: number
+  duration?: number
   dayPlanItems?: DayPlanItem[]
   createdAt: string
   updatedAt: string
@@ -131,6 +133,7 @@ export interface DayPlanItem {
   startTime?: string
   endTime?: string
   duration?: number
+  distance?: number
   cost?: number
   notes?: string
   order: number

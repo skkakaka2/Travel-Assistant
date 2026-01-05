@@ -58,3 +58,29 @@ export const truncate = (text: string, length: number): string => {
   return text.slice(0, length) + '...'
 }
 
+// Format distance (meters to km or m)
+export const formatDistance = (distance: number): string => {
+  if (!distance || distance < 0) return '--'
+  if (distance >= 1000) {
+    return `${(distance / 1000).toFixed(1)} km`
+  }
+  return `${distance} m`
+}
+
+// Format duration (seconds to hours and minutes)
+export const formatDuration = (seconds: number): string => {
+  if (!seconds || seconds <= 0) return '--'
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  
+  if (hours > 0 && minutes > 0) {
+    return `${hours}h ${minutes}m`
+  } else if (hours > 0) {
+    return `${hours}h`
+  } else if (minutes > 0) {
+    return `${minutes}m`
+  } else {
+    return '< 1m'
+  }
+}
+

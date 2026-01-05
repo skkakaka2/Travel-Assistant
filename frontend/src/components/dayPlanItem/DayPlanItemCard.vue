@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { NCard, NIcon, NTag, NButton, NSpace, NPopconfirm } from 'naive-ui'
-import { CreateOutline, TrashOutline, TimeOutline, LocationOutline, CashOutline } from '@vicons/ionicons5'
+import { CreateOutline, TrashOutline, TimeOutline, LocationOutline, CashOutline, NavigateOutline, HourglassOutline } from '@vicons/ionicons5'
 import type { DayPlanItem } from '@/types/api'
-import { getItemTypeIcon, getItemTypeLabel, getItemTypeColor, formatCurrency } from '@/utils/format'
+import { getItemTypeIcon, getItemTypeLabel, getItemTypeColor, formatCurrency, formatDistance, formatDuration } from '@/utils/format'
 
 const props = defineProps<{
   item: DayPlanItem
@@ -37,6 +37,14 @@ const emit = defineEmits<{
           <span v-if="item.address" class="meta-item">
             <NIcon :size="14"><LocationOutline /></NIcon>
             {{ item.address }}
+          </span>
+          <span v-if="item.distance && item.distance > 0" class="meta-item">
+            <NIcon :size="14"><NavigateOutline /></NIcon>
+            {{ formatDistance(item.distance) }}
+          </span>
+          <span v-if="item.duration && item.duration > 0" class="meta-item">
+            <NIcon :size="14"><HourglassOutline /></NIcon>
+            {{ formatDuration(item.duration) }}
           </span>
           <span v-if="item.cost" class="meta-item">
             <NIcon :size="14"><CashOutline /></NIcon>

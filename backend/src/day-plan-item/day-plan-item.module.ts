@@ -5,13 +5,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DayPlanItem } from './entities/day-plan-item.entity';
 import { DayPlan } from 'src/day-plan/entities/day-plan.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
-import { DayPlanModule } from 'src/day-plan/day-plan.module';
+import { User } from 'src/user/entities/user.entity';
+import { QueueModule } from 'src/queue';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([DayPlan, DayPlanItem, Trip]),
+    TypeOrmModule.forFeature([DayPlan, DayPlanItem, Trip, User]),
+    QueueModule,
   ],
   controllers: [DayPlanItemController],
   providers: [DayPlanItemService],
+  exports: [DayPlanItemService],
 })
 export class DayPlanItemModule {}

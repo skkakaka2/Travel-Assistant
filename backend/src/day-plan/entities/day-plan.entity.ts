@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { DayPlanItem } from '../../day-plan-item/entities/day-plan-item.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Entity('day_plans')
 @Index('day_plans_tripId_idx', ['tripId'])
@@ -29,6 +30,19 @@ export class DayPlan {
 
   @Column({ type: 'text', nullable: true })
   notes?: string | null;
+
+  @Column({ type: 'int', default: 0 })
+  distance?: number;
+
+  @Column({ type: 'int', default: 0 })
+  duration?: number;
+
+  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ type: 'int' })
+  userId: number;
 
   @CreateDateColumn({
     name: 'createdAt',

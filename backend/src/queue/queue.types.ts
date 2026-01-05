@@ -13,8 +13,14 @@ export interface CalculateItemDistanceJob {
   // 当前 item 所属的 trip ID
   tripId: number;
   // 当前 item 的经纬度
-  latitude: number;
-  longitude: number;
+  start: {
+    latitude: number;
+    longitude: number;
+  };
+  end: {
+    latitude: number;
+    longitude: number;
+  };
   // 当前 item 的顺序
   order: number;
 }

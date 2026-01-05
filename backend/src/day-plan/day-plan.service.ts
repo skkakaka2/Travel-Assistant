@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateDayPlanDto } from './dto/create-day-plan.dto';
 import { UpdateDayPlanDto } from './dto/update-day-plan.dto';
 import {
@@ -11,6 +11,7 @@ import { DayPlan } from './entities/day-plan.entity';
 import { Repository } from 'typeorm';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { DayPlanItemService } from 'src/day-plan-item/day-plan-item.service';
+import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
 
 @Injectable()
 export class DayPlanService {
@@ -19,10 +20,11 @@ export class DayPlanService {
     private readonly dayPlanRepository: Repository<DayPlan>,
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
+    @Inject(forwardRef(() => DayPlanItemService))
     private readonly dayPlanItemService: DayPlanItemService,
   ) {}
 
-  async create(createDayPlanDto: CreateDayPlanDto) {
+  async create(createDayPlanDto: CreateDayPlanDto, user: ContextUser) {
     const trip = await this.tripRepository.findOne({
       where: {
         id: createDayPlanDto.tripId,
@@ -46,12 +48,29 @@ export class DayPlanService {
     if (exist) {
       return errorResponse('Day plan already exists', null);
     }
+    //如果dayplan不是第一天且前一天未添加任何item则阻止
+    if (createDayPlanDto.dayNumber > 1) {
+      const previousDayPlan = await this.dayPlanRepository.findOne({
+        where: {
+          tripId: createDayPlanDto.tripId,
+          dayNumber: createDayPlanDto.dayNumber - 1,
+        },
+      });
+      if (previousDayPlan) {
+        const previousDayPlanItems =
+          await this.dayPlanItemService.findAllByDayPlanId(previousDayPlan.id);
+        if (previousDayPlanItems.length === 0) {
+          return errorResponse('前一天未添加任何行程，请先完成前一天的行程', null);
+        }
+      }
+    }
 
     const dayPlan = this.dayPlanRepository.create({
       tripId: createDayPlanDto.tripId,
       date: createDayPlanDto.date,
       dayNumber: createDayPlanDto.dayNumber,
       notes: createDayPlanDto.notes,
+      userId: Number(user.userId),
     });
 
     const result = await this.dayPlanRepository.save(dayPlan);

@@ -25,7 +25,7 @@ import { DayPlanItemModule } from './day-plan-item/day-plan-item.module';
           type: 'mysql' as const,
           entities: [User, Trip, DayPlan, DayPlanItem],
           synchronize: false,
-          logging: process.env.NODE_ENV === 'development',
+          logging: false,
           autoLoadEntities: true,
         };
 

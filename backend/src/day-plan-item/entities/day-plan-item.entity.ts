@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { DayPlan } from '../../day-plan/entities/day-plan.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
+import { User } from 'src/user/entities/user.entity';
 
 export enum PlanItemType {
   HOTEL = 'HOTEL',
@@ -50,8 +51,8 @@ export class DayPlanItem {
   @Column({ type: 'varchar', length: 5, nullable: true })
   endTime?: string | null;
 
-  @Column({ type: 'int', nullable: true })
-  duration?: number | null;
+  @Column({ type: 'int', default: 0 })
+  duration: number;
 
   @Column({ type: 'int', default: 0, nullable: true })
   cost?: number | null;
@@ -68,8 +69,8 @@ export class DayPlanItem {
   @Column({ type: 'decimal', precision: 11, scale: 8, nullable: true })
   longitude?: number | null;
 
-  @Column({ type: 'int', nullable: true })
-  distance?: number | null;
+  @Column({ type: 'int', default: 0 })
+  distance: number;
 
   @CreateDateColumn({
     name: 'createdAt',
@@ -87,4 +88,11 @@ export class DayPlanItem {
     onUpdate: 'CURRENT_TIMESTAMP(3)',
   })
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ type: 'int', nullable: true })
+  userId?: number | null;
 }

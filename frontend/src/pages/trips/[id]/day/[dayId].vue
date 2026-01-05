@@ -71,6 +71,11 @@ function handleEditItem(item: DayPlanItem) {
 }
 
 async function handleItemFormSubmit(data: CreateDayPlanItemDto | UpdateDayPlanItemDto) {
+  if (!data.latitude || !data.longitude || !data.address) {
+    message.error("请选择地图上的位置");
+    return;
+  }
+
   try {
     if (editingItem.value) {
       const result = await dayPlanItemApi.update(editingItem.value.id, data as UpdateDayPlanItemDto);
@@ -125,78 +130,78 @@ const sortedItems = computed(() => {
 
 <template>
   <NSpin :show="loading">
-      <div v-if="dayPlan" class="day-plan-detail">
-        <header class="page-header">
-          <NButton quaternary @click="router.push(`/trips/${tripId}`)">
-            <template #icon>
-              <NIcon><ArrowBackOutline /></NIcon>
-            </template>
-            Back to Trip
-          </NButton>
-        </header>
+    <div v-if="dayPlan" class="day-plan-detail">
+      <header class="page-header">
+        <NButton quaternary @click="router.push(`/trips/${tripId}`)">
+          <template #icon>
+            <NIcon><ArrowBackOutline /></NIcon>
+          </template>
+          Back to Trip
+        </NButton>
+      </header>
 
-        <div class="day-header">
-          <div class="day-title-section">
-            <h1 class="day-title">Day {{ dayPlan.dayNumber }}</h1>
-            <p class="day-date">{{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }})</p>
-          </div>
+      <div class="day-header">
+        <div class="day-title-section">
+          <h1 class="day-title">Day {{ dayPlan.dayNumber }}</h1>
+          <p class="day-date">{{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }})</p>
+        </div>
+      </div>
+
+      <NCard class="notes-card">
+        <h3 class="section-title">Notes</h3>
+        <NSpace vertical :size="12">
+          <NInput v-model:value="notes" type="textarea" placeholder="Add notes for this day..." :rows="3" />
+          <NButton type="primary" :loading="saving" @click="handleSaveNotes">
+            <template #icon>
+              <NIcon><SaveOutline /></NIcon>
+            </template>
+            Save Notes
+          </NButton>
+        </NSpace>
+      </NCard>
+
+      <section class="items-section">
+        <div class="section-header">
+          <h2 class="section-title">Schedule</h2>
+          <NButton type="primary" @click="handleAddItem">
+            <template #icon>
+              <NIcon><AddOutline /></NIcon>
+            </template>
+            Add Item
+          </NButton>
         </div>
 
-        <NCard class="notes-card">
-          <h3 class="section-title">Notes</h3>
-          <NSpace vertical :size="12">
-            <NInput v-model:value="notes" type="textarea" placeholder="Add notes for this day..." :rows="3" />
-            <NButton type="primary" :loading="saving" @click="handleSaveNotes">
-              <template #icon>
-                <NIcon><SaveOutline /></NIcon>
-              </template>
-              Save Notes
-            </NButton>
-          </NSpace>
-        </NCard>
+        <div v-if="sortedItems.length > 0" class="items-list">
+          <DayPlanItemCard
+            v-for="item in sortedItems"
+            :key="item.id"
+            :item="item"
+            @edit="handleEditItem"
+            @delete="handleDeleteItem"
+          />
+        </div>
 
-        <section class="items-section">
-          <div class="section-header">
-            <h2 class="section-title">Schedule</h2>
+        <NEmpty v-else description="No items yet. Add your first activity!">
+          <template #extra>
             <NButton type="primary" @click="handleAddItem">
               <template #icon>
                 <NIcon><AddOutline /></NIcon>
               </template>
-              Add Item
+              Add First Item
             </NButton>
-          </div>
+          </template>
+        </NEmpty>
+      </section>
 
-          <div v-if="sortedItems.length > 0" class="items-list">
-            <DayPlanItemCard
-              v-for="item in sortedItems"
-              :key="item.id"
-              :item="item"
-              @edit="handleEditItem"
-              @delete="handleDeleteItem"
-            />
-          </div>
-
-          <NEmpty v-else description="No items yet. Add your first activity!">
-            <template #extra>
-              <NButton type="primary" @click="handleAddItem">
-                <template #icon>
-                  <NIcon><AddOutline /></NIcon>
-                </template>
-                Add First Item
-              </NButton>
-            </template>
-          </NEmpty>
-        </section>
-
-        <DayPlanItemForm
-          v-model:show="showItemForm"
-          :item="editingItem"
-          :day-plan-id="dayPlanId"
-          :trip-id="tripId"
-          @submit="handleItemFormSubmit"
-        />
-      </div>
-    </NSpin>
+      <DayPlanItemForm
+        v-model:show="showItemForm"
+        :item="editingItem"
+        :day-plan-id="dayPlanId"
+        :trip-id="tripId"
+        @submit="handleItemFormSubmit"
+      />
+    </div>
+  </NSpin>
 </template>
 
 <style scoped>

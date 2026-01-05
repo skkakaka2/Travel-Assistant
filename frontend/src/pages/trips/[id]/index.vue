@@ -29,6 +29,8 @@ import {
   GameControllerOutline,
   EllipsisHorizontalOutline,
   TimeOutline,
+  NavigateOutline,
+  HourglassOutline,
 } from "@vicons/ionicons5";
 import TripForm from "@/components/trip/TripForm.vue";
 import { useTripStore } from "@/stores";
@@ -36,7 +38,7 @@ import { tripApi, dayPlanApi } from "@/api";
 import type { Trip, DayPlan, CreateDayPlanDto, UpdateTripDto, DayPlanItem } from "@/types/api";
 import { PlanItemType } from "@/types/api";
 import { formatDate, getDaysDiff, getDayOfWeek, dayjs } from "@/utils/date";
-import { formatCurrency } from "@/utils/format";
+import { formatCurrency, formatDistance, formatDuration } from "@/utils/format";
 
 const route = useRoute();
 const router = useRouter();
@@ -90,7 +92,6 @@ async function handleDeleteTrip() {
 async function handleAddDayPlan() {
   if (!trip.value) return;
 
-  // Find the next available date
   const existingDates = new Set(dayPlans.value.map((dp) => dp.date));
   let nextDate = dayjs(trip.value.startDate);
   const endDate = dayjs(trip.value.endDate);
@@ -115,11 +116,15 @@ async function handleAddDayPlan() {
   };
 
   try {
-    await dayPlanApi.create(newDayPlan);
-    message.success("Day plan added");
-    loadTrip();
-  } catch (error) {
-    message.error("Failed to add day plan");
+    const result = await dayPlanApi.create(newDayPlan);
+    if (result.data.code === 200) {
+      message.success("Day plan added");
+      loadTrip();
+    } else {
+      message.error(result.data.message);
+    }
+  } catch (error: any) {
+    message.error(error.message);
   }
 }
 
@@ -187,147 +192,158 @@ function getTypeTagType(type: PlanItemType) {
 
 <template>
   <NSpin :show="loading">
-      <div v-if="trip" class="trip-detail">
-        <header class="page-header">
-          <NButton quaternary @click="router.push('/trips')">
+    <div v-if="trip" class="trip-detail">
+      <header class="page-header">
+        <NButton quaternary @click="router.push('/trips')">
+          <template #icon>
+            <NIcon><ArrowBackOutline /></NIcon>
+          </template>
+          Back to Trips
+        </NButton>
+
+        <NSpace>
+          <NButton @click="showEditForm = true">
             <template #icon>
-              <NIcon><ArrowBackOutline /></NIcon>
+              <NIcon><CreateOutline /></NIcon>
             </template>
-            Back to Trips
+            Edit
           </NButton>
+          <NPopconfirm @positive-click="handleDeleteTrip">
+            <template #trigger>
+              <NButton type="error">
+                <template #icon>
+                  <NIcon><TrashOutline /></NIcon>
+                </template>
+                Delete
+              </NButton>
+            </template>
+            Are you sure you want to delete this trip?
+          </NPopconfirm>
+        </NSpace>
+      </header>
 
-          <NSpace>
-            <NButton @click="showEditForm = true">
-              <template #icon>
-                <NIcon><CreateOutline /></NIcon>
-              </template>
-              Edit
-            </NButton>
-            <NPopconfirm @positive-click="handleDeleteTrip">
-              <template #trigger>
-                <NButton type="error">
-                  <template #icon>
-                    <NIcon><TrashOutline /></NIcon>
-                  </template>
-                  Delete
-                </NButton>
-              </template>
-              Are you sure you want to delete this trip?
-            </NPopconfirm>
-          </NSpace>
-        </header>
+      <NCard class="trip-info-card">
+        <h1 class="trip-title">{{ trip.name }}</h1>
+        <p v-if="trip.description" class="trip-description">
+          {{ trip.description }}
+        </p>
 
-        <NCard class="trip-info-card">
-          <h1 class="trip-title">{{ trip.name }}</h1>
-          <p v-if="trip.description" class="trip-description">
-            {{ trip.description }}
-          </p>
-
-          <div class="trip-meta">
-            <div class="meta-item">
-              <NIcon :size="18"><CalendarOutline /></NIcon>
-              <span>{{ formatDate(trip.startDate) }} - {{ formatDate(trip.endDate) }}</span>
-              <NTag type="primary" size="small">{{ duration }} days</NTag>
-            </div>
-            <div class="meta-item">
-              <NIcon :size="18"><PeopleOutline /></NIcon>
-              <span>{{ trip.userCount }} travelers</span>
-            </div>
-            <div class="meta-item">
-              <NIcon :size="18"><WalletOutline /></NIcon>
-              <span>{{ formatCurrency(trip.budget) }} budget</span>
-            </div>
+        <div class="trip-meta">
+          <div class="meta-item">
+            <NIcon :size="18"><CalendarOutline /></NIcon>
+            <span>{{ formatDate(trip.startDate) }} - {{ formatDate(trip.endDate) }}</span>
+            <NTag type="primary" size="small">{{ duration }} days</NTag>
           </div>
-        </NCard>
+          <div class="meta-item">
+            <NIcon :size="18"><PeopleOutline /></NIcon>
+            <span>{{ trip.userCount }} travelers</span>
+          </div>
+          <div class="meta-item">
+            <NIcon :size="18"><WalletOutline /></NIcon>
+            <span>{{ formatCurrency(trip.budget) }} budget</span>
+          </div>
+        </div>
+      </NCard>
 
-        <section class="timeline-section">
-          <div class="section-header">
-            <h2 class="section-title">Itinerary</h2>
+      <section class="timeline-section">
+        <div class="section-header">
+          <h2 class="section-title">Itinerary</h2>
+          <NButton type="primary" @click="handleAddDayPlan">
+            <template #icon>
+              <NIcon><AddOutline /></NIcon>
+            </template>
+            Add Day
+          </NButton>
+        </div>
+
+        <NTimeline v-if="dayPlans.length > 0" class="day-timeline">
+          <NTimelineItem v-for="(dayPlan, dayPlanIndex) in dayPlans" :key="dayPlan.id" type="success">
+            <template #header>
+              <div class="timeline-header" @click="goToDayPlan(dayPlan)">
+                <span class="day-number">第 {{ dayPlan.dayNumber }} 天</span>
+                <span class="day-date"> {{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }}) </span>
+              </div>
+            </template>
+
+            <NCard class="day-card" hoverable @click="goToDayPlan(dayPlan)">
+              <div class="day-card-content">
+                <div class="day-info">
+                  <!-- 备注信息 -->
+                  <!-- <p v-if="dayPlan.notes" class="day-notes">{{ dayPlan.notes }}</p> -->
+
+                  <!-- 行程项目列表 -->
+                  <div v-if="dayPlan.dayPlanItems && dayPlan.dayPlanItems.length > 0" class="day-items">
+                    <div v-for="item in dayPlan.dayPlanItems" :key="item.id" class="day-item">
+                      <NTag :type="getTypeTagType(item.type)" size="small" round>
+                        <template #icon>
+                          <NIcon :component="getTypeIcon(item.type)" />
+                        </template>
+                        {{ getTypeName(item.type) }}
+                      </NTag>
+                      <span class="item-name">{{ item.name }}</span>
+                      <span v-if="item.startTime" class="item-time">
+                        <NIcon :size="12"><TimeOutline /></NIcon>
+                        {{ item.startTime }}
+                        <template v-if="item.endTime">- {{ item.endTime }}</template>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- 没有行程项目时的提示 -->
+                  <p v-else class="day-notes-empty">No activities planned yet</p>
+
+                  <!-- 汇总信息：里程和时间 -->
+                  <div v-if="dayPlan.distance || dayPlan.duration" class="day-summary">
+                    <span v-if="dayPlan.distance && dayPlan.distance > 0" class="summary-item">
+                      <NIcon :size="14"><NavigateOutline /></NIcon>
+                      <span>{{ formatDistance(dayPlan.distance) }}</span>
+                    </span>
+                    <span v-if="dayPlan.duration && dayPlan.duration > 0" class="summary-item">
+                      <NIcon :size="14"><HourglassOutline /></NIcon>
+                      <span>{{ formatDuration(dayPlan.duration) }}</span>
+                    </span>
+                  </div>
+                </div>
+                <NSpace class="day-actions">
+                  <NButton quaternary circle size="small" @click.stop="goToDayPlan(dayPlan)">
+                    <template #icon>
+                      <NIcon><CreateOutline /></NIcon>
+                    </template>
+                  </NButton>
+                  <NPopconfirm
+                    v-if="dayPlanIndex === dayPlans.length - 1"
+                    @positive-click="handleDeleteDayPlan(dayPlan.id)"
+                  >
+                    <template #trigger>
+                      <NButton quaternary circle size="small" @click.stop>
+                        <template #icon>
+                          <NIcon><TrashOutline /></NIcon>
+                        </template>
+                      </NButton>
+                    </template>
+                    Delete this day plan?
+                  </NPopconfirm>
+                </NSpace>
+              </div>
+            </NCard>
+          </NTimelineItem>
+        </NTimeline>
+
+        <NEmpty v-else description="No day plans yet. Add your first day!">
+          <template #extra>
             <NButton type="primary" @click="handleAddDayPlan">
               <template #icon>
                 <NIcon><AddOutline /></NIcon>
               </template>
-              Add Day
+              Add First Day
             </NButton>
-          </div>
+          </template>
+        </NEmpty>
+      </section>
 
-          <NTimeline v-if="dayPlans.length > 0" class="day-timeline">
-            <NTimelineItem v-for="dayPlan in dayPlans" :key="dayPlan.id" type="success">
-              <template #header>
-                <div class="timeline-header" @click="goToDayPlan(dayPlan)">
-                  <span class="day-number">第 {{ dayPlan.dayNumber }} 天</span>
-                  <span class="day-date"> {{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }}) </span>
-                </div>
-              </template>
-
-              <NCard class="day-card" hoverable @click="goToDayPlan(dayPlan)">
-                <div class="day-card-content">
-                  <div class="day-info">
-                    <!-- 备注信息 -->
-                    <!-- <p v-if="dayPlan.notes" class="day-notes">{{ dayPlan.notes }}</p> -->
-
-                    <!-- 行程项目列表 -->
-                    <div v-if="dayPlan.dayPlanItems && dayPlan.dayPlanItems.length > 0" class="day-items">
-                      <div v-for="item in dayPlan.dayPlanItems.slice(0, 4)" :key="item.id" class="day-item">
-                        <NTag :type="getTypeTagType(item.type)" size="small" round>
-                          <template #icon>
-                            <NIcon :component="getTypeIcon(item.type)" />
-                          </template>
-                          {{ getTypeName(item.type) }}
-                        </NTag>
-                        <span class="item-name">{{ item.name }}</span>
-                        <span v-if="item.startTime" class="item-time">
-                          <NIcon :size="12"><TimeOutline /></NIcon>
-                          {{ item.startTime }}
-                          <template v-if="item.endTime">- {{ item.endTime }}</template>
-                        </span>
-                      </div>
-                      <!-- 如果超过4项，显示省略提示 -->
-                      <div v-if="dayPlan.dayPlanItems.length > 4" class="day-items-more">
-                        +{{ dayPlan.dayPlanItems.length - 4 }} more items...
-                      </div>
-                    </div>
-
-                    <!-- 没有行程项目时的提示 -->
-                    <p v-else class="day-notes-empty">No activities planned yet</p>
-                  </div>
-                  <NSpace class="day-actions">
-                    <NButton quaternary circle size="small" @click.stop="goToDayPlan(dayPlan)">
-                      <template #icon>
-                        <NIcon><CreateOutline /></NIcon>
-                      </template>
-                    </NButton>
-                    <NPopconfirm @positive-click="handleDeleteDayPlan(dayPlan.id)">
-                      <template #trigger>
-                        <NButton quaternary circle size="small" @click.stop>
-                          <template #icon>
-                            <NIcon><TrashOutline /></NIcon>
-                          </template>
-                        </NButton>
-                      </template>
-                      Delete this day plan?
-                    </NPopconfirm>
-                  </NSpace>
-                </div>
-              </NCard>
-            </NTimelineItem>
-          </NTimeline>
-
-          <NEmpty v-else description="No day plans yet. Add your first day!">
-            <template #extra>
-              <NButton type="primary" @click="handleAddDayPlan">
-                <template #icon>
-                  <NIcon><AddOutline /></NIcon>
-                </template>
-                Add First Day
-              </NButton>
-            </template>
-          </NEmpty>
-        </section>
-
-        <TripForm v-model:show="showEditForm" :trip="trip" @submit="handleUpdateTrip" />
-      </div>
-    </NSpin>
+      <TripForm v-model:show="showEditForm" :trip="trip" @submit="handleUpdateTrip" />
+    </div>
+  </NSpin>
 </template>
 
 <style scoped>
@@ -478,6 +494,23 @@ function getTypeTagType(type: PlanItemType) {
 .day-info {
   flex: 1;
   min-width: 0;
+}
+
+.day-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border-color);
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-color-secondary);
+  font-size: 0.85rem;
 }
 
 @media (max-width: 768px) {

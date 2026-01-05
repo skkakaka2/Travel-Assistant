@@ -14,6 +14,7 @@ import { CreateDayPlanDto } from './dto/create-day-plan.dto';
 import { UpdateDayPlanDto } from './dto/update-day-plan.dto';
 import { ApiOperation, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { PaginationQuery } from 'src/common/pagination';
+import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
 
 @Controller('dayplan')
 export class DayPlanController {
@@ -22,8 +23,11 @@ export class DayPlanController {
   @Post()
   @ApiOperation({ summary: 'Create a day plan' })
   @ApiBody({ type: CreateDayPlanDto })
-  create(@Body() createDayPlanDto: CreateDayPlanDto) {
-    return this.dayPlanService.create(createDayPlanDto);
+  create(
+    @Body() createDayPlanDto: CreateDayPlanDto,
+    @ContextUser() user: ContextUser,
+  ) {
+    return this.dayPlanService.create(createDayPlanDto, user);
   }
 
   @Get()
