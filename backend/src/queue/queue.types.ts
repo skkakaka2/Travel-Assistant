@@ -2,27 +2,14 @@
  * 队列消息类型定义
  */
 
+import { User } from 'src/user/entities/user.entity';
+
 /**
  * 计算单个 item 距离的任务数据
  */
 export interface CalculateItemDistanceJob {
-  // 当前 item 的 ID
-  itemId: number;
-  // 当前 item 所属的 dayPlan ID
-  dayPlanId: number;
-  // 当前 item 所属的 trip ID
   tripId: number;
-  // 当前 item 的经纬度
-  start: {
-    latitude: number;
-    longitude: number;
-  };
-  end: {
-    latitude: number;
-    longitude: number;
-  };
-  // 当前 item 的顺序
-  order: number;
+  userInfo: User;
 }
 
 /**
@@ -48,4 +35,3 @@ export interface DistanceCalculationResult {
   // 错误信息（如果失败）
   error?: string;
 }
-

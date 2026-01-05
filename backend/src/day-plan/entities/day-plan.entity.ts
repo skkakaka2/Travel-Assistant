@@ -61,13 +61,13 @@ export class DayPlan {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => Trip, (trip) => trip.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Trip, (trip) => trip.dayPlans, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'tripId' })
   trip: Trip;
 
   @Column({ type: 'int' })
   tripId: number;
 
-  @OneToMany(() => DayPlanItem, (dayPlanItem) => dayPlanItem.dayPlanId)
+  @OneToMany(() => DayPlanItem, (dayPlanItem) => dayPlanItem.dayPlan)
   dayPlanItems: DayPlanItem[];
 }

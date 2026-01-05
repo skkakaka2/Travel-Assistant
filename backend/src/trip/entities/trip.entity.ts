@@ -55,7 +55,7 @@ export class Trip {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.trips, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
@@ -65,6 +65,6 @@ export class Trip {
   @OneToMany(() => DayPlan, (dayPlan) => dayPlan.trip)
   dayPlans: DayPlan[];
 
-  @OneToMany(() => DayPlanItem, (dayPlanItem) => dayPlanItem.tripId)
+  @OneToMany(() => DayPlanItem, (dayPlanItem) => dayPlanItem.trip)
   dayPlanItems: DayPlanItem[];
 }

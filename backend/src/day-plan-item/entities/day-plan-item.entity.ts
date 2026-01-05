@@ -28,12 +28,18 @@ export class DayPlanItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int' })
-  @ManyToOne(() => DayPlan, (dayPlan) => dayPlan.id, { onDelete: 'CASCADE' })
-  dayPlanId: number;
+  @ManyToOne(() => DayPlan, (dayPlan) => dayPlan.dayPlanItems, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'dayPlanId' })
+  dayPlan: DayPlan;
 
   @Column({ type: 'int' })
-  @ManyToOne(() => Trip, (trip) => trip.id, { onDelete: 'CASCADE' })
+  dayPlanId: number;
+
+  @ManyToOne(() => Trip, (trip) => trip.dayPlanItems, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'tripId' })
+  trip: Trip;
+
+  @Column({ type: 'int' })
   tripId: number;
 
   @Column({ type: 'enum', enum: PlanItemType })

@@ -8,6 +8,8 @@ import { DayPlan } from 'src/day-plan/entities/day-plan.entity';
 import { QUEUE_NAMES, JOB_NAMES } from '../queue.constants';
 import { CalculateItemDistanceJob } from '../queue.types';
 import { Repository } from 'typeorm';
+import { Trip } from 'src/trip/entities/trip.entity';
+import { userInfo } from 'os';
 
 @Processor(QUEUE_NAMES.DISTANCE_CALCULATION, { concurrency: 1 })
 export class DistanceCalculationProcessor extends WorkerHost {
@@ -18,6 +20,8 @@ export class DistanceCalculationProcessor extends WorkerHost {
     private readonly dayPlanItemRepository: Repository<DayPlanItem>,
     @InjectRepository(DayPlan)
     private readonly dayPlanRepository: Repository<DayPlan>,
+    @InjectRepository(Trip)
+    private readonly tripRepository: Repository<Trip>,
   ) {
     super();
   }
@@ -42,58 +46,80 @@ export class DistanceCalculationProcessor extends WorkerHost {
   }
 
   async calculateItemDistance(data: CalculateItemDistanceJob) {
-    this.logger.log(
-      `Calculating distance for item ${data.itemId}, dayPlan ${data.dayPlanId}`,
-    );
-    this.logger.debug(`Start: ${data.start.latitude}, ${data.start.longitude}`);
-    this.logger.debug(`End: ${data.end.latitude}, ${data.end.longitude}`);
-
-    const { start, end } = data;
-    const { distance, duration } = await this.calculateDrivingDistance(
-      start,
-      end,
-    );
-
-    if (distance !== -1 && duration) {
-      this.logger.log(
-        `Distance calculated: ${distance}m, Duration: ${duration}s for item ${data.itemId}`,
-      );
-
-      // 更新 item 的距离和时间
-      await this.dayPlanItemRepository.update(data.itemId, {
-        distance,
-        duration,
-      });
-      this.logger.debug(`Updated item ${data.itemId} with distance and duration`);
-
-      // 更新 dayplan 的总距离和时间
-      const dayplan = await this.dayPlanRepository.findOne({
-        where: {
-          id: data.dayPlanId,
+    this.logger.log(`Calculating distance for trip ${data.tripId}`);
+    const { tripId } = data;
+    const tripInfo = await this.tripRepository.findOne({
+      where: {
+        id: tripId,
+      },
+      relations: {
+        dayPlans: {
+          dayPlanItems: true,
         },
-      });
-
-      if (dayplan) {
-        const previousDistance = dayplan.distance || 0;
-        const previousDuration = dayplan.duration || 0;
-        // 使用 update 方法而不是 save，避免外键约束问题
-        await this.dayPlanRepository.update(data.dayPlanId, {
-          distance: (previousDistance || 0) + distance,
-          duration: (previousDuration || 0) + duration,
-        });
-        this.logger.log(
-          `Updated dayPlan ${data.dayPlanId}: distance ${previousDistance} -> ${dayplan.distance}, duration ${previousDuration} -> ${dayplan.duration}`,
-        );
-      } else {
-        this.logger.warn(`DayPlan ${data.dayPlanId} not found`);
-      }
-    } else {
-      this.logger.warn(
-        `Failed to calculate distance for item ${data.itemId}: distance=${distance}, duration=${duration}`,
-      );
+      },
+      order: {
+        dayPlans: {
+          dayPlanItems: {
+            startTime: 'ASC',
+          },
+        },
+      },
+    });
+    if (!tripInfo) {
+      throw new Error('Trip not found');
     }
+    const itemAll = tripInfo.dayPlans.flatMap(
+      (dayPlan) => dayPlan.dayPlanItems,
+    );
+    for (let index = 0; index < itemAll.length; index++) {
+      const item = itemAll[index];
+      if (!item.latitude || !item.longitude) {
+        continue;
+      }
 
-    return distance;
+      let result: RouteResult;
+      if (index === 0) {
+        const start = {
+          latitude: data.userInfo.homeLatitude!,
+          longitude: data.userInfo.homeLongitude!,
+        };
+        result = await this.calculateDrivingDistance(start, {
+          latitude: item.latitude,
+          longitude: item.longitude,
+        });
+      } else {
+        const prevItem = itemAll[index - 1];
+        result = await this.calculateDrivingDistance(
+          { latitude: prevItem.latitude!, longitude: prevItem.longitude! },
+          { latitude: item.latitude, longitude: item.longitude },
+        );
+      }
+      item.distance = result.distance;
+      item.duration = result.duration;
+      await this.dayPlanItemRepository.update(item.id, {
+        distance: result.distance,
+        duration: result.duration,
+      });
+    }
+    // 更新所有相关的 dayPlan
+    for (const dayPlan of tripInfo.dayPlans) {
+      const dayPlanItems = itemAll.filter(
+        (item) => item.dayPlanId === dayPlan.id,
+      );
+      const dayPlanDistance = dayPlanItems.reduce(
+        (acc, item) => acc + (item.distance || 0),
+        0,
+      );
+      const dayPlanDuration = dayPlanItems.reduce(
+        (acc, item) => acc + (item.duration || 0),
+        0,
+      );
+
+      await this.dayPlanRepository.update(dayPlan.id, {
+        distance: dayPlanDistance,
+        duration: dayPlanDuration,
+      });
+    }
   }
 
   async calculateDrivingDistance(

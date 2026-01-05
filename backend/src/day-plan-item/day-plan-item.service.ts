@@ -16,6 +16,7 @@ import { RouteResult } from 'src/common/distance.util';
 import { InjectQueue } from '@nestjs/bullmq';
 import { CalculateItemDistanceJob, JOB_NAMES, QUEUE_NAMES } from 'src/queue';
 import { Queue } from 'bullmq';
+import { Trip } from 'src/trip/entities/trip.entity';
 
 @Injectable()
 export class DayPlanItemService {
@@ -73,14 +74,7 @@ export class DayPlanItemService {
     const savedResult = await this.dayPlanItemRepository.save(result);
 
     // 计算里程和时间
-    await this.calculateItemDistanceAndTime(
-      savedResult,
-      dayPlan,
-      items,
-      userInfo,
-      createDayPlanItemDto.latitude,
-      createDayPlanItemDto.longitude,
-    );
+    await this.calculateItemDistanceAndTime(savedResult.tripId, userInfo!);
 
     return successResponse(savedResult);
   }
@@ -176,14 +170,7 @@ export class DayPlanItemService {
         updateDayPlanItemDto.longitude ?? updatedItem.longitude ?? undefined;
 
       if (latitude && longitude) {
-        await this.calculateItemDistanceAndTime(
-          updatedItem,
-          dayPlan,
-          otherItems,
-          userInfo,
-          latitude,
-          longitude,
-        );
+        await this.calculateItemDistanceAndTime(updatedItem.tripId, userInfo!);
       }
     }
 
@@ -223,6 +210,12 @@ export class DayPlanItemService {
       });
     }
     const result = await this.dayPlanItemRepository.delete(id);
+    const userInfo = await this.userRepository.findOne({
+      where: {
+        id: dayPlan.userId,
+      },
+    });
+    await this.calculateItemDistanceAndTime(exist.tripId, userInfo!);
     return successResponse(result);
   }
 
@@ -254,108 +247,14 @@ export class DayPlanItemService {
 
   /**
    * 计算行程项的里程和时间
-   * @param item 新创建的行程项
-   * @param dayPlan 所属的日程计划
-   * @param existingItems 当前日程计划中已存在的行程项
-   * @param userInfo 用户信息（用于获取家庭地址）
-   * @param endLatitude 目的地纬度
-   * @param endLongitude 目的地经度
    */
   private async calculateItemDistanceAndTime(
-    item: DayPlanItem,
-    dayPlan: DayPlan,
-    existingItems: DayPlanItem[],
-    userInfo: User | null,
-    endLatitude: string | number | undefined,
-    endLongitude: string | number | undefined,
+    tripId: number,
+    userInfo: User,
   ): Promise<void> {
-    // 如果没有经纬度信息，不计算距离
-    if (!endLatitude || !endLongitude) {
-      return;
-    }
-
-    let startLatitude: number | undefined;
-    let startLongitude: number | undefined;
-
-    // 第一天且没有行程时，计算起点（用户家庭地址）到第一个行程的距离
-    if (dayPlan.dayNumber === 1 && existingItems.length === 0) {
-      if (!userInfo?.homeLatitude || !userInfo?.homeLongitude) {
-        return;
-      }
-      startLatitude = userInfo.homeLatitude;
-      startLongitude = userInfo.homeLongitude;
-    } else if (existingItems.length > 0) {
-      // 有行程时，计算前一个行程到当前行程的距离
-      const previousItem = existingItems[existingItems.length - 1];
-      if (previousItem?.latitude && previousItem?.longitude) {
-        startLatitude =
-          typeof previousItem.latitude === 'string'
-            ? parseFloat(previousItem.latitude)
-            : previousItem.latitude;
-        startLongitude =
-          typeof previousItem.longitude === 'string'
-            ? parseFloat(previousItem.longitude)
-            : previousItem.longitude;
-      }
-    } else if (dayPlan.dayNumber > 1) {
-      // 没有行程且非第一天的行程时，要计算前一天的最后一个行程的距离
-      const previousDayPlan = await this.dayPlanRepository.findOne({
-        where: {
-          tripId: dayPlan.tripId,
-          dayNumber: dayPlan.dayNumber - 1,
-        },
-      });
-
-      if (previousDayPlan) {
-        // 查找前一天的最后一个行程
-        const previousItems = await this.dayPlanItemRepository.find({
-          where: {
-            dayPlanId: previousDayPlan.id,
-          },
-          order: {
-            order: 'ASC',
-          },
-        });
-
-        if (previousItems.length > 0) {
-          const lastItem = previousItems[previousItems.length - 1];
-          if (lastItem.latitude && lastItem.longitude) {
-            startLatitude =
-              typeof lastItem.latitude === 'string'
-                ? parseFloat(lastItem.latitude)
-                : lastItem.latitude;
-            startLongitude =
-              typeof lastItem.longitude === 'string'
-                ? parseFloat(lastItem.longitude)
-                : lastItem.longitude;
-          }
-        }
-      }
-    }
-
-    // 如果找到了起点坐标，添加距离计算任务到队列
-    if (startLatitude && startLongitude) {
-      const endLat =
-        typeof endLatitude === 'string' ? parseFloat(endLatitude) : endLatitude;
-      const endLng =
-        typeof endLongitude === 'string'
-          ? parseFloat(endLongitude)
-          : endLongitude;
-
-      this.distanceCalculationQueue.add(JOB_NAMES.CALCULATE_ITEM_DISTANCE, {
-        itemId: item.id,
-        dayPlanId: dayPlan.id,
-        tripId: dayPlan.tripId,
-        start: {
-          latitude: startLatitude,
-          longitude: startLongitude,
-        },
-        end: {
-          latitude: endLat,
-          longitude: endLng,
-        },
-        order: item.order,
-      });
-    }
+    this.distanceCalculationQueue.add(JOB_NAMES.CALCULATE_ITEM_DISTANCE, {
+      tripId,
+      userInfo,
+    });
   }
 }

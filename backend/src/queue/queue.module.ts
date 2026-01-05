@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DayPlanItem } from 'src/day-plan-item/entities/day-plan-item.entity';
 import { DistanceCalculationProcessor } from './processor/distance-calculation.processor';
 import { DayPlan } from 'src/day-plan/entities/day-plan.entity';
+import { Trip } from 'src/trip/entities/trip.entity';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { DayPlan } from 'src/day-plan/entities/day-plan.entity';
       name: QUEUE_NAMES.DISTANCE_CALCULATION,
     }),
     // 为 Processor 提供 TypeORM repository
-    TypeOrmModule.forFeature([DayPlanItem, DayPlan]),
+    TypeOrmModule.forFeature([DayPlanItem, DayPlan, Trip]),
   ],
   providers: [DistanceCalculationProcessor],
   exports: [BullModule],
