@@ -227,7 +227,7 @@ onUnmounted(() => {
       <NSpace>
         <NInput
           v-model:value="searchInput"
-          placeholder="Search location..."
+          placeholder="搜索位置..."
           clearable
           style="width: 200px"
           @keyup.enter="handleSearch"
@@ -236,8 +236,8 @@ onUnmounted(() => {
             <NIcon><SearchOutline /></NIcon>
           </template>
         </NInput>
-        <NButton type="primary" @click="handleSearch">Search</NButton>
-        <NButton @click="locateCurrentPosition" title="Current Location">
+        <NButton type="primary" @click="handleSearch">搜索</NButton>
+        <NButton @click="locateCurrentPosition" title="当前位置">
           <template #icon>
             <NIcon><LocationOutline /></NIcon>
           </template>
@@ -247,7 +247,7 @@ onUnmounted(() => {
 
     <!-- 地图容器 -->
     <div class="map-container">
-      <NSpin :show="loading" description="Loading map...">
+      <NSpin :show="loading" description="加载地图中...">
         <div ref="mapContainer" class="map"></div>
       </NSpin>
     </div>
@@ -255,11 +255,11 @@ onUnmounted(() => {
     <!-- 选中位置信息 -->
     <div v-if="selectedLat && selectedLng" class="selected-info">
       <div class="info-item">
-        <span class="label">Coordinates:</span>
+        <span class="label">坐标：</span>
         <span class="value">{{ selectedLat }}, {{ selectedLng }}</span>
       </div>
       <div v-if="selectedAddress" class="info-item">
-        <span class="label">Address:</span>
+        <span class="label">地址：</span>
         <span class="value">{{ selectedAddress }}</span>
       </div>
     </div>

@@ -1,8 +1,11 @@
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
+import { resolve } from 'path';
 
 // Load environment variables
-config();
+// Priority: .env.local > .env
+config({ path: resolve(process.cwd(), '.env.local') });
+config({ path: resolve(process.cwd(), '.env') });
 
 export const AppDataSource = new DataSource({
   type: 'mysql',

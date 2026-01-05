@@ -10,7 +10,7 @@ const router = useRouter();
 
 const userOptions = [
   {
-    label: "Settings",
+    label: "设置",
     key: "settings",
     icon: () => h(NIcon, null, { default: () => h(SettingsOutline) }),
   },
@@ -19,7 +19,7 @@ const userOptions = [
     key: "d1",
   },
   {
-    label: "Logout",
+    label: "登出",
     key: "logout",
     icon: () => h(NIcon, null, { default: () => h(LogOutOutline) }),
   },
@@ -41,7 +41,7 @@ function handleUserAction(key: string) {
       <div class="header-content container">
         <RouterLink to="/trips" class="logo">
           <span class="logo-icon">🌍</span>
-          <span class="logo-text gradient-text">Travel Assistant</span>
+          <span class="logo-text gradient-text">旅行助手</span>
         </RouterLink>
 
         <NSpace align="center" :size="12">

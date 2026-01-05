@@ -34,7 +34,7 @@ const message = useMessage();
 const loading = ref(false);
 const formRef = ref<FormInst | null>(null);
 const isEdit = computed(() => !!props.item);
-const title = computed(() => (isEdit.value ? "Edit Item" : "Add Item"));
+const title = computed(() => (isEdit.value ? "编辑项目" : "添加项目"));
 
 const typeOptions = Object.values(PlanItemType).map((type) => ({
   label: `${getItemTypeIcon(type)} ${getItemTypeLabel(type)}`,
@@ -99,11 +99,11 @@ watch(
 );
 
 const formRules = {
-  name: [{ required: true, message: "Please enter item name", trigger: "blur" }],
-  address: [{ required: true, message: "Please enter item address", trigger: "blur" }],
-  startTime: [{ required: true, message: "Please select start time", trigger: "blur" }],
-  endTime: [{ required: true, message: "Please select end time", trigger: "blur" }],
-  cost: [{ required: true, type: "number" as const, message: "Please enter cost", trigger: "blur" }],
+  name: [{ required: true, message: "请输入项目名称", trigger: "blur" }],
+  address: [{ required: true, message: "请输入项目地址", trigger: "blur" }],
+  startTime: [{ required: true, message: "请选择开始时间", trigger: "blur" }],
+  endTime: [{ required: true, message: "请选择结束时间", trigger: "blur" }],
+  cost: [{ required: true, type: "number" as const, message: "请输入费用", trigger: "blur" }],
 };
 
 function handleClose() {
@@ -144,20 +144,20 @@ function handleLocationSelected(data: { latitude: number; longitude: number; add
       <!-- 左侧表单 -->
       <div class="form-section">
         <NForm ref="formRef" :model="formData" label-placement="top" :rules="formRules">
-          <NFormItem path="type" label="Type">
+          <NFormItem path="type" label="类型">
             <NSelect v-model:value="formData.type" :options="typeOptions" />
           </NFormItem>
 
-          <NFormItem path="name" label="Name">
-            <NInput v-model:value="formData.name" placeholder="e.g., Visit the Great Wall" />
+          <NFormItem path="name" label="名称">
+            <NInput v-model:value="formData.name" placeholder="例如：参观长城" />
           </NFormItem>
 
-          <NFormItem path="address" label="Address">
-            <NInput v-model:value="formData.address" placeholder="e.g., Badaling, Beijing" />
+          <NFormItem path="address" label="地址">
+            <NInput v-model:value="formData.address" placeholder="例如：北京八达岭" />
           </NFormItem>
 
           <NSpace :size="16">
-            <NFormItem path="startTime" label="Start Time">
+            <NFormItem path="startTime" label="开始时间">
               <NTimePicker
                 v-model:formatted-value="formData.startTime"
                 format="HH"
@@ -167,7 +167,7 @@ function handleLocationSelected(data: { latitude: number; longitude: number; add
               />
             </NFormItem>
 
-            <NFormItem path="endTime" label="End Time">
+            <NFormItem path="endTime" label="结束时间">
               <NTimePicker
                 v-model:formatted-value="formData.endTime"
                 format="HH"
@@ -177,21 +177,21 @@ function handleLocationSelected(data: { latitude: number; longitude: number; add
               />
             </NFormItem>
           </NSpace>
-          <NFormItem path="cost" label="Cost">
+          <NFormItem path="cost" label="费用">
             <NInputNumber v-model:value="formData.cost" :min="0" style="width: 200px">
               <template #prefix>¥</template>
             </NInputNumber>
           </NFormItem>
 
-          <NFormItem path="notes" label="Notes">
-            <NInput v-model:value="formData.notes" type="textarea" placeholder="Add any notes..." :rows="8" />
+          <NFormItem path="notes" label="备注">
+            <NInput v-model:value="formData.notes" type="textarea" placeholder="添加任何备注..." :rows="8" />
           </NFormItem>
         </NForm>
       </div>
 
       <!-- 右侧地图 -->
       <div class="map-section">
-        <div class="map-title">Select Location</div>
+        <div class="map-title">选择位置</div>
         <BaiduMapPicker
           v-model:latitude="formData.latitude"
           v-model:longitude="formData.longitude"
@@ -203,9 +203,9 @@ function handleLocationSelected(data: { latitude: number; longitude: number; add
 
     <template #footer>
       <NSpace justify="end">
-        <NButton @click="handleClose">Cancel</NButton>
+        <NButton @click="handleClose">取消</NButton>
         <NButton type="primary" :loading="loading" @click="handleSubmit">
-          {{ isEdit ? "Save Changes" : "Add Item" }}
+          {{ isEdit ? "保存更改" : "添加项目" }}
         </NButton>
       </NSpace>
     </template>

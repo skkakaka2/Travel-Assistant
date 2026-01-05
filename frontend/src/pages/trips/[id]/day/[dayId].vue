@@ -39,7 +39,7 @@ async function loadDayPlan() {
     notes.value = dayPlan.value.notes || "";
     items.value = itemsResponse.data.data || [];
   } catch (error) {
-    message.error("Failed to load day plan");
+    message.error("加载日期计划失败");
     router.push(`/trips/${tripId.value}`);
   } finally {
     loading.value = false;
@@ -52,9 +52,9 @@ async function handleSaveNotes() {
   saving.value = true;
   try {
     await dayPlanApi.update(dayPlanId.value, { notes: notes.value });
-    message.success("Notes saved");
+    message.success("备注已保存");
   } catch (error) {
-    message.error("Failed to save notes");
+    message.error("保存备注失败");
   } finally {
     saving.value = false;
   }
@@ -80,7 +80,7 @@ async function handleItemFormSubmit(data: CreateDayPlanItemDto | UpdateDayPlanIt
     if (editingItem.value) {
       const result = await dayPlanItemApi.update(editingItem.value.id, data as UpdateDayPlanItemDto);
       if (result.data.code === 200) {
-        message.success("Item updated");
+        message.success("项目已更新");
         loadDayPlan();
         showItemForm.value = false;
       } else {
@@ -89,7 +89,7 @@ async function handleItemFormSubmit(data: CreateDayPlanItemDto | UpdateDayPlanIt
     } else {
       const result = await dayPlanItemApi.create(data as CreateDayPlanItemDto);
       if (result.data.code === 200) {
-        message.success("Item added");
+        message.success("项目已添加");
         loadDayPlan();
         showItemForm.value = false;
       } else {
@@ -105,13 +105,13 @@ async function handleDeleteItem(id: number) {
   try {
     const result = await dayPlanItemApi.delete(id);
     if (result.data.code === 200) {
-      message.success("Item deleted");
+      message.success("项目已删除");
       loadDayPlan();
     } else {
       message.error(result.data.message);
     }
   } catch (error) {
-    message.error("Failed to delete item");
+    message.error("删除项目失败");
   }
 }
 
@@ -136,38 +136,38 @@ const sortedItems = computed(() => {
           <template #icon>
             <NIcon><ArrowBackOutline /></NIcon>
           </template>
-          Back to Trip
+          返回行程
         </NButton>
       </header>
 
       <div class="day-header">
         <div class="day-title-section">
-          <h1 class="day-title">Day {{ dayPlan.dayNumber }}</h1>
+          <h1 class="day-title">第 {{ dayPlan.dayNumber }} 天</h1>
           <p class="day-date">{{ formatDate(dayPlan.date) }} ({{ getDayOfWeek(dayPlan.date) }})</p>
         </div>
       </div>
 
       <NCard class="notes-card">
-        <h3 class="section-title">Notes</h3>
+        <h3 class="section-title">备注</h3>
         <NSpace vertical :size="12">
-          <NInput v-model:value="notes" type="textarea" placeholder="Add notes for this day..." :rows="3" />
+          <NInput v-model:value="notes" type="textarea" placeholder="为此日期添加备注..." :rows="3" />
           <NButton type="primary" :loading="saving" @click="handleSaveNotes">
             <template #icon>
               <NIcon><SaveOutline /></NIcon>
             </template>
-            Save Notes
+            保存备注
           </NButton>
         </NSpace>
       </NCard>
 
       <section class="items-section">
         <div class="section-header">
-          <h2 class="section-title">Schedule</h2>
+          <h2 class="section-title">日程安排</h2>
           <NButton type="primary" @click="handleAddItem">
             <template #icon>
               <NIcon><AddOutline /></NIcon>
             </template>
-            Add Item
+            添加项目
           </NButton>
         </div>
 
@@ -181,13 +181,13 @@ const sortedItems = computed(() => {
           />
         </div>
 
-        <NEmpty v-else description="No items yet. Add your first activity!">
+        <NEmpty v-else description="还没有项目。添加您的第一个活动！">
           <template #extra>
             <NButton type="primary" @click="handleAddItem">
               <template #icon>
                 <NIcon><AddOutline /></NIcon>
               </template>
-              Add First Item
+              添加第一个项目
             </NButton>
           </template>
         </NEmpty>

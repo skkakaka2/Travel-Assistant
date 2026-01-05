@@ -51,7 +51,7 @@ async function loadUser() {
       homeLongitude: user.value.homeLongitude ? user.value.homeLongitude.toString() : undefined,
     };
   } catch (error) {
-    message.error("Failed to load user information");
+    message.error("加载用户信息失败");
   } finally {
     loading.value = false;
   }
@@ -70,12 +70,12 @@ async function handleSave() {
     };
 
     await userApi.setHome(homeData);
-    message.success("Settings saved successfully");
+    message.success("设置保存成功");
 
     // 重新加载用户信息
     await loadUser();
   } catch (error) {
-    message.error("Failed to save settings");
+    message.error("保存设置失败");
   } finally {
     saving.value = false;
   }
@@ -120,9 +120,9 @@ onMounted(() => {
         <template #icon>
           <NIcon><ArrowBackOutline /></NIcon>
         </template>
-        Back
+        返回
       </NButton>
-      <h1 class="page-title">Settings</h1>
+      <h1 class="page-title">设置</h1>
     </header>
 
     <NSpin :show="loading">
@@ -146,7 +146,7 @@ onMounted(() => {
           <template #header>
             <div class="card-header">
               <NIcon :size="20"><HomeOutline /></NIcon>
-              <span>Home Location</span>
+              <span>家庭位置</span>
             </div>
           </template>
 
@@ -154,10 +154,10 @@ onMounted(() => {
             <!-- 左侧表单 -->
             <div class="form-section">
               <NForm ref="formRef" :model="formData" label-placement="top">
-                <NFormItem label="Home Address">
+                <NFormItem label="家庭地址">
                   <NInput
                     v-model:value="formData.homeAddress"
-                    placeholder="Enter your home address"
+                    placeholder="请输入您的家庭地址"
                     type="textarea"
                     :rows="2"
                   />
@@ -169,20 +169,20 @@ onMounted(() => {
                     <span v-if="formData.homeLatitude && formData.homeLongitude">
                       {{ formData.homeLatitude }}, {{ formData.homeLongitude }}
                     </span>
-                    <span v-else class="no-location">No location selected</span>
+                    <span v-else class="no-location">未选择位置</span>
                   </div>
                 </NSpace>
 
                 <NDivider />
 
                 <NSpace>
-                  <NButton type="primary" :loading="saving" @click="handleSave"> Save Settings </NButton>
-                  <NButton @click="clearHomeLocation"> Clear Location </NButton>
+                  <NButton type="primary" :loading="saving" @click="handleSave"> 保存设置 </NButton>
+                  <NButton @click="clearHomeLocation"> 清除位置 </NButton>
                 </NSpace>
               </NForm>
 
               <div class="tip-text">
-                <p>💡 Setting your home location helps calculate travel distances and plan routes more efficiently.</p>
+                <p>💡 设置您的家庭位置有助于计算旅行距离并更高效地规划路线。</p>
               </div>
             </div>
 

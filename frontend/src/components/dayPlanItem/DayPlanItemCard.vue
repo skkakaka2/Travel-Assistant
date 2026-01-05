@@ -69,7 +69,7 @@ const emit = defineEmits<{
               </template>
             </NButton>
           </template>
-          Delete this item?
+          删除此项目？
         </NPopconfirm>
       </NSpace>
     </div>

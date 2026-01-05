@@ -16,23 +16,23 @@ const formData = ref<LoginDto>({
 })
 
 const formRules = {
-  username: { required: true, message: 'Please enter username', trigger: 'blur' },
-  password: { required: true, message: 'Please enter password', trigger: 'blur' },
+  username: { required: true, message: '请输入用户名', trigger: 'blur' },
+  password: { required: true, message: '请输入密码', trigger: 'blur' },
 }
 
 async function handleLogin() {
   if (!formData.value.username || !formData.value.password) {
-    message.warning('Please fill in all fields')
+    message.warning('请填写所有字段')
     return
   }
 
   loading.value = true
   try {
     await authStore.login(formData.value)
-    message.success('Login successful')
+    message.success('登录成功')
     router.push('/trips')
   } catch (error: any) {
-    message.error(error?.response?.data?.message || 'Login failed')
+    message.error(error?.response?.data?.message || '登录失败')
   } finally {
     loading.value = false
   }
@@ -41,20 +41,20 @@ async function handleLogin() {
 
 <template>
   <NForm :model="formData" :rules="formRules" @submit.prevent="handleLogin">
-      <NFormItem path="username" label="Username">
+      <NFormItem path="username" label="用户名">
         <NInput
           v-model:value="formData.username"
-          placeholder="Enter your username"
+          placeholder="请输入用户名"
           size="large"
           :input-props="{ autocomplete: 'username' }"
         />
       </NFormItem>
 
-      <NFormItem path="password" label="Password">
+      <NFormItem path="password" label="密码">
         <NInput
           v-model:value="formData.password"
           type="password"
-          placeholder="Enter your password"
+          placeholder="请输入密码"
           size="large"
           show-password-on="click"
           :input-props="{ autocomplete: 'current-password' }"
@@ -69,12 +69,12 @@ async function handleLogin() {
           :loading="loading"
           attr-type="submit"
         >
-          Sign In
+          登录
         </NButton>
 
         <div class="auth-footer">
-          Don't have an account?
-          <RouterLink to="/register" class="auth-link">Sign up</RouterLink>
+          还没有账号？
+          <RouterLink to="/register" class="auth-link">注册</RouterLink>
         </div>
       </NSpace>
   </NForm>

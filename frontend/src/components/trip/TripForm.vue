@@ -28,7 +28,7 @@ const message = useMessage()
 const loading = ref(false)
 
 const isEdit = computed(() => !!props.trip)
-const title = computed(() => (isEdit.value ? 'Edit Trip' : 'Create Trip'))
+const title = computed(() => (isEdit.value ? '编辑行程' : '创建行程'))
 
 const formData = ref<CreateTripDto>({
   name: '',
@@ -87,11 +87,11 @@ function handleClose() {
 
 async function handleSubmit() {
   if (!formData.value.name) {
-    message.warning('Please enter trip name')
+    message.warning('请输入行程名称')
     return
   }
   if (!formData.value.startDate || !formData.value.endDate) {
-    message.warning('Please select date range')
+    message.warning('请选择日期范围')
     return
   }
 
@@ -115,14 +115,14 @@ async function handleSubmit() {
     @update:show="emit('update:show', $event)"
   >
     <NForm :model="formData" label-placement="top">
-      <NFormItem label="Trip Name" required>
+      <NFormItem label="行程名称" required>
         <NInput
           v-model:value="formData.name"
-          placeholder="e.g., Japan Adventure 2024"
+          placeholder="例如：2024日本之旅"
         />
       </NFormItem>
 
-      <NFormItem label="Date Range" required>
+      <NFormItem label="日期范围" required>
         <NDatePicker
           v-model:value="dateRange"
           type="daterange"
@@ -133,7 +133,7 @@ async function handleSubmit() {
       </NFormItem>
 
       <NSpace :size="16">
-        <NFormItem label="Travelers">
+        <NFormItem label="旅行人数">
           <NInputNumber
             v-model:value="formData.userCount"
             :min="1"
@@ -142,7 +142,7 @@ async function handleSubmit() {
           />
         </NFormItem>
 
-        <NFormItem label="Budget">
+        <NFormItem label="预算">
           <NInputNumber
             v-model:value="formData.budget"
             :min="0"
@@ -154,11 +154,11 @@ async function handleSubmit() {
         </NFormItem>
       </NSpace>
 
-      <NFormItem label="Description">
+      <NFormItem label="描述">
         <NInput
           v-model:value="formData.description"
           type="textarea"
-          placeholder="Describe your trip..."
+          placeholder="描述您的行程..."
           :rows="3"
         />
       </NFormItem>
@@ -166,9 +166,9 @@ async function handleSubmit() {
 
     <template #footer>
       <NSpace justify="end">
-        <NButton @click="handleClose">Cancel</NButton>
+        <NButton @click="handleClose">取消</NButton>
         <NButton type="primary" :loading="loading" @click="handleSubmit">
-          {{ isEdit ? 'Save Changes' : 'Create Trip' }}
+          {{ isEdit ? '保存更改' : '创建行程' }}
         </NButton>
       </NSpace>
     </template>

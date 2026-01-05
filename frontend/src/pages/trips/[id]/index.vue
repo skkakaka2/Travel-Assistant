@@ -62,7 +62,7 @@ async function loadTrip() {
     trip.value = response.data.data;
     dayPlans.value = trip.value.dayPlans || [];
   } catch (error) {
-    message.error("Failed to load trip");
+    message.error("加载行程失败");
     router.push("/trips");
   } finally {
     loading.value = false;
@@ -72,20 +72,20 @@ async function loadTrip() {
 async function handleUpdateTrip(data: UpdateTripDto) {
   try {
     await tripStore.updateTrip(tripId.value, data);
-    message.success("Trip updated successfully");
+    message.success("行程更新成功");
     loadTrip();
   } catch (error) {
-    message.error("Failed to update trip");
+    message.error("更新行程失败");
   }
 }
 
 async function handleDeleteTrip() {
   try {
     await tripStore.deleteTrip(tripId.value);
-    message.success("Trip deleted successfully");
+    message.success("行程删除成功");
     router.push("/trips");
   } catch (error) {
-    message.error("Failed to delete trip");
+    message.error("删除行程失败");
   }
 }
 
@@ -105,7 +105,7 @@ async function handleAddDayPlan() {
   }
 
   if (nextDate.isAfter(endDate)) {
-    message.warning("All dates in the trip range already have day plans");
+    message.warning("行程范围内的所有日期都已创建日期计划");
     return;
   }
 
@@ -118,7 +118,7 @@ async function handleAddDayPlan() {
   try {
     const result = await dayPlanApi.create(newDayPlan);
     if (result.data.code === 200) {
-      message.success("Day plan added");
+      message.success("日期计划已添加");
       loadTrip();
     } else {
       message.error(result.data.message);
@@ -131,10 +131,10 @@ async function handleAddDayPlan() {
 async function handleDeleteDayPlan(id: number) {
   try {
     await dayPlanApi.delete(id);
-    message.success("Day plan deleted");
+    message.success("日期计划已删除");
     loadTrip();
   } catch (error) {
-    message.error("Failed to delete day plan");
+    message.error("删除日期计划失败");
   }
 }
 
@@ -182,7 +182,7 @@ function getTypeIcon(type: PlanItemType) {
 }
 
 function getTypeName(type: PlanItemType) {
-  return typeNameMap[type] || "Other";
+  return typeNameMap[type] || "其他";
 }
 
 function getTypeTagType(type: PlanItemType) {
@@ -198,7 +198,7 @@ function getTypeTagType(type: PlanItemType) {
           <template #icon>
             <NIcon><ArrowBackOutline /></NIcon>
           </template>
-          Back to Trips
+          返回行程列表
         </NButton>
 
         <NSpace>
@@ -206,7 +206,7 @@ function getTypeTagType(type: PlanItemType) {
             <template #icon>
               <NIcon><CreateOutline /></NIcon>
             </template>
-            Edit
+            编辑
           </NButton>
           <NPopconfirm @positive-click="handleDeleteTrip">
             <template #trigger>
@@ -214,10 +214,10 @@ function getTypeTagType(type: PlanItemType) {
                 <template #icon>
                   <NIcon><TrashOutline /></NIcon>
                 </template>
-                Delete
+                删除
               </NButton>
             </template>
-            Are you sure you want to delete this trip?
+            您确定要删除此行程吗？
           </NPopconfirm>
         </NSpace>
       </header>
@@ -232,27 +232,27 @@ function getTypeTagType(type: PlanItemType) {
           <div class="meta-item">
             <NIcon :size="18"><CalendarOutline /></NIcon>
             <span>{{ formatDate(trip.startDate) }} - {{ formatDate(trip.endDate) }}</span>
-            <NTag type="primary" size="small">{{ duration }} days</NTag>
+            <NTag type="primary" size="small">{{ duration }} 天</NTag>
           </div>
           <div class="meta-item">
             <NIcon :size="18"><PeopleOutline /></NIcon>
-            <span>{{ trip.userCount }} travelers</span>
+            <span>{{ trip.userCount }} 人</span>
           </div>
           <div class="meta-item">
             <NIcon :size="18"><WalletOutline /></NIcon>
-            <span>{{ formatCurrency(trip.budget) }} budget</span>
+            <span>{{ formatCurrency(trip.budget) }} 预算</span>
           </div>
         </div>
       </NCard>
 
       <section class="timeline-section">
         <div class="section-header">
-          <h2 class="section-title">Itinerary</h2>
+          <h2 class="section-title">行程安排</h2>
           <NButton type="primary" @click="handleAddDayPlan">
             <template #icon>
               <NIcon><AddOutline /></NIcon>
             </template>
-            Add Day
+            添加日期
           </NButton>
         </div>
 
@@ -290,7 +290,7 @@ function getTypeTagType(type: PlanItemType) {
                   </div>
 
                   <!-- 没有行程项目时的提示 -->
-                  <p v-else class="day-notes-empty">No activities planned yet</p>
+                  <p v-else class="day-notes-empty">尚未计划活动</p>
 
                   <!-- 汇总信息：里程和时间 -->
                   <div v-if="dayPlan.distance || dayPlan.duration" class="day-summary">
@@ -321,7 +321,7 @@ function getTypeTagType(type: PlanItemType) {
                         </template>
                       </NButton>
                     </template>
-                    Delete this day plan?
+                    删除此日期计划？
                   </NPopconfirm>
                 </NSpace>
               </div>
@@ -329,13 +329,13 @@ function getTypeTagType(type: PlanItemType) {
           </NTimelineItem>
         </NTimeline>
 
-        <NEmpty v-else description="No day plans yet. Add your first day!">
+        <NEmpty v-else description="还没有日期计划。添加您的第一天！">
           <template #extra>
             <NButton type="primary" @click="handleAddDayPlan">
               <template #icon>
                 <NIcon><AddOutline /></NIcon>
               </template>
-              Add First Day
+              添加第一天
             </NButton>
           </template>
         </NEmpty>

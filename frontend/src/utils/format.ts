@@ -29,12 +29,12 @@ export const getItemTypeIcon = (type: string): string => {
 // Get item type label
 export const getItemTypeLabel = (type: string): string => {
   const labels: Record<string, string> = {
-    HOTEL: 'Hotel',
-    ATTRACTION: 'Attraction',
-    RESTAURANT: 'Restaurant',
-    TRANSPORT: 'Transport',
-    ACTIVITY: 'Activity',
-    OTHER: 'Other',
+    HOTEL: '住宿',
+    ATTRACTION: '景点',
+    RESTAURANT: '餐饮',
+    TRANSPORT: '交通',
+    ACTIVITY: '活动',
+    OTHER: '其他',
   }
   return labels[type] || type
 }

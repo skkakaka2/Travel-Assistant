@@ -27,7 +27,7 @@ async function loadTrips() {
   try {
     await tripStore.fetchTrips({ page: page.value, pageSize: pageSize.value });
   } catch (error) {
-    message.error("Failed to load trips");
+    message.error("加载行程失败");
   }
 }
 
@@ -58,24 +58,24 @@ async function handleFormSubmit(data: CreateTripDto | UpdateTripDto) {
   try {
     if (editingTrip.value) {
       await tripStore.updateTrip(editingTrip.value.id, data);
-      message.success("Trip updated successfully");
+      message.success("行程更新成功");
     } else {
       await tripStore.createTrip(data as CreateTripDto);
-      message.success("Trip created successfully");
+      message.success("行程创建成功");
     }
     loadTrips();
   } catch (error) {
-    message.error("Operation failed");
+    message.error("操作失败");
   }
 }
 
 async function handleDelete(id: number) {
   try {
     await tripStore.deleteTrip(id);
-    message.success("Trip deleted successfully");
+    message.success("行程删除成功");
     loadTrips();
   } catch (error) {
-    message.error("Failed to delete trip");
+    message.error("删除行程失败");
   }
 }
 
@@ -88,14 +88,14 @@ function handleTripClick(trip: Trip) {
   <div class="trips-page">
     <header class="page-header">
       <div>
-        <h1 class="page-title">My Trips</h1>
-        <p class="page-subtitle">Plan and manage your travel adventures</p>
+        <h1 class="page-title">我的行程</h1>
+        <p class="page-subtitle">规划和管理您的旅行冒险</p>
       </div>
       <NButton type="primary" @click="handleCreate">
         <template #icon>
           <NIcon><AddOutline /></NIcon>
         </template>
-        New Trip
+        新建行程
       </NButton>
     </header>
 
@@ -114,15 +114,15 @@ function handleTripClick(trip: Trip) {
       <EmptyState
         v-else-if="!tripStore.loading"
         icon="🌍"
-        title="No trips yet"
-        description="Start planning your next adventure by creating a new trip"
+        title="还没有行程"
+        description="通过创建新行程开始规划您的下一次冒险"
       >
         <template #action>
           <NButton type="primary" @click="handleCreate">
             <template #icon>
               <NIcon><AddOutline /></NIcon>
             </template>
-            Create Your First Trip
+            创建您的第一个行程
           </NButton>
         </template>
       </EmptyState>

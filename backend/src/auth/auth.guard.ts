@@ -7,11 +7,15 @@ import {
 import { Observable } from 'rxjs';
 import * as jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { resolve } from 'path';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from './decorators/public.decorator';
 import { ContextUser } from './decorators/contextuser.decorator';
 
-dotenv.config();
+// Load environment variables
+// Priority: .env.local > .env
+dotenv.config({ path: resolve(process.cwd(), '.env.local') });
+dotenv.config({ path: resolve(process.cwd(), '.env') });
 
 @Injectable()
 export class AuthGuard implements CanActivate {

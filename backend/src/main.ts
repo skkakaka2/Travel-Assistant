@@ -8,7 +8,14 @@ import { DataSource } from 'typeorm';
 import { seedAdmin } from './seeds/seed';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import fastifyCookie from '@fastify/cookie';
+import { config } from 'dotenv';
+import { resolve } from 'path';
 import 'reflect-metadata';
+
+// Load environment variables
+// Priority: .env.local > .env
+config({ path: resolve(process.cwd(), '.env.local') });
+config({ path: resolve(process.cwd(), '.env') });
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(

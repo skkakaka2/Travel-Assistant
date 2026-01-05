@@ -19,9 +19,9 @@ const emit = defineEmits<{
 const duration = computed(() => getDaysDiff(props.trip.startDate, props.trip.endDate))
 
 const status = computed(() => {
-  if (isFuture(props.trip.startDate)) return { label: 'Upcoming', type: 'info' as const }
-  if (isPast(props.trip.endDate)) return { label: 'Completed', type: 'success' as const }
-  return { label: 'In Progress', type: 'warning' as const }
+  if (isFuture(props.trip.startDate)) return { label: '即将到来', type: 'info' as const }
+  if (isPast(props.trip.endDate)) return { label: '已完成', type: 'success' as const }
+  return { label: '进行中', type: 'warning' as const }
 })
 </script>
 
@@ -49,7 +49,7 @@ const status = computed(() => {
       </div>
       <div class="meta-item">
         <NIcon :size="16"><PeopleOutline /></NIcon>
-        <span>{{ trip.userCount }} travelers</span>
+        <span>{{ trip.userCount }} 人</span>
       </div>
       <div class="meta-item">
         <NIcon :size="16"><WalletOutline /></NIcon>
@@ -59,7 +59,7 @@ const status = computed(() => {
 
     <div class="trip-footer">
       <NTag type="primary" size="small">
-        {{ duration }} days
+        {{ duration }} 天
       </NTag>
 
       <NSpace :size="4">
@@ -88,7 +88,7 @@ const status = computed(() => {
               </template>
             </NButton>
           </template>
-          Are you sure you want to delete this trip?
+          您确定要删除此行程吗？
         </NPopconfirm>
       </NSpace>
     </div>
