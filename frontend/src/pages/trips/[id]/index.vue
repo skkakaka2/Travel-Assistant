@@ -31,6 +31,7 @@ import {
   TimeOutline,
   NavigateOutline,
   HourglassOutline,
+  RefreshOutline,
 } from "@vicons/ionicons5";
 import TripForm from "@/components/trip/TripForm.vue";
 import { useTripStore } from "@/stores";
@@ -50,7 +51,7 @@ const loading = ref(true);
 const trip = ref<Trip | null>(null);
 const dayPlans = ref<DayPlan[]>([]);
 const showEditForm = ref(false);
-
+const refreshingDistance = ref(false);
 onMounted(() => {
   loadTrip();
 });
@@ -188,6 +189,18 @@ function getTypeName(type: PlanItemType) {
 function getTypeTagType(type: PlanItemType) {
   return typeTagMap[type] || "default";
 }
+
+async function handleRefreshDistance() {
+  if (!trip.value) return;
+  loading.value = true;
+  try {
+    await loadTrip();
+  } catch (error) {
+    message.error("刷新失败");
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -248,12 +261,20 @@ function getTypeTagType(type: PlanItemType) {
       <section class="timeline-section">
         <div class="section-header">
           <h2 class="section-title">行程安排</h2>
-          <NButton type="primary" @click="handleAddDayPlan">
-            <template #icon>
-              <NIcon><AddOutline /></NIcon>
-            </template>
-            添加日期
-          </NButton>
+          <div>
+            <NButton @click="handleRefreshDistance" :loading="refreshingDistance">
+              <template #icon>
+                <NIcon><RefreshOutline /></NIcon>
+              </template>
+              刷新行程
+            </NButton>
+            <NButton style="margin-left: 10px" type="primary" @click="handleAddDayPlan">
+              <template #icon>
+                <NIcon><AddOutline /></NIcon>
+              </template>
+              添加日期
+            </NButton>
+          </div>
         </div>
 
         <NTimeline v-if="dayPlans.length > 0" class="day-timeline">

@@ -103,7 +103,7 @@ const formRules = {
   address: [{ required: true, message: "请输入项目地址", trigger: "blur" }],
   startTime: [{ required: true, message: "请选择开始时间", trigger: "blur" }],
   endTime: [{ required: true, message: "请选择结束时间", trigger: "blur" }],
-  cost: [{ required: true, type: "number" as const, message: "请输入费用", trigger: "blur" }],
+  // cost: [{ required: true, type: "number" as const, message: "请输入费用", trigger: "blur" }],
 };
 
 function handleClose() {
@@ -178,7 +178,7 @@ function handleLocationSelected(data: { latitude: number; longitude: number; add
             </NFormItem>
           </NSpace>
           <NFormItem path="cost" label="费用">
-            <NInputNumber v-model:value="formData.cost" :min="0" style="width: 200px">
+            <NInputNumber v-model:value="formData.cost" placeholder="请输入费用" :min="0" style="width: 200px">
               <template #prefix>¥</template>
             </NInputNumber>
           </NFormItem>

@@ -80,8 +80,8 @@ export class CreateDayPlanItemDto {
     example: 10000,
   })
   @IsNumber()
-  @IsNotEmpty()
-  cost: number;
+  @IsOptional()
+  cost?: number;
 
   @ApiProperty({
     description: 'Item notes',

@@ -2,11 +2,12 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { NButton, NIcon, NSpace, NCard, NSpin, NInput, NEmpty, useMessage } from "naive-ui";
-import { ArrowBackOutline, AddOutline, SaveOutline } from "@vicons/ionicons5";
+import { ArrowBackOutline, AddOutline, SaveOutline, HomeOutline, RefreshOutline } from "@vicons/ionicons5";
 import DayPlanItemCard from "@/components/dayPlanItem/DayPlanItemCard.vue";
 import DayPlanItemForm from "@/components/dayPlanItem/DayPlanItemForm.vue";
-import { dayPlanApi, dayPlanItemApi } from "@/api";
+import { dayPlanApi, dayPlanItemApi, userApi } from "@/api";
 import type { DayPlan, DayPlanItem, CreateDayPlanItemDto, UpdateDayPlanItemDto } from "@/types/api";
+import { PlanItemType } from "@/types/api";
 import { formatDate, getDayOfWeek } from "@/utils/date";
 
 const route = useRoute();
@@ -18,6 +19,8 @@ const dayPlanId = computed(() => Number(route.params.dayId));
 
 const loading = ref(true);
 const saving = ref(false);
+const goingHome = ref(false);
+const refreshingDistance = ref(false);
 const dayPlan = ref<DayPlan | null>(null);
 const items = ref<DayPlanItem[]>([]);
 const notes = ref("");
@@ -115,6 +118,62 @@ async function handleDeleteItem(id: number) {
   }
 }
 
+async function handleRefreshDistance() {
+  if (!dayPlan.value) return;
+  loading.value = true;
+  try {
+    await loadDayPlan();
+  } catch (error) {
+    message.error("刷新失败");
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function handleGoHome() {
+  if (!dayPlan.value) return;
+
+  goingHome.value = true;
+  try {
+    // 获取用户信息
+    const userResponse = await userApi.getCurrentUser();
+    const user = userResponse.data.data;
+
+    if (!user.homeAddress || !user.homeLatitude || !user.homeLongitude) {
+      message.error("请先在设置中设置家的位置");
+      goingHome.value = false;
+      return;
+    }
+
+    // 创建"回家"的 item
+    const homeItem: CreateDayPlanItemDto = {
+      dayPlanId: dayPlanId.value,
+      tripId: tripId.value,
+      type: PlanItemType.TRANSPORT,
+      name: "回家",
+      address: user.homeAddress,
+      latitude: user.homeLatitude,
+      longitude: user.homeLongitude,
+      startTime: "22",
+      endTime: "23",
+      cost: 0,
+      notes: "返回家中",
+    };
+
+    const result = await dayPlanItemApi.create(homeItem);
+    if (result.data.code === 200) {
+      message.success("已添加回家项目");
+      loadDayPlan();
+    } else {
+      message.error(result.data.message);
+    }
+  } catch (error: any) {
+    message.error(error.message || "添加回家项目失败");
+  } finally {
+    goingHome.value = false;
+  }
+}
+
 const sortedItems = computed(() => {
   return [...items.value].sort((a, b) => {
     // Sort by start time, then by order
@@ -163,12 +222,26 @@ const sortedItems = computed(() => {
       <section class="items-section">
         <div class="section-header">
           <h2 class="section-title">日程安排</h2>
-          <NButton type="primary" @click="handleAddItem">
-            <template #icon>
-              <NIcon><AddOutline /></NIcon>
-            </template>
-            添加项目
-          </NButton>
+          <NSpace>
+            <NButton @click="handleGoHome" :loading="goingHome">
+              <template #icon>
+                <NIcon><HomeOutline /></NIcon>
+              </template>
+              一键回家
+            </NButton>
+            <NButton @click="handleRefreshDistance" :loading="refreshingDistance">
+              <template #icon>
+                <NIcon><RefreshOutline /></NIcon>
+              </template>
+              刷新里程
+            </NButton>
+            <NButton type="primary" @click="handleAddItem">
+              <template #icon>
+                <NIcon><AddOutline /></NIcon>
+              </template>
+              添加项目
+            </NButton>
+          </NSpace>
         </div>
 
         <div v-if="sortedItems.length > 0" class="items-list">
