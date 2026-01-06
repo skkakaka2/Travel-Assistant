@@ -195,7 +195,7 @@ export class DayPlanItemService {
       return errorResponse('Day plan not found', null);
     }
     const { distance, duration } = exist;
-    if (distance > 0 || duration > 0) {
+    if (distance && duration && (distance > 0 || duration > 0)) {
       const newDistance =
         dayPlan.distance! - distance < 0
           ? 0

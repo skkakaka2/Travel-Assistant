@@ -100,7 +100,7 @@ export class DistanceCalculationProcessor extends WorkerHost {
         distance: result.distance,
         duration: result.duration,
       });
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
     // 更新所有相关的 dayPlan
     for (const dayPlan of tripInfo.dayPlans) {

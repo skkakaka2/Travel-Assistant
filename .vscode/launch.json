@@ -9,7 +9,7 @@
       "type": "chrome",
       "request": "launch",
       "skipFiles": ["${workspaceFolder}/frontend/node_modules/**/*.js"],
-      "url": "http://localhost:5173",
+      "url": "http://localhost:8088",
       "webRoot": "${workspaceFolder}/frontend/",
       "preLaunchTask": "npm: dev"
     },

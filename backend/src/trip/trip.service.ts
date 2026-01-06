@@ -84,6 +84,11 @@ export class TripService {
     if (!result) {
       return errorResponse('Trip not found', null);
     }
+    result.dayPlans.forEach((dayPlan) => {
+      dayPlan.dayPlanItems.sort((a, b) =>
+        a.startTime!.localeCompare(b.startTime!),
+      );
+    });
     return successResponse(result);
   }
 

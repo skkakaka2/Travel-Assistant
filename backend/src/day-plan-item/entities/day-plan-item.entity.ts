@@ -58,7 +58,7 @@ export class DayPlanItem {
   endTime?: string | null;
 
   @Column({ type: 'int', default: 0 })
-  duration: number;
+  duration?: number | null;
 
   @Column({ type: 'int', default: 0, nullable: true })
   cost?: number | null;
@@ -76,7 +76,7 @@ export class DayPlanItem {
   longitude?: number | null;
 
   @Column({ type: 'int', default: 0 })
-  distance: number;
+  distance?: number | null;
 
   @CreateDateColumn({
     name: 'createdAt',

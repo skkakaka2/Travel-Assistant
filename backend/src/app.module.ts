@@ -65,7 +65,6 @@ import { DayPlanItemModule } from './day-plan-item/day-plan-item.module';
       useValue: new ValidationPipe({
         transform: true,
         whitelist: true,
-        forbidNonWhitelisted: true,
         transformOptions: {
           enableImplicitConversion: true,
         },
