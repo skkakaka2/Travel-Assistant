@@ -3,4 +3,5 @@ export * from './trip'
 export * from './dayPlan'
 export * from './dayPlanItem'
 export * from './user'
+export * from './upload'
 

@@ -16,6 +16,7 @@ import { DayPlan } from './day-plan/entities/day-plan.entity';
 import { Trip } from './trip/entities/trip.entity';
 import { User } from './user/entities/user.entity';
 import { DayPlanItemModule } from './day-plan-item/day-plan-item.module';
+import { FileSystemModule } from './file-system/file-system.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { DayPlanItemModule } from './day-plan-item/day-plan-item.module';
     UserModule,
     DayPlanModule,
     DayPlanItemModule,
+    FileSystemModule,
   ],
   controllers: [AppController],
   providers: [

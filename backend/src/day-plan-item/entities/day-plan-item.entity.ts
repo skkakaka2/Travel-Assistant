@@ -28,7 +28,9 @@ export class DayPlanItem {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => DayPlan, (dayPlan) => dayPlan.dayPlanItems, { onDelete: 'CASCADE' })
+  @ManyToOne(() => DayPlan, (dayPlan) => dayPlan.dayPlanItems, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'dayPlanId' })
   dayPlan: DayPlan;
 
@@ -77,6 +79,9 @@ export class DayPlanItem {
 
   @Column({ type: 'int', default: 0 })
   distance?: number | null;
+
+  @Column({ type: 'json', nullable: true })
+  imgList?: string[] | null;
 
   @CreateDateColumn({
     name: 'createdAt',

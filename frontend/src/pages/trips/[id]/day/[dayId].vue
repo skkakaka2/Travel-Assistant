@@ -251,6 +251,7 @@ const sortedItems = computed(() => {
             :item="item"
             @edit="handleEditItem"
             @delete="handleDeleteItem"
+            @refresh="loadDayPlan"
           />
         </div>
 

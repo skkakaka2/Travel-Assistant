@@ -245,6 +245,17 @@ export class DayPlanItemService {
     });
   }
 
+  async uploadImg(itemId: number, img: string) {
+    const exist = await this.dayPlanItemRepository.findOne({
+      where: {
+        id: itemId,
+      },
+    });
+    if (!exist) {
+      return errorResponse('Day plan item not found', null);
+    }
+  }
+
   /**
    * 计算行程项的里程和时间
    */

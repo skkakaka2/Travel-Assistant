@@ -139,6 +139,7 @@ export interface DayPlanItem {
   order: number
   latitude?: string
   longitude?: string
+  imgList?: string[]
   createdAt: string
   updatedAt: string
 }

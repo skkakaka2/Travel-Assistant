@@ -3,13 +3,16 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import Multipart from '@fastify/multipart';
+import fastifyStatic from '@fastify/static';
 import { AppModule } from './app.module';
 import { DataSource } from 'typeorm';
 import { seedAdmin } from './seeds/seed';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import fastifyCookie from '@fastify/cookie';
 import { config } from 'dotenv';
-import { resolve } from 'path';
+import { resolve, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import 'reflect-metadata';
 
 // Load environment variables
@@ -26,6 +29,23 @@ async function bootstrap() {
   // 注册 cookie 插件
   await app.register(fastifyCookie, {
     secret: process.env.COOKIE_SECRET || 'my-secret-key', // 用于签名 cookie
+  });
+  await app.register(Multipart, {
+    limits: {
+      fileSize: 1024 * 1024 * 10,
+    },
+  });
+
+  // 配置静态文件服务，用于访问上传的图片
+  const uploadsDir = join(process.cwd(), 'uploads');
+  // 确保 uploads 目录存在
+  if (!existsSync(uploadsDir)) {
+    mkdirSync(uploadsDir, { recursive: true });
+  }
+  await app.register(fastifyStatic, {
+    root: uploadsDir,
+    prefix: '/uploads/', // 访问路径前缀: http://localhost:3000/uploads/xxx.jpg
+    decorateReply: false, // 避免与其他静态服务冲突
   });
 
   await app.enableCors({
