@@ -47,9 +47,28 @@ const emit = defineEmits<{
 
 const message = useMessage();
 const uploading = ref(false);
+const deletingImage = ref<string | null>(null);
 
 // 图片列表
 const imageList = computed(() => props.item.imgList || []);
+
+// 删除图片
+async function handleDeleteImage(filename: string) {
+  deletingImage.value = filename;
+  try {
+    const result = await uploadApi.deleteImage(props.item.id, filename);
+    if (result.data.code === 200) {
+      message.success("图片已删除");
+      emit("refresh");
+    } else {
+      message.error(result.data.message || "删除失败");
+    }
+  } catch (error: any) {
+    message.error(error.message || "删除失败");
+  } finally {
+    deletingImage.value = null;
+  }
+}
 
 // 获取图片完整 URL（静态文件服务）
 function getImageUrl(filename: string): string {
@@ -59,20 +78,34 @@ function getImageUrl(filename: string): string {
 }
 
 // 自定义上传处理
-async function handleUpload({ file }: { file: UploadFileInfo }) {
-  if (!file.file) return;
+async function handleUpload({
+  file,
+  onFinish,
+  onError,
+}: {
+  file: UploadFileInfo;
+  onFinish: () => void;
+  onError: () => void;
+}) {
+  if (!file.file) {
+    onError();
+    return;
+  }
 
   uploading.value = true;
   try {
     const result = await uploadApi.uploadImage(props.item.id, file.file);
     if (result.data.code === 200) {
       message.success("图片上传成功");
+      onFinish(); // 标记上传完成，清除文件
       emit("refresh");
     } else {
       message.error(result.data.message || "上传失败");
+      onError(); // 标记上传失败
     }
   } catch (error: any) {
     message.error(error.message || "上传失败");
+    onError();
   } finally {
     uploading.value = false;
   }
@@ -130,15 +163,29 @@ async function handleUpload({ file }: { file: UploadFileInfo }) {
           <!-- 已上传的图片展示 -->
           <NImageGroup v-if="imageList.length > 0">
             <div class="photo-grid">
-              <div v-for="(img, index) in imageList" :key="index" class="photo-item">
-                <NImage
-                  :src="getImageUrl(img)"
-                  :alt="`Photo ${index + 1}`"
-                  object-fit="cover"
-                  width="80"
-                  height="80"
-                  lazy
-                />
+              <div v-for="(img, index) in imageList" :key="index" class="photo-wrapper">
+                <div class="photo-item">
+                  <NImage
+                    :src="getImageUrl(img)"
+                    :alt="`Photo ${index + 1}`"
+                    object-fit="cover"
+                    width="80"
+                    height="80"
+                    lazy
+                  />
+                </div>
+                <NButton
+                  size="tiny"
+                  type="error"
+                  quaternary
+                  class="photo-delete-btn"
+                  :loading="deletingImage === img"
+                  @click="handleDeleteImage(img)"
+                >
+                  <template #icon>
+                    <NIcon :size="12"><TrashOutline /></NIcon>
+                  </template>
+                </NButton>
               </div>
             </div>
           </NImageGroup>
@@ -268,7 +315,15 @@ async function handleUpload({ file }: { file: UploadFileInfo }) {
   gap: var(--spacing-xs);
 }
 
+.photo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
 .photo-item {
+  position: relative;
   width: 80px;
   height: 80px;
   border-radius: var(--radius-sm, 6px);
@@ -282,6 +337,11 @@ async function handleUpload({ file }: { file: UploadFileInfo }) {
 .photo-item:hover {
   transform: scale(1.05);
   box-shadow: var(--shadow-sm);
+}
+
+.photo-delete-btn {
+  padding: 2px 6px;
+  font-size: 0.7rem;
 }
 
 .photo-item :deep(.n-image) {
