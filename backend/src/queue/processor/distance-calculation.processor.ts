@@ -127,9 +127,9 @@ export class DistanceCalculationProcessor extends WorkerHost {
     start: { latitude: number; longitude: number },
     end: { latitude: number; longitude: number },
   ): Promise<RouteResult> {
-    const BAIDU_AK = process.env.BAIDU_MAP_AK;
+    const BAIDU_AK = process.env.BAIDU_MAP_SERVER_AK;
     if (!BAIDU_AK) {
-      this.logger.error('BAIDU_MAP_AK is not configured');
+      this.logger.error('BAIDU_MAP_SERVER_AK is not configured');
       return {
         distance: -1,
         duration: 0,

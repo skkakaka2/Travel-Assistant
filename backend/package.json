@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && copy .env.production dist\\.env && copy docker-entrypoint.sh dist\\ && copy package.json dist\\ && copy pnpm-lock.yaml dist\\ && tar -cvf dist.tar -C dist . && scp dist.tar aaa@192.168.31.119:/home/aaa/travelassistant",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

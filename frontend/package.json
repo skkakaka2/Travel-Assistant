@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vue-tsc -b && vite build && tar -cvf dist.tar -C dist . && scp dist.tar aaa@192.168.31.119:/home/aaa/travelassistantFrontend",
     "preview": "vite preview"
   },
   "dependencies": {

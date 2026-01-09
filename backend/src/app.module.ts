@@ -17,6 +17,11 @@ import { Trip } from './trip/entities/trip.entity';
 import { User } from './user/entities/user.entity';
 import { DayPlanItemModule } from './day-plan-item/day-plan-item.module';
 import { FileSystemModule } from './file-system/file-system.module';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+console.log(process.env.DATABASE_URL);
 
 @Module({
   imports: [

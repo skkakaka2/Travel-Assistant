@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { NForm, NFormItem, NInput, NButton, NSpace, useMessage } from 'naive-ui'
+import type { FormRules } from 'naive-ui'
 import { useAuthStore } from '@/stores'
 import type { RegisterDto } from '@/types/api'
 
@@ -17,11 +18,11 @@ const formData = ref<RegisterDto>({
   name: '',
 })
 
-const formRules = {
+const formRules: FormRules = {
   username: { required: true, message: '请输入用户名', trigger: 'blur' },
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入有效的邮箱地址', trigger: 'blur' },
+    { type: 'email' as const, message: '请输入有效的邮箱地址', trigger: 'blur' },
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
