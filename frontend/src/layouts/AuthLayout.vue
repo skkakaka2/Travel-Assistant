@@ -30,8 +30,8 @@ const themeStore = useThemeStore()
       <div class="auth-card glass">
         <div class="auth-header">
           <span class="auth-logo">🌍</span>
-          <h1 class="auth-title gradient-text">旅行助手</h1>
-          <p class="auth-subtitle">规划您的完美旅程</p>
+          <h1 class="auth-title gradient-text">自驾助手</h1>
+          <p class="auth-subtitle">规划您的完美自驾</p>
         </div>
 
         <div class="auth-content">

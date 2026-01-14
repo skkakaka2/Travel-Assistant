@@ -32,8 +32,11 @@ import {
   NavigateOutline,
   HourglassOutline,
   RefreshOutline,
+  ImageOutline,
+  MapOutline,
 } from "@vicons/ionicons5";
 import TripForm from "@/components/trip/TripForm.vue";
+import TripMapView from "@/components/trip/TripMapView.vue";
 import { useTripStore } from "@/stores";
 import { tripApi, dayPlanApi } from "@/api";
 import type { Trip, DayPlan, CreateDayPlanDto, UpdateTripDto, DayPlanItem } from "@/types/api";
@@ -52,6 +55,10 @@ const trip = ref<Trip | null>(null);
 const dayPlans = ref<DayPlan[]>([]);
 const showEditForm = ref(false);
 const refreshingDistance = ref(false);
+const exportingPDF = ref(false);
+const exportingImage = ref(false);
+const showMapView = ref(false);
+
 onMounted(() => {
   loadTrip();
 });
@@ -201,6 +208,20 @@ async function handleRefreshDistance() {
     loading.value = false;
   }
 }
+
+async function handleExportImage() {
+  if (!trip.value) return;
+  exportingImage.value = true;
+  try {
+    const filename = `${trip.value.name || "trip"}.png`;
+    await tripApi.exportToImage(tripId.value, filename);
+    message.success("图片导出成功");
+  } catch (error: any) {
+    message.error(error.message || "导出图片失败");
+  } finally {
+    exportingImage.value = false;
+  }
+}
 </script>
 
 <template>
@@ -215,6 +236,18 @@ async function handleRefreshDistance() {
         </NButton>
 
         <NSpace>
+          <NButton type="primary" @click="showMapView = true">
+            <template #icon>
+              <NIcon><MapOutline /></NIcon>
+            </template>
+            查看地图
+          </NButton>
+          <NButton @click="handleExportImage" :loading="exportingImage">
+            <template #icon>
+              <NIcon><ImageOutline /></NIcon>
+            </template>
+            导出图片
+          </NButton>
           <NButton @click="showEditForm = true">
             <template #icon>
               <NIcon><CreateOutline /></NIcon>
@@ -363,6 +396,9 @@ async function handleRefreshDistance() {
       </section>
 
       <TripForm v-model:show="showEditForm" :trip="trip" @submit="handleUpdateTrip" />
+      
+      <!-- 地图视图 -->
+      <TripMapView v-model:show="showMapView" :trip="trip" :day-plans="dayPlans" />
     </div>
   </NSpin>
 </template>

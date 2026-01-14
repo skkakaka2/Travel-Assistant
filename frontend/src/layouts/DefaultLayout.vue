@@ -41,7 +41,7 @@ function handleUserAction(key: string) {
       <div class="header-content container">
         <RouterLink to="/trips" class="logo">
           <span class="logo-icon">🌍</span>
-          <span class="logo-text gradient-text">旅行助手</span>
+          <span class="logo-text gradient-text">自驾助手</span>
         </RouterLink>
 
         <NSpace align="center" :size="12">

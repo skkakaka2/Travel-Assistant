@@ -202,7 +202,6 @@ async function handleUpload({
               <NIcon :size="20" v-if="!uploading"><AddOutline /></NIcon>
               <span v-if="uploading">上传中...</span>
               <span v-else-if="imageList.length === 0">添加照片</span>
-              <span v-else>+</span>
             </div>
           </NUpload>
         </div>
@@ -372,7 +371,6 @@ async function handleUpload({
     border-color 0.2s,
     color 0.2s,
     background-color 0.2s;
-  background-color: var(--bg-color-light, #fafafa);
 }
 
 .upload-trigger:hover {

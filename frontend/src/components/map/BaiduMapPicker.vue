@@ -2,6 +2,7 @@
 import { ref, onMounted, watch, onUnmounted } from "vue";
 import { NInput, NButton, NSpace, NSpin, NIcon } from "naive-ui";
 import { SearchOutline, LocationOutline } from "@vicons/ionicons5";
+import { useBaiduMap } from "@/composables/useBaiduMap";
 
 // 声明百度地图全局变量类型
 declare global {
@@ -26,69 +27,49 @@ const emit = defineEmits<{
 
 const mapContainer = ref<HTMLDivElement | null>(null);
 const searchInput = ref("");
-const loading = ref(true);
 const selectedAddress = ref(props.address || "");
 const selectedLat = ref<string | undefined>(props.latitude);
 const selectedLng = ref<string | undefined>(props.longitude);
+
+// 使用百度地图 composable
+const { loading, initMap: initBaiduMap, getMap, destroyMap, setCenterAndZoom } = useBaiduMap(mapContainer);
 
 let map: any = null;
 let marker: any = null;
 let geocoder: any = null;
 let localSearch: any = null;
 
-// 百度地图 API Key（从环境变量获取）
-const BAIDU_MAP_AK = import.meta.env.VITE_BAIDU_MAP_AK || "";
-
-// 动态加载百度地图脚本
-function loadBaiduMapScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (window.BMapGL) {
-      resolve();
-      return;
-    }
-
-    // 设置回调函数
-    window.initBaiduMap = () => {
-      resolve();
-    };
-
-    const script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = `https://api.map.baidu.com/api?v=1.0&type=webgl&ak=${BAIDU_MAP_AK}&callback=initBaiduMap`;
-    script.onerror = () => reject(new Error("Failed to load Baidu Map API"));
-    document.head.appendChild(script);
-  });
-}
-
 // 初始化地图
 async function initMap() {
   if (!mapContainer.value) return;
 
   try {
-    await loadBaiduMapScript();
-
     const BMapGL = window.BMapGL;
 
-    // 默认中心点（北京）
-    const defaultCenter = new BMapGL.Point(116.404, 39.915);
-
-    // 创建地图实例
-    map = new BMapGL.Map(mapContainer.value);
-
-    // 如果有初始经纬度，使用它作为中心点
+    // 使用 composable 初始化地图
     if (props.latitude && props.longitude) {
-      const center = new BMapGL.Point(props.longitude, props.latitude);
-      map.centerAndZoom(center, 15);
-      addMarker(center);
+      map = await initBaiduMap({
+        center: { lng: Number(props.longitude), lat: Number(props.latitude) },
+        zoom: 15,
+        enableScrollWheelZoom: true,
+        controls: true,
+      });
+      if (map) {
+        const center = new BMapGL.Point(props.longitude, props.latitude);
+        addMarker(center);
+      }
     } else {
-      map.centerAndZoom(defaultCenter, 12);
+      map = await initBaiduMap({
+        zoom: 12,
+        enableScrollWheelZoom: true,
+        controls: true,
+      });
     }
 
-    // 启用滚轮缩放
-    map.enableScrollWheelZoom(true);
-
-    // 添加缩放控件
-    map.addControl(new BMapGL.ZoomControl());
+    if (!map) {
+      console.error("Failed to initialize map");
+      return;
+    }
 
     // 初始化地理编码器
     geocoder = new BMapGL.Geocoder();
@@ -114,11 +95,8 @@ async function initMap() {
       addMarker(point);
       reverseGeocode(point);
     });
-
-    loading.value = false;
   } catch (error) {
     console.error("Failed to initialize Baidu Map:", error);
-    loading.value = false;
   }
 }
 
@@ -192,8 +170,8 @@ watch(
   () => [props.latitude, props.longitude],
   ([lat, lng]) => {
     if (lat && lng && map && window.BMapGL) {
+      setCenterAndZoom(Number(lng), Number(lat), 15);
       const point = new window.BMapGL.Point(lng, lat);
-      map.centerAndZoom(point, 15);
       addMarker(point);
     }
   }
@@ -213,10 +191,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (map) {
-    map.destroy?.();
-    map = null;
-  }
+  destroyMap();
+  map = null;
 });
 </script>
 

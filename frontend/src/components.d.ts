@@ -20,5 +20,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     TripCard: typeof import('./components/trip/TripCard.vue')['default']
     TripForm: typeof import('./components/trip/TripForm.vue')['default']
+    TripMapView: typeof import('./components/trip/TripMapView.vue')['default']
   }
 }

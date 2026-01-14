@@ -233,7 +233,7 @@ const sortedItems = computed(() => {
               <template #icon>
                 <NIcon><RefreshOutline /></NIcon>
               </template>
-              刷新里程
+              刷新活动
             </NButton>
             <NButton type="primary" @click="handleAddItem">
               <template #icon>
