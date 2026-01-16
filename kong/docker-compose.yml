@@ -68,7 +68,7 @@ services:
     command: -c "kong migrations bootstrap && kong migrations up && /docker-entrypoint.sh kong docker-start"
 
   konga:
-    image: pantsel/konga:latest-arm64
+    image: pantsel/konga:0.14.9
     container_name: konga
     environment:
       TOKEN_SECRET: konga-token-secret
