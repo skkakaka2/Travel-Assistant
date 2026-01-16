@@ -56,7 +56,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "8008:8000"
       - "8001:8001"
       - "8002:8002"
       - "8443:8443"
