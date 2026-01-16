@@ -73,7 +73,7 @@ async function handleDeleteImage(filename: string) {
 // 获取图片完整 URL（静态文件服务）
 function getImageUrl(filename: string): string {
   // 后端静态文件服务地址
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
   return `${baseUrl}/uploads/${filename}`;
 }
 

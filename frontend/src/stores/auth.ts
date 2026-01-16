@@ -10,6 +10,10 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(data: LoginDto) {
     const response = await authApi.login(data)
     // Token is stored in httpOnly cookie by backend
+    // Also store token in localStorage for Authorization header
+    if (response.data.code === 200 && response.data.data) {
+      localStorage.setItem("token", response.data.data)
+    }
     return response.data
   }
 
@@ -24,6 +28,8 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       // Ignore logout errors
     }
+    // Clear token from localStorage
+    localStorage.removeItem("token")
     user.value = null
   }
 

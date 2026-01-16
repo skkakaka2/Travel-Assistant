@@ -24,15 +24,7 @@ export class AuthController {
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: FastifyReply,
   ) {
-    const result = await this.authService.login(loginDto);
-    res.setCookie('token', result.data, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 7 days (seconds)
-      path: '/',
-      sameSite: 'strict',
-    });
-    return result;
+    return await this.authService.login(loginDto);
   }
 
   @Post('register')
@@ -40,6 +32,6 @@ export class AuthController {
   @ApiOperation({ summary: 'User registration' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return await this.userService.create(createUserDto);
   }
 }

@@ -35,6 +35,7 @@ async function bootstrap() {
       fileSize: 1024 * 1024 * 10,
     },
   });
+  app.setGlobalPrefix('api');
 
   // 配置静态文件服务，用于访问上传的图片
   const uploadsDir = join(process.cwd(), 'uploads');

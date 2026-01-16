@@ -11,7 +11,7 @@ if [ ! -d "/home/aaa/travelassistant" ]; then
     mkdir -p /home/aaa/travelassistant
 fi
 
-rm -rf /home/aaa/travelassistant/*
+sudo rm -rf /home/aaa/travelassistant/*
 
 # scp dist.tar aaa@192.168.31.119:/home/aaa/travelassistant
 

@@ -15,7 +15,6 @@ declare module 'vue' {
     DayPlanItemCard: typeof import('./components/dayPlanItem/DayPlanItemCard.vue')['default']
     DayPlanItemForm: typeof import('./components/dayPlanItem/DayPlanItemForm.vue')['default']
     EmptyState: typeof import('./components/common/EmptyState.vue')['default']
-    HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TripCard: typeof import('./components/trip/TripCard.vue')['default']

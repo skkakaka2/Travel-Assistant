@@ -6,16 +6,9 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import * as jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
-import { resolve } from 'path';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from './decorators/public.decorator';
 import { ContextUser } from './decorators/contextuser.decorator';
-
-// Load environment variables
-// Priority: .env.local > .env
-dotenv.config({ path: resolve(process.cwd(), '.env.local') });
-dotenv.config({ path: resolve(process.cwd(), '.env') });
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -32,30 +25,43 @@ export class AuthGuard implements CanActivate {
     if (isPublic) {
       return true;
     }
+
     const req = context.switchToHttp().getRequest();
-    const token = req.cookies.token;
+    
+    // Kong 已经验证了 JWT token，我们只需要提取用户信息
+    // 优先从 Authorization header 读取（Kong 验证后会保留）
+    let token: string | null = null;
+    
+    // 从 Authorization header 读取
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    }
+
     if (!token) {
+      // 如果 Kong 已经验证通过，理论上不应该到这里
+      // 但为了安全，仍然抛出错误
       throw new UnauthorizedException('Missing authorization token');
     }
-    const validateToken = this.validateToken(token);
-    if (!validateToken) {
-      throw new UnauthorizedException('Invalid authorization token');
-    }
-    const decoded = jwt.decode(token) as { userId: string; username: string };
-    const user: ContextUser = {
-      userId: parseInt(decoded.userId),
-      username: decoded.username,
-    };
-    req.user = user;
-    return true;
-  }
 
-  private validateToken(token: string): boolean {
     try {
-      jwt.verify(token, process.env.JWT_SECRET);
+      // 只解码 token，不验证（Kong 已经验证过了）
+      // 如果 Kong 验证失败，请求不会到达这里
+      const decoded = jwt.decode(token) as { userId: number | string; username: string } | null;
+      
+      if (!decoded || !decoded.userId || !decoded.username) {
+        throw new UnauthorizedException('Invalid token payload');
+      }
+
+      const user: ContextUser = {
+        userId: typeof decoded.userId === 'number' ? decoded.userId : parseInt(decoded.userId),
+        username: decoded.username,
+      };
+      
+      req.user = user;
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Invalid authorization token');
+      throw new UnauthorizedException('Failed to extract user information from token');
     }
   }
 }

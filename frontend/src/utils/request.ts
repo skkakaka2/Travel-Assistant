@@ -10,9 +10,23 @@ const request: AxiosInstance = axios.create({
   },
 });
 
+// 从 cookie 中读取 token 的工具函数
+function getTokenFromCookie(): string | null {
+  // 由于 httpOnly cookie 无法通过 JavaScript 读取，我们从 localStorage 读取
+  // 登录时会将 token 存储到 localStorage
+  const token = localStorage.getItem("token");
+  return token;
+}
+
 // Request interceptor
 request.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // 从 cookie 或 localStorage 获取 token 并添加到 Authorization header
+    const token = getTokenFromCookie();
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {

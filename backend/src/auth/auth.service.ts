@@ -36,10 +36,15 @@ export class AuthService {
     // 设置 token 过期时间（默认 7 天）
     const expiresIn = process.env.TOKEN_EXP || '7d'; // 支持 '7d', '24h', '3600' 等格式
 
+    // Kong JWT 插件需要的 Consumer key（从环境变量读取，默认为 'travel-assistant-key'）
+    // 这个 key 必须与 Kong 中创建的 Consumer JWT Credential 的 key 一致
+    const kongConsumerKey = process.env.KONG_CONSUMER_KEY || 'travel-assistant-key';
+
     const token = jwt.sign(
       {
         userId: user.id,
         username: user.username,
+        kongKey: kongConsumerKey,
       },
       process.env.JWT_SECRET,
       {
