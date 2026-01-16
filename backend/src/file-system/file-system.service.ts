@@ -33,7 +33,7 @@ export class FileSystemService {
 
         if (!allowedExts.includes(ext)) {
           // 丢弃流，不占用内存
-          part.file.resume();
+          part.file.destroy();
           throw new Error('只能上传图片格式');
         }
 
@@ -55,6 +55,15 @@ export class FileSystemService {
     }
 
     return await this.relateFileToItem(Number(fields.itemId), uniqueName);
+  }
+
+  async deleteFile(filepath: string) {
+    try {
+      await fs.unlink(path.join(process.cwd(), 'uploads', filepath));
+      return successResponse(null);
+    } catch (error) {
+      return errorResponse('删除文件失败', null);
+    }
   }
 
   async relateFileToItem(itemId: number, filename: string) {
