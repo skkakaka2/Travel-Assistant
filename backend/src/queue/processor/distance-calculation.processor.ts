@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { userInfo } from 'os';
 import { DayPlanItemService } from 'src/day-plan-item/day-plan-item.service';
+import { predictTripCost } from 'src/utils/utils';
 
 @Processor(QUEUE_NAMES.DISTANCE_CALCULATION, { concurrency: 1 })
 export class DistanceCalculationProcessor extends WorkerHost {
@@ -23,9 +24,6 @@ export class DistanceCalculationProcessor extends WorkerHost {
     private readonly dayPlanRepository: Repository<DayPlan>,
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
-
-    @Inject(forwardRef(() => DayPlanItemService))
-    private readonly dayPlanItemService: DayPlanItemService,
   ) {
     super();
   }
@@ -101,19 +99,18 @@ export class DistanceCalculationProcessor extends WorkerHost {
       }
       item.distance = result.distance;
       item.duration = result.duration;
-      let carCost = await this.dayPlanItemService.predictTripCost(
-        item,
-        data.userInfo,
-      );
+      let carCost = await predictTripCost(item, data.userInfo);
       item.roadCost = carCost;
       totalRoadCost += carCost;
       await this.dayPlanItemRepository.update(item.id, item);
       await new Promise((resolve) => setTimeout(resolve, 400));
     }
 
+    //计算整个行程的过路费和总花费
     tripInfo.roadCost = totalRoadCost;
-    tripInfo.totalCost += totalRoadCost;
+    tripInfo.totalCost = totalRoadCost + tripInfo.roadCost;
     await this.tripRepository.update(tripInfo.id, tripInfo);
+
     // 更新所有相关的 dayPlan
     for (const dayPlan of tripInfo.dayPlans) {
       const dayPlanItems = itemAll.filter(

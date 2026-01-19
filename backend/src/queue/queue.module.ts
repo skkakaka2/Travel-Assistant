@@ -7,7 +7,6 @@ import { DayPlanItem } from 'src/day-plan-item/entities/day-plan-item.entity';
 import { DistanceCalculationProcessor } from './processor/distance-calculation.processor';
 import { DayPlan } from 'src/day-plan/entities/day-plan.entity';
 import { Trip } from 'src/trip/entities/trip.entity';
-import { DayPlanItemModule } from 'src/day-plan-item/day-plan-item.module';
 
 @Module({
   imports: [
@@ -30,7 +29,6 @@ import { DayPlanItemModule } from 'src/day-plan-item/day-plan-item.module';
     }),
     // 为 Processor 提供 TypeORM repository
     TypeOrmModule.forFeature([DayPlanItem, DayPlan, Trip]),
-    DayPlanItemModule,
   ],
   providers: [DistanceCalculationProcessor],
   exports: [BullModule],

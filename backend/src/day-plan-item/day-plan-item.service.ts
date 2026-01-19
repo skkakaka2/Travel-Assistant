@@ -275,26 +275,4 @@ export class DayPlanItemService {
       userInfo,
     });
   }
-
-  //预测行程花费（油费+过路费）
-  async predictTripCost(item: DayPlanItem, userInfo: User): Promise<number> {
-    const userRow = await this.userRepository.findOne({
-      where: {
-        id: userInfo.id,
-      },
-    });
-    const dayPlan = await this.dayPlanRepository.findOne({
-      where: {
-        id: item.dayPlanId,
-      },
-    });
-    const distance = item.distance ?? 0;
-    let roadCost = 0;
-    if (dayPlan!.isHoliday === 1) {
-      roadCost = 0;
-    }
-    const carCost = distance * userRow!.perKilometerCost!;
-    const totalCost = roadCost + carCost;
-    return parseInt(totalCost.toFixed(0));
-  }
 }
