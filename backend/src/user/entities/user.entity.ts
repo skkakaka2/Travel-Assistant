@@ -57,6 +57,12 @@ export class User {
   })
   updatedAt: Date;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  fuelConsumption?: number | null;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  perKilometerCost?: number | null;
+
   @OneToMany(() => Trip, (trip) => trip.user)
   trips: Trip[];
 }

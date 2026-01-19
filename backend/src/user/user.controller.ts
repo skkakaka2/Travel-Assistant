@@ -8,7 +8,7 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, SetHomeDto } from './dto/create-user.dto';
+import { CreateUserDto, SetCarDto, SetHomeDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ContextUser } from 'src/auth/decorators/contextuser.decorator';
 
@@ -54,5 +54,10 @@ export class UserController {
   @Get('has-home')
   hasHome(@ContextUser() user: ContextUser) {
     return this.userService.hasHome(user);
+  }
+
+  @Post('set-car')
+  setCar(@Body() setCarDto: SetCarDto, @ContextUser() user: ContextUser) {
+    return this.userService.setCar(setCarDto, user);
   }
 }

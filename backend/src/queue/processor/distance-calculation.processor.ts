@@ -1,6 +1,6 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Logger } from '@nestjs/common';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { RouteResult } from 'src/common/distance.util';
 import { DayPlanItem } from 'src/day-plan-item/entities/day-plan-item.entity';
@@ -10,6 +10,7 @@ import { CalculateItemDistanceJob } from '../queue.types';
 import { Repository } from 'typeorm';
 import { Trip } from 'src/trip/entities/trip.entity';
 import { userInfo } from 'os';
+import { DayPlanItemService } from 'src/day-plan-item/day-plan-item.service';
 
 @Processor(QUEUE_NAMES.DISTANCE_CALCULATION, { concurrency: 1 })
 export class DistanceCalculationProcessor extends WorkerHost {
@@ -22,6 +23,9 @@ export class DistanceCalculationProcessor extends WorkerHost {
     private readonly dayPlanRepository: Repository<DayPlan>,
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
+
+    @Inject(forwardRef(() => DayPlanItemService))
+    private readonly dayPlanItemService: DayPlanItemService,
   ) {
     super();
   }
@@ -71,6 +75,7 @@ export class DistanceCalculationProcessor extends WorkerHost {
     const itemAll = tripInfo.dayPlans.flatMap(
       (dayPlan) => dayPlan.dayPlanItems,
     );
+    let totalRoadCost = 0;
     for (let index = 0; index < itemAll.length; index++) {
       const item = itemAll[index];
       if (!item.latitude || !item.longitude) {
@@ -96,12 +101,19 @@ export class DistanceCalculationProcessor extends WorkerHost {
       }
       item.distance = result.distance;
       item.duration = result.duration;
-      await this.dayPlanItemRepository.update(item.id, {
-        distance: result.distance,
-        duration: result.duration,
-      });
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      let carCost = await this.dayPlanItemService.predictTripCost(
+        item,
+        data.userInfo,
+      );
+      item.roadCost = carCost;
+      totalRoadCost += carCost;
+      await this.dayPlanItemRepository.update(item.id, item);
+      await new Promise((resolve) => setTimeout(resolve, 400));
     }
+
+    tripInfo.roadCost = totalRoadCost;
+    tripInfo.totalCost += totalRoadCost;
+    await this.tripRepository.update(tripInfo.id, tripInfo);
     // 更新所有相关的 dayPlan
     for (const dayPlan of tripInfo.dayPlans) {
       const dayPlanItems = itemAll.filter(

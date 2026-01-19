@@ -73,3 +73,22 @@ export class SetHomeDto {
   @IsNotEmpty()
   homeLongitude: number;
 }
+
+export class SetCarDto {
+  @ApiProperty({
+    description: 'Fuel consumption',
+    example: 10,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  //百公里油耗
+  fuelConsumption: number;
+  @ApiProperty({
+    description: 'Per kilometer cost',
+    example: 0.5,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  //每公里费用
+  perKilometerCost: number;
+}

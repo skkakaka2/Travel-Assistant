@@ -124,4 +124,14 @@ export class CreateDayPlanDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @ApiProperty({
+    description: 'Is holiday',
+    example: 0,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  @IsInt()
+  @Type(() => Number)
+  isHoliday?: number;
 }

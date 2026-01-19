@@ -29,6 +29,12 @@ export class Trip {
   @Column({ type: 'int', default: 0 })
   budget: number;
 
+  @Column({ type: 'int', default: 0 })
+  roadCost: number;
+
+  @Column({ type: 'int', default: 0 })
+  totalCost: number;
+
   @Column({ type: 'varchar', length: 191 })
   startDate: string;
 

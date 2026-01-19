@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, SetHomeDto } from './dto/create-user.dto';
+import { CreateUserDto, SetCarDto, SetHomeDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import {
@@ -76,5 +76,10 @@ export class UserService {
         ? true
         : false,
     );
+  }
+
+  async setCar(setCarDto: SetCarDto, user: ContextUser) {
+    await this.userRepository.update({ id: user.userId }, setCarDto);
+    return successResponse(setCarDto);
   }
 }

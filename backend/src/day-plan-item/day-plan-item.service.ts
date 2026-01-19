@@ -67,6 +67,13 @@ export class DayPlanItemService {
     if (isOverlap) {
       return errorResponse('存在时间重叠的行程', null);
     }
+
+    if (dayPlan.isHoliday === 1) {
+      createDayPlanItemDto.isHoliday = 1;
+    } else {
+      createDayPlanItemDto.isHoliday = 0;
+    }
+
     const result = this.dayPlanItemRepository.create({
       ...createDayPlanItemDto,
       userId: Number(user.userId),
@@ -267,5 +274,27 @@ export class DayPlanItemService {
       tripId,
       userInfo,
     });
+  }
+
+  //预测行程花费（油费+过路费）
+  async predictTripCost(item: DayPlanItem, userInfo: User): Promise<number> {
+    const userRow = await this.userRepository.findOne({
+      where: {
+        id: userInfo.id,
+      },
+    });
+    const dayPlan = await this.dayPlanRepository.findOne({
+      where: {
+        id: item.dayPlanId,
+      },
+    });
+    const distance = item.distance ?? 0;
+    let roadCost = 0;
+    if (dayPlan!.isHoliday === 1) {
+      roadCost = 0;
+    }
+    const carCost = distance * userRow!.perKilometerCost!;
+    const totalCost = roadCost + carCost;
+    return parseInt(totalCost.toFixed(0));
   }
 }

@@ -62,8 +62,11 @@ export class DayPlanItem {
   @Column({ type: 'int', default: 0 })
   duration?: number | null;
 
-  @Column({ type: 'int', default: 0, nullable: true })
-  cost?: number | null;
+  @Column({ type: 'int', default: 0})
+  cost: number;
+
+  @Column({ type: 'int', default: 0 })
+  roadCost: number;
 
   @Column({ type: 'text', nullable: true })
   notes?: string | null;

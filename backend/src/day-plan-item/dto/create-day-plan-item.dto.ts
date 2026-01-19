@@ -106,4 +106,11 @@ export class CreateDayPlanItemDto {
   @IsNumber()
   @IsNotEmpty()
   longitude: number;
+  @ApiProperty({
+    description: 'Is holiday',
+    example: 0,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  isHoliday?: number;
 }

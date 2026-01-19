@@ -37,6 +37,10 @@ export class DayPlan {
   @Column({ type: 'int', default: 0 })
   duration?: number;
 
+  @Column({ type: 'int', default: 0 })
+  //是否节假日（0：否，1：是）
+  isHoliday: number;
+
   @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;

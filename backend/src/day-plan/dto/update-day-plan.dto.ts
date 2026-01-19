@@ -114,4 +114,14 @@ export class UpdateDayPlanDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @ApiPropertyOptional({
+    description: 'Is holiday',
+    example: 0,
+  })
+  @IsNumber()
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  isHoliday?: number;
 }
