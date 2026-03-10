@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
         // 2. 检查用户是否存在
         if (user == null) {
-            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+            throw new BusinessException(ErrorCode.LOGIN_FAILED);
         }
 
         // 3. 检查账号状态
@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
 
         // 4. 验证密码
         if (!passwordUtils.matches(request.getPassword(), user.getPassword())) {
-            throw new BusinessException(ErrorCode.PASSWORD_ERROR);
+            throw new BusinessException(ErrorCode.LOGIN_FAILED);
         }
 
         // 5. 生成 Token

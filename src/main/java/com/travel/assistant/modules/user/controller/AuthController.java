@@ -59,7 +59,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     @Operation(summary = "用户登录", description = "验证用户名密码，返回 Token")
-    public Result<LoginVO> login(@Valid @RequestBody LoginRequest request) {
+    public Result<LoginVO> login(@RequestBody @Valid LoginRequest request) {
         LoginVO loginVO = userService.login(request);
         return Result.success(loginVO);
     }

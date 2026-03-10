@@ -29,6 +29,7 @@ public enum ErrorCode {
     PHONE_EXISTS(2004, "手机号已注册"),
     OLD_PASSWORD_ERROR(2005, "原密码错误"),
     USER_DISABLED(2006, "账号已被禁用"),
+    LOGIN_FAILED(2007, "登陆失败"),
 
     // ==================== 车辆模块错误 (3xxx) ====================
     
