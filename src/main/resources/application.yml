@@ -1,0 +1,73 @@
+# Spring Boot 主配置文件
+spring:
+  application:
+    name: travel-assistant
+
+  # 配置文件激活：dev 表示开发环境
+  profiles:
+    active: dev
+
+  # Jackson JSON 配置
+  jackson:
+    # 日期格式化
+    date-format: yyyy-MM-dd HH:mm:ss
+    # 时区设置
+    time-zone: Asia/Shanghai
+    # JSON 序列化时忽略空值
+    default-property-inclusion: non_null
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      # 单个文件最大 10MB
+      max-file-size: 10MB
+      # 总请求最大 100MB
+      max-request-size: 100MB
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  # Mapper XML 文件位置
+  mapper-locations: classpath:mapper/**/*.xml
+  # 实体类扫描路径
+  type-aliases-package: com.travel.assistant.entity
+  configuration:
+    # 开启驼峰命名转换：数据库字段 user_name -> Java属性 userName
+    map-underscore-to-camel-case: true
+    # 打印 SQL 日志（开发环境可用）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# SpringDoc API 文档配置
+springdoc:
+  api-docs:
+    # API 文档路径
+    path: /v3/api-docs
+  swagger-ui:
+    # Swagger UI 路径
+    path: /swagger-ui.html
+
+# 应用自定义配置
+app:
+  # JWT 配置
+  jwt:
+    # JWT 密钥（生产环境应使用环境变量）
+    secret: your-secret-key-please-change-in-production-environment
+    # Token 有效期（小时）
+    expiration: 168
+
+  # 本地文件存储配置
+  storage:
+    # 文件存储路径
+    location: ./uploads
+    # 访问路径前缀
+    url-prefix: /uploads/
+
+  # 百度地图 API 配置
+  baidu-map:
+    # API Key（请替换为您自己的 Key）
+    ak: your-baidu-map-ak
+    # 地理编码接口
+    geocoding-url: https://api.map.baidu.com/geocoding/v3/
+    # 逆地理编码接口
+    reverse-geocoding-url: https://api.map.baidu.com/reverse_geocoding/v3/
+    # 路线规划接口
+    direction-url: https://api.map.baidu.com/direction/v2/driving
