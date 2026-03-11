@@ -35,9 +35,25 @@ public class Result<T> {
      */
     private T data;
 
+    /**
+     * 总页数
+     */
+    private Long total;
+
+    /**
+     * 当前页数
+     */
+    private Long page;
+
+    /**
+     * 每页条数
+     */
+    private Long size;
+
     // ==================== 私有构造方法 ====================
-    
-    private Result() {}
+
+    private Result() {
+    }
 
     private Result(Integer code, String message, T data) {
         this.code = code;
@@ -45,8 +61,17 @@ public class Result<T> {
         this.data = data;
     }
 
+    private Result(Integer code, String message, T data, Long total, Long page, Long size) {
+        this.code = code;
+        this.message = message;
+        this.data = data;
+        this.total = total;
+        this.page = page;
+        this.size = size;
+    }
+
     // ==================== 静态工厂方法 ====================
-    
+
     /**
      * 成功返回（无数据）
      */
@@ -56,6 +81,7 @@ public class Result<T> {
 
     /**
      * 成功返回（有数据）
+     * 
      * @param data 返回的数据
      */
     public static <T> Result<T> success(T data) {
@@ -64,8 +90,9 @@ public class Result<T> {
 
     /**
      * 成功返回（自定义消息）
+     * 
      * @param message 提示信息
-     * @param data 返回的数据
+     * @param data    返回的数据
      */
     public static <T> Result<T> success(String message, T data) {
         return new Result<>(200, message, data);
@@ -73,7 +100,8 @@ public class Result<T> {
 
     /**
      * 失败返回
-     * @param code 错误码
+     * 
+     * @param code    错误码
      * @param message 错误信息
      */
     public static <T> Result<T> error(Integer code, String message) {
@@ -82,6 +110,7 @@ public class Result<T> {
 
     /**
      * 失败返回（默认 400 错误码）
+     * 
      * @param message 错误信息
      */
     public static <T> Result<T> error(String message) {
@@ -89,7 +118,7 @@ public class Result<T> {
     }
 
     // ==================== 常见的 HTTP 状态码快捷方法 ====================
-    
+
     /**
      * 404 - 资源未找到
      */
