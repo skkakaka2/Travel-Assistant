@@ -3,3 +3,11 @@ server:
 
 jwt:
   secret: "fewafvedfjweklr"
+
+mysql:
+  host: localhost
+  port: 3306
+  username: root
+  password: admin
+  database: travel_assistant
+  dsn: root:admin@tcp(localhost:3306)/travel_assistant?charset=utf8mb4&parseTime=True&loc=Local

@@ -11,6 +11,14 @@ type GlobalConfig struct {
 	Jwt struct {
 		Secret string `mapstructure:"secret"`
 	} `mapstructure:"jwt"`
+	Mysql struct {
+		Host     string `mapstructure:"host"`
+		Port     int    `mapstructure:"port"`
+		Username string `mapstructure:"username"`
+		Password string `mapstructure:"password"`
+		Database string `mapstructure:"database"`
+		Dsn      string `mapstructure:"dsn"`
+	} `mapstructure:"mysql"`
 }
 
 var AppConfig GlobalConfig

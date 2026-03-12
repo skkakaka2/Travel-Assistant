@@ -9,6 +9,7 @@ import (
 
 func main() {
 	config.Init()
+	config.InitDB()
 	fmt.Printf("%+v\n", config.AppConfig)
 	router := router.SetupRouter()
 	port := ":" + strconv.Itoa(config.AppConfig.Server.Port)
