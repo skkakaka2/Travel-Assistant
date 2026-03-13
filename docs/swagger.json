@@ -1,0 +1,369 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "旅游助手 API 文档",
+        "title": "Travel Assistant API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/v1/trip/create": {
+            "post": {
+                "description": "创建行程",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trip"
+                ],
+                "summary": "创建行程",
+                "parameters": [
+                    {
+                        "description": "创建行程请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.CreateTripRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建行程成功",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TripEntity"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/trip/get": {
+            "get": {
+                "description": "获取行程分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trip"
+                ],
+                "summary": "获取行程分页",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页条数",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取行程分页成功",
+                        "schema": {
+                            "$ref": "#/definitions/service.GetTripByPaginationResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/login": {
+            "post": {
+                "description": "登录",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "登录",
+                "parameters": [
+                    {
+                        "description": "登录请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "登录成功",
+                        "schema": {
+                            "$ref": "#/definitions/entity.UserEntity"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/register": {
+            "post": {
+                "description": "注册用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "注册用户",
+                "parameters": [
+                    {
+                        "description": "注册请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "注册成功",
+                        "schema": {
+                            "$ref": "#/definitions/user.RegisterResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.TripEntity": {
+            "type": "object",
+            "properties": {
+                "budget": {
+                    "description": "预算",
+                    "type": "number"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "creator": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "entity.UserEntity": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.CreateTripRequest": {
+            "type": "object",
+            "required": [
+                "budget",
+                "endDate",
+                "startDate",
+                "title",
+                "userCount"
+            ],
+            "properties": {
+                "budget": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "minLength": 0
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                },
+                "userCount": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "service.GetTripByPaginationResponse": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "trips": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.TripEntity"
+                    }
+                }
+            }
+        },
+        "user.LoginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "必填，6-20位",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
+                },
+                "username": {
+                    "description": "必填，3-20位字母数字",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                }
+            }
+        },
+        "user.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "avatar": {
+                    "description": "可选，URL格式",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "必填，邮箱格式",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "必填，6-20位",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
+                },
+                "phone": {
+                    "description": "可选，11位数字",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "必填，3-20位字母数字",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                }
+            }
+        },
+        "user.RegisterResponse": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
