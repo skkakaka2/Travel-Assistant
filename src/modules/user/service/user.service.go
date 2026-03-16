@@ -45,9 +45,7 @@ type LoginResponse struct {
 // @Router /api/v1/user/register [post]
 func Register(c *gin.Context) {
 	request := RegisterRequest{}
-
-	if err := c.ShouldBindJSON(&request); err != nil {
-		response.Error(c, http.StatusBadRequest, err.Error())
+	if !response.BindJSON(c, &request) {
 		return
 	}
 
@@ -81,9 +79,7 @@ func Register(c *gin.Context) {
 // @Router /api/v1/user/login [post]
 func Login(c *gin.Context) {
 	request := LoginRequest{}
-
-	if err := c.ShouldBindJSON(&request); err != nil {
-		response.Error(c, http.StatusBadRequest, err.Error())
+	if !response.BindJSON(c, &request) {
 		return
 	}
 

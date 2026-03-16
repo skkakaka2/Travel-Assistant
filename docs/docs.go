@@ -24,6 +24,144 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/activity/create": {
+            "post": {
+                "description": "为指定行程创建活动",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Activity"
+                ],
+                "summary": "创建活动",
+                "parameters": [
+                    {
+                        "description": "创建活动请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.CreateActivityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建活动成功",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ActivityEntity"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/activity/delete": {
+            "delete": {
+                "description": "删除指定活动",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Activity"
+                ],
+                "summary": "删除活动",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "活动ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除活动成功"
+                    }
+                }
+            }
+        },
+        "/api/v1/activity/list": {
+            "get": {
+                "description": "获取指定行程的活动列表，可按日期筛选",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Activity"
+                ],
+                "summary": "获取活动列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "行程ID",
+                        "name": "tripId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "日期筛选(yyyy-MM-dd)",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取活动列表成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entity.ActivityEntity"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/activity/update": {
+            "put": {
+                "description": "更新活动信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Activity"
+                ],
+                "summary": "更新活动",
+                "parameters": [
+                    {
+                        "description": "更新活动请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.UpdateActivityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新活动成功",
+                        "schema": {
+                            "$ref": "#/definitions/entity.ActivityEntity"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/trip/create": {
             "post": {
                 "description": "创建行程",
@@ -51,6 +189,38 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "创建行程成功",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TripEntity"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/trip/delete": {
+            "delete": {
+                "description": "删除行程",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trip"
+                ],
+                "summary": "删除行程",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "行程ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除行程成功",
                         "schema": {
                             "$ref": "#/definitions/entity.TripEntity"
                         }
@@ -92,6 +262,40 @@ const docTemplate = `{
                         "description": "获取行程分页成功",
                         "schema": {
                             "$ref": "#/definitions/service.GetTripByPaginationResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/trip/update": {
+            "put": {
+                "description": "更新行程",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Trip"
+                ],
+                "summary": "更新行程",
+                "parameters": [
+                    {
+                        "description": "更新行程请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.UpdateTripRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新行程成功",
+                        "schema": {
+                            "$ref": "#/definitions/entity.TripEntity"
                         }
                     }
                 }
@@ -167,6 +371,52 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "entity.ActivityEntity": {
+            "type": "object",
+            "properties": {
+                "activityDate": {
+                    "description": "活动日期(yyyy-MM-dd)",
+                    "type": "string"
+                },
+                "cost": {
+                    "description": "活动费用",
+                    "type": "number"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "description": {
+                    "description": "活动描述",
+                    "type": "string"
+                },
+                "endTime": {
+                    "description": "结束时间(HH:mm)",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "location": {
+                    "description": "活动地点",
+                    "type": "string"
+                },
+                "startTime": {
+                    "description": "开始时间(HH:mm)",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "活动标题",
+                    "type": "string"
+                },
+                "tripId": {
+                    "description": "关联的行程ID",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
         "entity.TripEntity": {
             "type": "object",
             "properties": {
@@ -232,6 +482,43 @@ const docTemplate = `{
                 }
             }
         },
+        "service.CreateActivityRequest": {
+            "type": "object",
+            "required": [
+                "activityDate",
+                "cost",
+                "title",
+                "tripId"
+            ],
+            "properties": {
+                "activityDate": {
+                    "type": "string"
+                },
+                "cost": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endTime": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "startTime": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "tripId": {
+                    "type": "integer"
+                }
+            }
+        },
         "service.CreateTripRequest": {
             "type": "object",
             "required": [
@@ -271,20 +558,92 @@ const docTemplate = `{
         "service.GetTripByPaginationResponse": {
             "type": "object",
             "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
-                "total": {
-                    "type": "integer"
-                },
                 "trips": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/entity.TripEntity"
                     }
+                }
+            }
+        },
+        "service.UpdateActivityRequest": {
+            "type": "object",
+            "required": [
+                "activityDate",
+                "cost",
+                "id",
+                "title",
+                "tripId"
+            ],
+            "properties": {
+                "activityDate": {
+                    "type": "string"
+                },
+                "cost": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "startTime": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "tripId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.UpdateTripRequest": {
+            "type": "object",
+            "required": [
+                "budget",
+                "endDate",
+                "id",
+                "startDate",
+                "title",
+                "userCount"
+            ],
+            "properties": {
+                "budget": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 200,
+                    "minLength": 0
+                },
+                "endDate": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "startDate": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                },
+                "userCount": {
+                    "type": "integer",
+                    "minimum": 1
                 }
             }
         },

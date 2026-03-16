@@ -1,5 +1,38 @@
 basePath: /api/v1
 definitions:
+  entity.ActivityEntity:
+    properties:
+      activityDate:
+        description: 活动日期(yyyy-MM-dd)
+        type: string
+      cost:
+        description: 活动费用
+        type: number
+      createdAt:
+        type: string
+      description:
+        description: 活动描述
+        type: string
+      endTime:
+        description: 结束时间(HH:mm)
+        type: string
+      id:
+        type: integer
+      location:
+        description: 活动地点
+        type: string
+      startTime:
+        description: 开始时间(HH:mm)
+        type: string
+      title:
+        description: 活动标题
+        type: string
+      tripId:
+        description: 关联的行程ID
+        type: integer
+      updatedAt:
+        type: string
+    type: object
   entity.TripEntity:
     properties:
       budget:
@@ -43,6 +76,32 @@ definitions:
       userName:
         type: string
     type: object
+  service.CreateActivityRequest:
+    properties:
+      activityDate:
+        type: string
+      cost:
+        minimum: 0
+        type: number
+      description:
+        type: string
+      endTime:
+        type: string
+      location:
+        type: string
+      startTime:
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      tripId:
+        type: integer
+    required:
+    - activityDate
+    - cost
+    - title
+    - tripId
+    type: object
   service.CreateTripRequest:
     properties:
       budget:
@@ -72,16 +131,69 @@ definitions:
     type: object
   service.GetTripByPaginationResponse:
     properties:
-      page:
-        type: integer
-      pageSize:
-        type: integer
-      total:
-        type: integer
       trips:
         items:
           $ref: '#/definitions/entity.TripEntity'
         type: array
+    type: object
+  service.UpdateActivityRequest:
+    properties:
+      activityDate:
+        type: string
+      cost:
+        minimum: 0
+        type: number
+      description:
+        type: string
+      endTime:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      startTime:
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      tripId:
+        type: integer
+    required:
+    - activityDate
+    - cost
+    - id
+    - title
+    - tripId
+    type: object
+  service.UpdateTripRequest:
+    properties:
+      budget:
+        minimum: 0
+        type: number
+      description:
+        maxLength: 200
+        minLength: 0
+        type: string
+      endDate:
+        type: string
+      id:
+        type: integer
+      startDate:
+        type: string
+      title:
+        maxLength: 20
+        minLength: 3
+        type: string
+      userCount:
+        minimum: 1
+        type: integer
+    required:
+    - budget
+    - endDate
+    - id
+    - startDate
+    - title
+    - userCount
     type: object
   user.LoginRequest:
     properties:
@@ -152,6 +264,96 @@ info:
   title: Travel Assistant API
   version: "1.0"
 paths:
+  /api/v1/activity/create:
+    post:
+      consumes:
+      - application/json
+      description: 为指定行程创建活动
+      parameters:
+      - description: 创建活动请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateActivityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建活动成功
+          schema:
+            $ref: '#/definitions/entity.ActivityEntity'
+      summary: 创建活动
+      tags:
+      - Activity
+  /api/v1/activity/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定活动
+      parameters:
+      - description: 活动ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除活动成功
+      summary: 删除活动
+      tags:
+      - Activity
+  /api/v1/activity/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定行程的活动列表，可按日期筛选
+      parameters:
+      - description: 行程ID
+        in: query
+        name: tripId
+        required: true
+        type: integer
+      - description: 日期筛选(yyyy-MM-dd)
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取活动列表成功
+          schema:
+            items:
+              $ref: '#/definitions/entity.ActivityEntity'
+            type: array
+      summary: 获取活动列表
+      tags:
+      - Activity
+  /api/v1/activity/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新活动信息
+      parameters:
+      - description: 更新活动请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.UpdateActivityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新活动成功
+          schema:
+            $ref: '#/definitions/entity.ActivityEntity'
+      summary: 更新活动
+      tags:
+      - Activity
   /api/v1/trip/create:
     post:
       consumes:
@@ -172,6 +374,27 @@ paths:
           schema:
             $ref: '#/definitions/entity.TripEntity'
       summary: 创建行程
+      tags:
+      - Trip
+  /api/v1/trip/delete:
+    delete:
+      consumes:
+      - application/json
+      description: 删除行程
+      parameters:
+      - description: 行程ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除行程成功
+          schema:
+            $ref: '#/definitions/entity.TripEntity'
+      summary: 删除行程
       tags:
       - Trip
   /api/v1/trip/get:
@@ -198,6 +421,28 @@ paths:
           schema:
             $ref: '#/definitions/service.GetTripByPaginationResponse'
       summary: 获取行程分页
+      tags:
+      - Trip
+  /api/v1/trip/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新行程
+      parameters:
+      - description: 更新行程请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.UpdateTripRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新行程成功
+          schema:
+            $ref: '#/definitions/entity.TripEntity'
+      summary: 更新行程
       tags:
       - Trip
   /api/v1/user/login:

@@ -2,6 +2,7 @@ package router
 
 import (
 	"travel-assistant/src/common/middleware"
+	activityService "travel-assistant/src/modules/activity/service"
 	tripService "travel-assistant/src/modules/trip/service"
 	userService "travel-assistant/src/modules/user/service"
 
@@ -17,7 +18,7 @@ func SetupRouter() *gin.Engine {
 
 	api := router.Group("/api/v1")
 
-	userGroup := api.Group("user", middleware.JwtMiddleware())
+	userGroup := api.Group("user")
 	{
 		userGroup.POST("register", userService.Register)
 		userGroup.POST("login", userService.Login)
@@ -28,6 +29,13 @@ func SetupRouter() *gin.Engine {
 		tripGroup.GET("get", tripService.GetTripByPagination)
 		tripGroup.PUT("update", tripService.UpdateTrip)
 		tripGroup.DELETE("delete", tripService.DeleteTrip)
+	}
+	activityGroup := api.Group("activity", middleware.JwtMiddleware())
+	{
+		activityGroup.POST("create", activityService.CreateActivity)
+		activityGroup.GET("list", activityService.GetActivities)
+		activityGroup.PUT("update", activityService.UpdateActivity)
+		activityGroup.DELETE("delete", activityService.DeleteActivity)
 	}
 
 	return router
