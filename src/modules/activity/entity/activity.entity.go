@@ -13,8 +13,8 @@ type ActivityEntity struct {
 	Location     string `gorm:"type:varchar(500)" json:"location"`              // 活动地点
 	Cost         uint   `gorm:"type:uint;not null" json:"cost"`                 // 总费用
 
-	Longitude float64 `gorm:"type:decimal(10,8);not null" json:"longitude"`
-	Latitude  float64 `gorm:"type:decimal(10,8);not null" json:"latitude"`
+	Longitude float64 `gorm:"type:decimal(9,6);not null" json:"longitude"`
+	Latitude  float64 `gorm:"type:decimal(8,6);not null" json:"latitude"`
 
 	Hotel         string `gorm:"type:varchar(255)" json:"hotel"`          // 酒店
 	HotelAddress  string `gorm:"type:varchar(255)" json:"hotelAddress"`   // 酒店地址
