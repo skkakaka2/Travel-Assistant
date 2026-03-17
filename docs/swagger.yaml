@@ -455,6 +455,33 @@ paths:
       summary: 更新活动
       tags:
       - Activity
+  /api/v1/map/route:
+    get:
+      consumes:
+      - application/json
+      description: 调用百度地图API，计算两个活动之间的驾车路线距离和预计时间
+      parameters:
+      - description: 起点活动ID
+        in: query
+        name: startActivityID
+        required: true
+        type: integer
+      - description: 终点活动ID
+        in: query
+        name: endActivityID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{\"distanceKm\":125.5,\"durationMin\":98}'
+          schema:
+            additionalProperties: true
+            type: object
+      summary: 获取活动间路线规划
+      tags:
+      - Map
   /api/v1/trip/create:
     post:
       consumes:

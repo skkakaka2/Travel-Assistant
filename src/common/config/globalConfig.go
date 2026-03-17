@@ -21,6 +21,10 @@ type GlobalConfig struct {
 		Port int    `mapstructure:"port"`
 		Dsn  string `mapstructure:"dsn"`
 	} `mapstructure:"mysql"`
+	BaiduMap struct {
+		Key      string `mapstructure:"key"`
+		BasePath string `mapstructure:"basePath"`
+	} `mapstructure:"baiduMap"`
 }
 
 var AppConfig GlobalConfig

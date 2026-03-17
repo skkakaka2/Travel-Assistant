@@ -24,8 +24,8 @@ type CreateActivityRequest struct {
 	Location     string `json:"location"`
 	Cost         uint   `json:"cost" binding:"required,min=0"`
 
-	Longitude float64 `json:"longitude" binding:"required,decimal6"`
-	Latitude  float64 `json:"latitude" binding:"required,decimal6"`
+	Longitude float64 `json:"longitude" binding:"required"`
+	Latitude  float64 `json:"latitude" binding:"required"`
 
 	Hotel         string `json:"hotel" binding:"omitempty,max=255"`
 	HotelAddress  string `json:"hotelAddress" binding:"omitempty,max=255"`

@@ -162,6 +162,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/map/route": {
+            "get": {
+                "description": "调用百度地图API，计算两个活动之间的驾车路线距离和预计时间",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Map"
+                ],
+                "summary": "获取活动间路线规划",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "起点活动ID",
+                        "name": "startActivityID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "终点活动ID",
+                        "name": "endActivityID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\\\"distanceKm\\\":125.5,\\\"durationMin\\\":98}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/trip/create": {
             "post": {
                 "description": "创建行程",
