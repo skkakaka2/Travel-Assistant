@@ -368,6 +368,40 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/user/update": {
+            "put": {
+                "description": "更新用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "更新用户",
+                "parameters": [
+                    {
+                        "description": "更新用户请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新用户成功",
+                        "schema": {
+                            "$ref": "#/definitions/entity.UserEntity"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -379,8 +413,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "cost": {
-                    "description": "活动费用",
-                    "type": "number"
+                    "description": "总费用",
+                    "type": "integer"
                 },
                 "createdAt": {
                     "type": "string"
@@ -393,12 +427,30 @@ const docTemplate = `{
                     "description": "结束时间(HH:mm)",
                     "type": "string"
                 },
+                "hotel": {
+                    "description": "酒店",
+                    "type": "string"
+                },
+                "hotelAddress": {
+                    "description": "酒店地址",
+                    "type": "string"
+                },
+                "hotelCost": {
+                    "description": "酒店费用",
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
                 },
                 "location": {
                     "description": "活动地点",
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
                 },
                 "startTime": {
                     "description": "开始时间(HH:mm)",
@@ -406,6 +458,14 @@ const docTemplate = `{
                 },
                 "title": {
                     "description": "活动标题",
+                    "type": "string"
+                },
+                "transportCost": {
+                    "description": "交通费用",
+                    "type": "integer"
+                },
+                "transportType": {
+                    "description": "交通方式",
                     "type": "string"
                 },
                 "tripId": {
@@ -420,9 +480,19 @@ const docTemplate = `{
         "entity.TripEntity": {
             "type": "object",
             "properties": {
+                "activities": {
+                    "description": "关联关系 - 行程有多个活动",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/entity.ActivityEntity"
+                    }
+                },
                 "budget": {
                     "description": "预算",
                     "type": "number"
+                },
+                "cost": {
+                    "type": "integer"
                 },
                 "createdAt": {
                     "type": "string"
@@ -459,13 +529,35 @@ const docTemplate = `{
                 "avatar": {
                     "type": "string"
                 },
+                "car": {
+                    "type": "string"
+                },
+                "carNumber": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
                 "email": {
                     "type": "string"
                 },
+                "home": {
+                    "type": "string"
+                },
+                "homeAddress": {
+                    "type": "string"
+                },
+                "homeLatitude": {
+                    "type": "number"
+                },
+                "homeLongitude": {
+                    "type": "number"
+                },
                 "id": {
+                    "type": "integer"
+                },
+                "perKilometerCost": {
+                    "description": "每公里油费",
                     "type": "integer"
                 },
                 "phone": {
@@ -487,6 +579,10 @@ const docTemplate = `{
             "required": [
                 "activityDate",
                 "cost",
+                "endTime",
+                "latitude",
+                "longitude",
+                "startTime",
                 "title",
                 "tripId"
             ],
@@ -495,7 +591,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "cost": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 0
                 },
                 "description": {
@@ -504,13 +600,39 @@ const docTemplate = `{
                 "endTime": {
                     "type": "string"
                 },
+                "hotel": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelAddress": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "latitude": {
+                    "type": "number"
+                },
                 "location": {
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
                 },
                 "startTime": {
                     "type": "string"
                 },
                 "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "transportCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "transportType": {
                     "type": "string",
                     "maxLength": 255
                 },
@@ -571,7 +693,11 @@ const docTemplate = `{
             "required": [
                 "activityDate",
                 "cost",
+                "endTime",
                 "id",
+                "latitude",
+                "longitude",
+                "startTime",
                 "title",
                 "tripId"
             ],
@@ -580,7 +706,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "cost": {
-                    "type": "number",
+                    "type": "integer",
                     "minimum": 0
                 },
                 "description": {
@@ -589,16 +715,42 @@ const docTemplate = `{
                 "endTime": {
                     "type": "string"
                 },
+                "hotel": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelAddress": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
                 "id": {
                     "type": "integer"
                 },
+                "latitude": {
+                    "type": "number"
+                },
                 "location": {
                     "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
                 },
                 "startTime": {
                     "type": "string"
                 },
                 "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "transportCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "transportType": {
                     "type": "string",
                     "maxLength": 255
                 },
@@ -671,19 +823,10 @@ const docTemplate = `{
         "user.RegisterRequest": {
             "type": "object",
             "required": [
-                "email",
                 "password",
                 "username"
             ],
             "properties": {
-                "avatar": {
-                    "description": "可选，URL格式",
-                    "type": "string"
-                },
-                "email": {
-                    "description": "必填，邮箱格式",
-                    "type": "string"
-                },
                 "password": {
                     "description": "必填，6-20位",
                     "type": "string",
@@ -705,19 +848,48 @@ const docTemplate = `{
         "user.RegisterResponse": {
             "type": "object",
             "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
                 },
                 "phone": {
                     "type": "string"
                 },
-                "username": {
+                "userName": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UpdateUserRequest": {
+            "type": "object",
+            "properties": {
+                "car": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "carNumber": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "home": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "homeAddress": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "homeLatitude": {
+                    "type": "number"
+                },
+                "homeLongitude": {
+                    "type": "number"
+                },
+                "perKilometerCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "phone": {
+                    "description": "可选，11位数字",
                     "type": "string"
                 }
             }

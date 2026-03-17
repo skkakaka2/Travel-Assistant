@@ -6,8 +6,8 @@ definitions:
         description: 活动日期(yyyy-MM-dd)
         type: string
       cost:
-        description: 活动费用
-        type: number
+        description: 总费用
+        type: integer
       createdAt:
         type: string
       description:
@@ -16,16 +16,35 @@ definitions:
       endTime:
         description: 结束时间(HH:mm)
         type: string
+      hotel:
+        description: 酒店
+        type: string
+      hotelAddress:
+        description: 酒店地址
+        type: string
+      hotelCost:
+        description: 酒店费用
+        type: integer
       id:
         type: integer
+      latitude:
+        type: number
       location:
         description: 活动地点
         type: string
+      longitude:
+        type: number
       startTime:
         description: 开始时间(HH:mm)
         type: string
       title:
         description: 活动标题
+        type: string
+      transportCost:
+        description: 交通费用
+        type: integer
+      transportType:
+        description: 交通方式
         type: string
       tripId:
         description: 关联的行程ID
@@ -35,9 +54,16 @@ definitions:
     type: object
   entity.TripEntity:
     properties:
+      activities:
+        description: 关联关系 - 行程有多个活动
+        items:
+          $ref: '#/definitions/entity.ActivityEntity'
+        type: array
       budget:
         description: 预算
         type: number
+      cost:
+        type: integer
       createdAt:
         type: string
       creator:
@@ -61,11 +87,26 @@ definitions:
     properties:
       avatar:
         type: string
+      car:
+        type: string
+      carNumber:
+        type: string
       createdAt:
         type: string
       email:
         type: string
+      home:
+        type: string
+      homeAddress:
+        type: string
+      homeLatitude:
+        type: number
+      homeLongitude:
+        type: number
       id:
+        type: integer
+      perKilometerCost:
+        description: 每公里油费
         type: integer
       phone:
         type: string
@@ -82,16 +123,35 @@ definitions:
         type: string
       cost:
         minimum: 0
-        type: number
+        type: integer
       description:
         type: string
       endTime:
         type: string
+      hotel:
+        maxLength: 255
+        type: string
+      hotelAddress:
+        maxLength: 255
+        type: string
+      hotelCost:
+        minimum: 0
+        type: integer
+      latitude:
+        type: number
       location:
         type: string
+      longitude:
+        type: number
       startTime:
         type: string
       title:
+        maxLength: 255
+        type: string
+      transportCost:
+        minimum: 0
+        type: integer
+      transportType:
         maxLength: 255
         type: string
       tripId:
@@ -99,6 +159,10 @@ definitions:
     required:
     - activityDate
     - cost
+    - endTime
+    - latitude
+    - longitude
+    - startTime
     - title
     - tripId
     type: object
@@ -142,18 +206,37 @@ definitions:
         type: string
       cost:
         minimum: 0
-        type: number
+        type: integer
       description:
         type: string
       endTime:
         type: string
+      hotel:
+        maxLength: 255
+        type: string
+      hotelAddress:
+        maxLength: 255
+        type: string
+      hotelCost:
+        minimum: 0
+        type: integer
       id:
         type: integer
+      latitude:
+        type: number
       location:
         type: string
+      longitude:
+        type: number
       startTime:
         type: string
       title:
+        maxLength: 255
+        type: string
+      transportCost:
+        minimum: 0
+        type: integer
+      transportType:
         maxLength: 255
         type: string
       tripId:
@@ -161,7 +244,11 @@ definitions:
     required:
     - activityDate
     - cost
+    - endTime
     - id
+    - latitude
+    - longitude
+    - startTime
     - title
     - tripId
     type: object
@@ -213,12 +300,6 @@ definitions:
     type: object
   user.RegisterRequest:
     properties:
-      avatar:
-        description: 可选，URL格式
-        type: string
-      email:
-        description: 必填，邮箱格式
-        type: string
       password:
         description: 必填，6-20位
         maxLength: 20
@@ -233,21 +314,41 @@ definitions:
         minLength: 3
         type: string
     required:
-    - email
     - password
     - username
     type: object
   user.RegisterResponse:
     properties:
-      avatar:
-        type: string
-      email:
-        type: string
       id:
         type: integer
       phone:
         type: string
-      username:
+      userName:
+        type: string
+    type: object
+  user.UpdateUserRequest:
+    properties:
+      car:
+        maxLength: 255
+        type: string
+      carNumber:
+        maxLength: 255
+        type: string
+      home:
+        maxLength: 255
+        type: string
+      homeAddress:
+        maxLength: 255
+        type: string
+      homeLatitude:
+        type: number
+      homeLongitude:
+        type: number
+      perKilometerCost:
+        minimum: 0
+        type: integer
+      phone:
+        description: 可选，11位数字
         type: string
     type: object
 host: localhost:8080
@@ -487,6 +588,28 @@ paths:
           schema:
             $ref: '#/definitions/user.RegisterResponse'
       summary: 注册用户
+      tags:
+      - User
+  /api/v1/user/update:
+    put:
+      consumes:
+      - application/json
+      description: 更新用户
+      parameters:
+      - description: 更新用户请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 更新用户成功
+          schema:
+            $ref: '#/definitions/entity.UserEntity'
+      summary: 更新用户
       tags:
       - User
 securityDefinitions:

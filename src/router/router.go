@@ -22,6 +22,7 @@ func SetupRouter() *gin.Engine {
 	{
 		userGroup.POST("register", userService.Register)
 		userGroup.POST("login", userService.Login)
+		userGroup.PUT("update", middleware.JwtMiddleware(), userService.UpdateUser)
 	}
 	tripGroup := api.Group("trip", middleware.JwtMiddleware())
 	{

@@ -36,6 +36,8 @@ func main() {
 
 	// 初始化日志
 	logger.InitLogger()
+
+	config.InitValidator()
 	defer logger.Logger.Sync()
 
 	// 启动服务

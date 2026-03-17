@@ -3,11 +3,12 @@ package service
 import (
 	"net/http"
 	"time"
+	"travel-assistant/src/common/Response"
 	"travel-assistant/src/common/config"
-	"travel-assistant/src/common/response"
 	"travel-assistant/src/modules/trip/entity"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/copier"
 )
 
 type CreateTripRequest struct {
@@ -37,16 +38,16 @@ type GetTripByPaginationResponse struct {
 func validateTripDates(c *gin.Context, startDateStr, endDateStr string) (time.Time, time.Time, bool) {
 	startDate, err := time.Parse("2006-01-02", startDateStr)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "开始日期格式错误")
+		Response.Error(c, http.StatusBadRequest, "开始日期格式错误")
 		return time.Time{}, time.Time{}, false
 	}
 	endDate, err := time.Parse("2006-01-02", endDateStr)
 	if err != nil {
-		response.Error(c, http.StatusBadRequest, "结束日期格式错误")
+		Response.Error(c, http.StatusBadRequest, "结束日期格式错误")
 		return time.Time{}, time.Time{}, false
 	}
 	if startDate.After(endDate) {
-		response.Error(c, http.StatusBadRequest, "开始日期不能晚于结束日期")
+		Response.Error(c, http.StatusBadRequest, "开始日期不能晚于结束日期")
 		return time.Time{}, time.Time{}, false
 	}
 	return startDate, endDate, true
@@ -62,7 +63,7 @@ func validateTripDates(c *gin.Context, startDateStr, endDateStr string) (time.Ti
 // @Router /api/v1/trip/create [post]
 func CreateTrip(c *gin.Context) {
 	request := CreateTripRequest{}
-	if !response.BindJSON(c, &request) {
+	if !Response.BindJSON(c, &request) {
 		return
 	}
 
@@ -74,23 +75,17 @@ func CreateTrip(c *gin.Context) {
 
 	userID := c.GetUint("userId")
 
-	trip := entity.TripEntity{
-		Title:       request.Title,
-		UserCount:   request.UserCount,
-		Description: request.Description,
-		StartDate:   request.StartDate,
-		EndDate:     request.EndDate,
-		Budget:      request.Budget,
-		Creator:     userID,
-	}
+	trip := entity.TripEntity{}
+	copier.Copy(&trip, &request)
+	trip.Creator = userID
 
 	result := config.DB.Create(&trip)
 	if result.Error != nil {
-		response.Error(c, http.StatusInternalServerError, result.Error.Error())
+		Response.Error(c, http.StatusInternalServerError, result.Error.Error())
 		return
 	}
 
-	response.Success(c, "创建行程成功", trip)
+	Response.Success(c, "创建行程成功", trip)
 }
 
 // @Summary 获取行程分页
@@ -104,18 +99,18 @@ func CreateTrip(c *gin.Context) {
 // @Router /api/v1/trip/get [get]
 func GetTripByPagination(c *gin.Context) {
 	request := GetTripByPaginationQuery{}
-	if !response.BindQuery(c, &request) {
+	if !Response.BindQuery(c, &request) {
 		return
 	}
 	total := int64(0)
 	trips := []entity.TripEntity{}
 	result := config.DB.Offset(int((request.Page - 1) * request.PageSize)).Limit(int(request.PageSize)).Find(&trips).Count(&total)
 	if result.Error != nil {
-		response.Error(c, http.StatusInternalServerError, "获取行程分页失败: "+result.Error.Error())
+		Response.Error(c, http.StatusInternalServerError, "获取行程分页失败: "+result.Error.Error())
 		return
 	}
 
-	response.SuccessWithPage(c, "获取行程分页成功", response.SuccessWithPageResponse[[]entity.TripEntity]{
+	Response.SuccessWithPage(c, "获取行程分页成功", Response.SuccessWithPageResponse[[]entity.TripEntity]{
 		List:     trips,
 		Total:    int(total),
 		Page:     request.Page,
@@ -133,13 +128,13 @@ func GetTripByPagination(c *gin.Context) {
 // @Router /api/v1/trip/update [put]
 func UpdateTrip(c *gin.Context) {
 	request := UpdateTripRequest{}
-	if !response.BindJSON(c, &request) {
+	if !Response.BindJSON(c, &request) {
 		return
 	}
 
 	trip := entity.TripEntity{}
 	if err := config.DB.Model(&trip).Where("id = ?", request.ID).First(&trip).Error; err != nil {
-		response.Error(c, http.StatusInternalServerError, "行程不存在: "+err.Error())
+		Response.Error(c, http.StatusInternalServerError, "行程不存在: "+err.Error())
 		return
 	}
 
@@ -150,11 +145,11 @@ func UpdateTrip(c *gin.Context) {
 	}
 	result := config.DB.Model(&trip).Where("id = ?", request.ID).Updates(request)
 	if result.Error != nil {
-		response.Error(c, http.StatusInternalServerError, "更新行程失败: "+result.Error.Error())
+		Response.Error(c, http.StatusInternalServerError, "更新行程失败: "+result.Error.Error())
 		return
 	}
 
-	response.Success(c, "更新行程成功", trip)
+	Response.Success(c, "更新行程成功", trip)
 }
 
 // @Summary 删除行程
@@ -167,21 +162,21 @@ func UpdateTrip(c *gin.Context) {
 // @Router /api/v1/trip/delete [delete]
 func DeleteTrip(c *gin.Context) {
 	id := uint(0)
-	if !response.BindQuery(c, &id) {
+	if !Response.BindQuery(c, &id) {
 		return
 	}
 
 	trip := entity.TripEntity{}
 
 	if err := config.DB.Model(&trip).Where("id = ?", id).First(&trip).Error; err != nil {
-		response.Error(c, http.StatusInternalServerError, "行程不存在: "+err.Error())
+		Response.Error(c, http.StatusInternalServerError, "行程不存在: "+err.Error())
 		return
 	}
 
 	if err := config.DB.Where("id = ?", id).Delete(&trip).Error; err != nil {
-		response.Error(c, http.StatusInternalServerError, "删除行程失败: "+err.Error())
+		Response.Error(c, http.StatusInternalServerError, "删除行程失败: "+err.Error())
 		return
 	}
 
-	response.Success[any](c, "删除行程成功", nil)
+	Response.Success[any](c, "删除行程成功", nil)
 }
