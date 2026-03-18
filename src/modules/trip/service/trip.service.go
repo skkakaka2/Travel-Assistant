@@ -149,6 +149,11 @@ func UpdateTrip(c *gin.Context) {
 		return
 	}
 
+	if _, err := CheckTripCostIsOverBudget(request.ID); err != nil {
+		Response.Error(c, http.StatusInternalServerError, "更新行程失败: "+err.Error())
+		return
+	}
+
 	Response.Success(c, "更新行程成功", trip)
 }
 
@@ -179,4 +184,20 @@ func DeleteTrip(c *gin.Context) {
 	}
 
 	Response.Success[any](c, "删除行程成功", nil)
+}
+
+func CheckTripCostIsOverBudget(tripId uint) (success bool, err error) {
+	var trip = entity.TripEntity{}
+	if err := config.DB.First(&trip, tripId).Error; err != nil {
+		return false, err
+	}
+	if trip.Cost > trip.Budget {
+		trip.IsOverBudget = 1
+		config.DB.Model(&trip).Save(&trip)
+		return true, nil
+	} else {
+		trip.IsOverBudget = 0
+		config.DB.Model(&trip).Save(&trip)
+		return false, nil
+	}
 }

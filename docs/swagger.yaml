@@ -86,7 +86,7 @@ definitions:
         type: array
       budget:
         description: 预算
-        type: number
+        type: integer
       cost:
         type: integer
       createdAt:
@@ -98,6 +98,9 @@ definitions:
       endDate:
         type: string
       id:
+        type: integer
+      isOverBudget:
+        description: 是否超预算
         type: integer
       startDate:
         type: string

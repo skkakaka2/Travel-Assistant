@@ -561,7 +561,7 @@ const docTemplate = `{
                 },
                 "budget": {
                     "description": "预算",
-                    "type": "number"
+                    "type": "integer"
                 },
                 "cost": {
                     "type": "integer"
@@ -579,6 +579,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "isOverBudget": {
+                    "description": "是否超预算",
                     "type": "integer"
                 },
                 "startDate": {
