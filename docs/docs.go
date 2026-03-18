@@ -128,6 +128,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/activity/route/query": {
+            "post": {
+                "description": "查询活动路线",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Activity"
+                ],
+                "summary": "查询活动路线",
+                "parameters": [
+                    {
+                        "description": "查询活动路线请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.CalcActivityRouteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询活动路线成功",
+                        "schema": {
+                            "$ref": "#/definitions/common.RouteResult"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/activity/update": {
             "put": {
                 "description": "更新活动信息",
@@ -157,46 +191,6 @@ const docTemplate = `{
                         "description": "更新活动成功",
                         "schema": {
                             "$ref": "#/definitions/entity.ActivityEntity"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/map/route": {
-            "get": {
-                "description": "调用百度地图API，计算两个活动之间的驾车路线距离和预计时间",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Map"
-                ],
-                "summary": "获取活动间路线规划",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "起点活动ID",
-                        "name": "startActivityID",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "终点活动ID",
-                        "name": "endActivityID",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\\\"distanceKm\\\":125.5,\\\"durationMin\\\":98}",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
                         }
                     }
                 }
@@ -445,6 +439,44 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "common.Result": {
+            "type": "object",
+            "properties": {
+                "routes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/common.Route"
+                    }
+                }
+            }
+        },
+        "common.Route": {
+            "type": "object",
+            "properties": {
+                "distance": {
+                    "description": "路线距离，单位：米",
+                    "type": "integer"
+                },
+                "duration": {
+                    "description": "路线耗时，单位：秒",
+                    "type": "integer"
+                }
+            }
+        },
+        "common.RouteResult": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "result": {
+                    "$ref": "#/definitions/common.Result"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
         "entity.ActivityEntity": {
             "type": "object",
             "properties": {
@@ -611,6 +643,21 @@ const docTemplate = `{
                 },
                 "userName": {
                     "type": "string"
+                }
+            }
+        },
+        "service.CalcActivityRouteRequest": {
+            "type": "object",
+            "required": [
+                "endActivityId",
+                "startActivityId"
+            ],
+            "properties": {
+                "endActivityId": {
+                    "type": "integer"
+                },
+                "startActivityId": {
+                    "type": "integer"
                 }
             }
         },

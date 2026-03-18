@@ -37,6 +37,7 @@ func SetupRouter() *gin.Engine {
 		activityGroup.GET("list", activityService.GetActivities)
 		activityGroup.PUT("update", activityService.UpdateActivity)
 		activityGroup.DELETE("delete", activityService.DeleteActivity)
+		activityGroup.POST("route/query", activityService.QueryActivityRoute)
 	}
 
 	return router

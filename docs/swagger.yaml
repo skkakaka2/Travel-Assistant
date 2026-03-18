@@ -1,5 +1,30 @@
 basePath: /api/v1
 definitions:
+  common.Result:
+    properties:
+      routes:
+        items:
+          $ref: '#/definitions/common.Route'
+        type: array
+    type: object
+  common.Route:
+    properties:
+      distance:
+        description: 路线距离，单位：米
+        type: integer
+      duration:
+        description: 路线耗时，单位：秒
+        type: integer
+    type: object
+  common.RouteResult:
+    properties:
+      message:
+        type: string
+      result:
+        $ref: '#/definitions/common.Result'
+      status:
+        type: integer
+    type: object
   entity.ActivityEntity:
     properties:
       activityDate:
@@ -116,6 +141,16 @@ definitions:
         type: string
       userName:
         type: string
+    type: object
+  service.CalcActivityRouteRequest:
+    properties:
+      endActivityId:
+        type: integer
+      startActivityId:
+        type: integer
+    required:
+    - endActivityId
+    - startActivityId
     type: object
   service.CreateActivityRequest:
     properties:
@@ -433,6 +468,28 @@ paths:
       summary: 获取活动列表
       tags:
       - Activity
+  /api/v1/activity/route/query:
+    post:
+      consumes:
+      - application/json
+      description: 查询活动路线
+      parameters:
+      - description: 查询活动路线请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.CalcActivityRouteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 查询活动路线成功
+          schema:
+            $ref: '#/definitions/common.RouteResult'
+      summary: 查询活动路线
+      tags:
+      - Activity
   /api/v1/activity/update:
     put:
       consumes:
@@ -455,33 +512,6 @@ paths:
       summary: 更新活动
       tags:
       - Activity
-  /api/v1/map/route:
-    get:
-      consumes:
-      - application/json
-      description: 调用百度地图API，计算两个活动之间的驾车路线距离和预计时间
-      parameters:
-      - description: 起点活动ID
-        in: query
-        name: startActivityID
-        required: true
-        type: integer
-      - description: 终点活动ID
-        in: query
-        name: endActivityID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{\"distanceKm\":125.5,\"durationMin\":98}'
-          schema:
-            additionalProperties: true
-            type: object
-      summary: 获取活动间路线规划
-      tags:
-      - Map
   /api/v1/trip/create:
     post:
       consumes:

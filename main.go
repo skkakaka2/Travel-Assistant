@@ -1,7 +1,6 @@
 package main
 
 import (
-	"travel-assistant/src/common/config"
 	"travel-assistant/src/common/logger"
 	"travel-assistant/src/router"
 
@@ -28,16 +27,6 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	// 初始化配置
-	config.Init()
-
-	// 初始化数据库
-	config.InitDB()
-
-	// 初始化日志
-	logger.InitLogger()
-
-	config.InitValidator()
 	defer logger.Logger.Sync()
 
 	// 启动服务

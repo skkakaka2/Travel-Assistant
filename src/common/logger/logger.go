@@ -11,6 +11,10 @@ import (
 var Logger *zap.Logger
 var Sugar *zap.SugaredLogger
 
+func init() {
+	InitLogger()
+}
+
 func InitLogger() {
 
 	lumberWriter := &lumberjack.Logger{

@@ -11,4 +11,4 @@ mysql:
 
 baiduMap:
   key: "9EbmPr87yf1THBdLbvd5V1519JXhHOvS"
-  basePath: "https://api.map.baidu.com/directionlite/v1/driving"
+  basePath: "https://api.map.baidu.com"
