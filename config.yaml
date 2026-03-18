@@ -14,3 +14,10 @@ mysql:
 baiduMap:
   key: "9EbmPr87yf1THBdLbvd5V1519JXhHOvS"
   basePath: "https://api.map.baidu.com"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+  poolSize: 10
+  minIdleConns: 2

@@ -13,6 +13,7 @@ func AutoMigrate() {
 	DB.AutoMigrate(&user.UserEntity{})
 	DB.AutoMigrate(&trip.TripEntity{})
 	DB.AutoMigrate(&activity.ActivityEntity{})
+	DB.AutoMigrate(&activity.ActivityRouteEntity{})
 
 	fmt.Println("自动迁移数据库完成")
 }

@@ -4,16 +4,15 @@ import (
 	"net/http"
 	"travel-assistant/src/common"
 	"travel-assistant/src/common/Response"
+	"travel-assistant/src/common/config"
+	"travel-assistant/src/modules/activity/entity"
 
 	"github.com/gin-gonic/gin"
 )
 
 type CreateActivityRouteRequest struct {
-	StartActivityID uint    `json:"startActivityId" binding:"required"`
-	EndActivityID   uint    `json:"endActivityId" binding:"required"`
-	TripID          uint    `json:"tripId" binding:"required"`
-	Distance        float64 `json:"distance" binding:"required,decimal6"`
-	Duration        float64 `json:"duration" binding:"required,decimal6"`
+	StartActivityID uint `json:"startActivityId" binding:"required"`
+	EndActivityID   uint `json:"endActivityId" binding:"required"`
 }
 
 type CalcActivityRouteRequest struct {
@@ -47,9 +46,21 @@ func QueryActivityRoute(c *gin.Context) {
 		Response.Error(c, http.StatusInternalServerError, "获取路线规划失败")
 		return
 	}
-	Response.Success(c, "获取路线规划成功", gin.H{
-		"distanceKm":  distanceKm,
-		"durationMin": durationMin,
-	})
+	startActivity := entity.ActivityEntity{}
+	if err := config.DB.Where("id=?", request.StartActivityID).First(&startActivity).Error; err != nil {
+		Response.Error(c, http.StatusInternalServerError, "获取起点活动失败")
+		return
+	}
 
+	var route = entity.ActivityRouteEntity{}
+	route.Distance = distanceKm
+	route.Duration = durationMin
+	route.StartActivityID = request.StartActivityID
+	route.EndActivityID = request.EndActivityID
+	route.TripID = startActivity.TripID
+	if err := config.DB.Model(&route).Create(&route).Error; err != nil {
+		Response.Error(c, http.StatusInternalServerError, "创建路线规划失败")
+		return
+	}
+	Response.Success(c, "获取路线规划成功", route)
 }
