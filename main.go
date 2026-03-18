@@ -1,6 +1,13 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	"travel-assistant/src/common/logger"
 	"travel-assistant/src/router"
 
@@ -31,5 +38,20 @@ func main() {
 
 	// 启动服务
 	r := router.SetupRouter()
-	r.Run(":8080")
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
+	}
+	go func() {
+		srv.ListenAndServe()
+		fmt.Println("服务启动成功")
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	srv.Shutdown(ctx)
 }

@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -39,8 +40,8 @@ var BaiduMap = BaiduMapType{
 	BasePath: config.AppConfig.BaiduMap.BasePath,
 }
 
-func (b *BaiduMapType) GetRoutesHandler(StartActivityID, EndActivityID uint) (float64, int, error) {
-	distanceKm, durationMin, err := BaiduMap.GetRoutes(StartActivityID, EndActivityID)
+func (b *BaiduMapType) GetRoutesHandler(ctx context.Context, StartActivityID, EndActivityID uint) (float64, int, error) {
+	distanceKm, durationMin, err := BaiduMap.GetRoutes(ctx, StartActivityID, EndActivityID)
 	if err != nil {
 		logger.Sugar.Error("获取路线规划失败: %w", err)
 		return 0, 0, err
@@ -49,16 +50,16 @@ func (b *BaiduMapType) GetRoutesHandler(StartActivityID, EndActivityID uint) (fl
 }
 
 // GetRoutes 获取两个活动之间的路线规划（距离：公里，时间：分钟）
-func (b *BaiduMapType) GetRoutes(startActivityID, endActivityID uint) (distanceKm float64, durationMin int, err error) {
+func (b *BaiduMapType) GetRoutes(ctx context.Context, startActivityID, endActivityID uint) (distanceKm float64, durationMin int, err error) {
 	// 查询起点活动
 	startActivity := entity.ActivityEntity{}
-	if err := config.DB.First(&startActivity, startActivityID).Error; err != nil {
+	if err := config.DB.WithContext(ctx).First(&startActivity, startActivityID).Error; err != nil {
 		return 0, 0, fmt.Errorf("查询起点活动失败: %w", err)
 	}
 
 	// 查询终点活动
 	endActivity := entity.ActivityEntity{}
-	if err := config.DB.First(&endActivity, endActivityID).Error; err != nil {
+	if err := config.DB.WithContext(ctx).First(&endActivity, endActivityID).Error; err != nil {
 		return 0, 0, fmt.Errorf("查询终点活动失败: %w", err)
 	}
 
@@ -75,7 +76,9 @@ func (b *BaiduMapType) GetRoutes(startActivityID, endActivityID uint) (distanceK
 		})
 
 	// 发送请求
-	resp, err := client.R().
+	ctxTimeout, cancel := context.WithTimeout(ctx, 8*time.Second)
+	defer cancel()
+	resp, err := client.R().SetContext(ctxTimeout).
 		Get(b.BasePath + "/directionlite/v1/driving" + "?origin=" + origin + "&destination=" + destination + "&ak=" + b.Key)
 
 	if err != nil {

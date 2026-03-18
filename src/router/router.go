@@ -1,6 +1,7 @@
 package router
 
 import (
+	"net/http"
 	"travel-assistant/src/common/middleware"
 	activityService "travel-assistant/src/modules/activity/service"
 	tripService "travel-assistant/src/modules/trip/service"
@@ -15,23 +16,28 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "ok",
+		})
+	})
 
-	api := router.Group("/api/v1")
+	api := router.Group("/api/v1", middleware.TraceMiddleware())
 
 	userGroup := api.Group("user")
 	{
 		userGroup.POST("register", userService.Register)
 		userGroup.POST("login", userService.Login)
-		userGroup.PUT("update", middleware.JwtMiddleware(), userService.UpdateUser)
+		userGroup.PUT("update", middleware.Auth(), userService.UpdateUser)
 	}
-	tripGroup := api.Group("trip", middleware.JwtMiddleware())
+	tripGroup := api.Group("trip", middleware.Auth())
 	{
 		tripGroup.POST("create", tripService.CreateTrip)
 		tripGroup.GET("get", tripService.GetTripByPagination)
 		tripGroup.PUT("update", tripService.UpdateTrip)
 		tripGroup.DELETE("delete", tripService.DeleteTrip)
 	}
-	activityGroup := api.Group("activity", middleware.JwtMiddleware())
+	activityGroup := api.Group("activity", middleware.Auth())
 	{
 		activityGroup.POST("create", activityService.CreateActivity)
 		activityGroup.GET("list", activityService.GetActivities)

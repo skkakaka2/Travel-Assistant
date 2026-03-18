@@ -37,11 +37,12 @@ type UpdateActivityRouteRequest struct {
 // @Router /api/v1/activity/route/query [post]
 func QueryActivityRoute(c *gin.Context) {
 	request := CalcActivityRouteRequest{}
+	context := c.Request.Context()
 	if !Response.BindJSON(c, &request) {
 		Response.Error(c, http.StatusBadRequest, "请求参数错误")
 		return
 	}
-	distanceKm, durationMin, err := common.BaiduMap.GetRoutesHandler(request.StartActivityID, request.EndActivityID)
+	distanceKm, durationMin, err := common.BaiduMap.GetRoutesHandler(context, request.StartActivityID, request.EndActivityID)
 	if err != nil {
 		Response.Error(c, http.StatusInternalServerError, "获取路线规划失败")
 		return

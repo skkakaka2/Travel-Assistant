@@ -35,6 +35,10 @@ func InitDB() *gorm.DB {
 
 	DB = db
 
+	sqlDB.SetMaxOpenConns(20)           // 最大连接数
+	sqlDB.SetMaxIdleConns(3)            // 空闲连接数
+	sqlDB.SetConnMaxLifetime(time.Hour) // 连接最大生命周期
+
 	if isDev() {
 		AutoMigrate()
 	}

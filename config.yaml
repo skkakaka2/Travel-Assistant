@@ -3,6 +3,8 @@ server:
 
 jwt:
   secret: "fewafvedfjweklr"
+  # authMode: "kong"
+  authMode: "jwt"
 
 mysql:
   host: localhost

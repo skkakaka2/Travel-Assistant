@@ -1,6 +1,6 @@
 package entity
 
-import "time"
+import "travel-assistant/src/modules/common/entity"
 
 type ActivityEntity struct {
 	ID           uint   `gorm:"primaryKey" json:"id"`
@@ -22,8 +22,7 @@ type ActivityEntity struct {
 	TransportType string `gorm:"type:varchar(255)" json:"transportType"`  // 交通方式
 	TransportCost uint   `gorm:"type:uint;not null" json:"transportCost"` // 交通费用
 
-	CreatedAt time.Time `gorm:"autoCreateTime" json:"createdAt"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updatedAt"`
+	entity.CommonEntity
 }
 
 func (ActivityEntity) TableName() string {

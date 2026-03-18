@@ -14,7 +14,8 @@ type GlobalConfig struct {
 		Port int `mapstructure:"port"`
 	} `mapstructure:"server"`
 	Jwt struct {
-		Secret string `mapstructure:"secret"`
+		Secret   string `mapstructure:"secret"`
+		AuthMode string `mapstructure:"authMode"`
 	} `mapstructure:"jwt"`
 	Mysql struct {
 		Host string `mapstructure:"host"`
@@ -70,6 +71,7 @@ func Init() {
 func bindEnvs(v *viper.Viper) {
 	v.BindEnv("server.port", "APP_SERVER_PORT")
 	v.BindEnv("jwt.secret", "APP_JWT_SECRET")
+	v.BindEnv("jwt.authMode", "APP_JWT_AUTH_MODE")
 	v.BindEnv("mysql.host", "APP_MYSQL_HOST")
 	v.BindEnv("mysql.port", "APP_MYSQL_PORT")
 	v.BindEnv("mysql.dsn", "APP_MYSQL_DSN")
