@@ -128,9 +128,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/activity/route/query": {
+        "/api/v1/activity/route/calc": {
             "post": {
-                "description": "查询活动路线",
+                "description": "计算两个活动之间的路线并保存，已存在的路线会从缓存直接返回",
                 "consumes": [
                     "application/json"
                 ],
@@ -140,10 +140,10 @@ const docTemplate = `{
                 "tags": [
                     "Activity"
                 ],
-                "summary": "查询活动路线",
+                "summary": "计算并保存活动路线",
                 "parameters": [
                     {
-                        "description": "查询活动路线请求",
+                        "description": "计算活动路线请求",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -154,9 +154,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "查询活动路线成功",
+                        "description": "计算路线成功",
                         "schema": {
-                            "$ref": "#/definitions/common.RouteResult"
+                            "$ref": "#/definitions/entity.ActivityRouteEntity"
                         }
                     }
                 }
@@ -439,44 +439,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "common.Result": {
-            "type": "object",
-            "properties": {
-                "routes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/common.Route"
-                    }
-                }
-            }
-        },
-        "common.Route": {
-            "type": "object",
-            "properties": {
-                "distance": {
-                    "description": "路线距离，单位：米",
-                    "type": "integer"
-                },
-                "duration": {
-                    "description": "路线耗时，单位：秒",
-                    "type": "integer"
-                }
-            }
-        },
-        "common.RouteResult": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "result": {
-                    "$ref": "#/definitions/common.Result"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
         "entity.ActivityEntity": {
             "type": "object",
             "properties": {
@@ -542,6 +504,37 @@ const docTemplate = `{
                 },
                 "tripId": {
                     "description": "关联的行程ID",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.ActivityRouteEntity": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "distance": {
+                    "type": "number"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "endActivityId": {
+                    "description": "终点活动id",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "startActivityId": {
+                    "description": "起点活动id",
+                    "type": "integer"
+                },
+                "tripId": {
                     "type": "integer"
                 },
                 "updatedAt": {
@@ -659,6 +652,9 @@ const docTemplate = `{
             "properties": {
                 "endActivityId": {
                     "type": "integer"
+                },
+                "forceRefresh": {
+                    "type": "boolean"
                 },
                 "startActivityId": {
                     "type": "integer"

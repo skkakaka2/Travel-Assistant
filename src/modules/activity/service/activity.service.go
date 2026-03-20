@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"net/http"
 	"time"
 	"travel-assistant/src/common"
@@ -219,6 +220,10 @@ func UpdateActivity(c *gin.Context) {
 
 	// 重新查询获取更新后的数据
 	config.DB.First(&activity, request.ID)
+
+	// 清除与该活动相关的路线缓存（异步）
+	go InvalidateActivityRouteCache(context.Background(), request.ID)
+
 	Response.Success(c, "更新活动成功", activity)
 }
 
@@ -259,6 +264,9 @@ func DeleteActivity(c *gin.Context) {
 		Response.Error(c, http.StatusInternalServerError, "删除活动失败: "+err.Error())
 		return
 	}
+
+	// 清除与该活动相关的路线缓存（异步）
+	go InvalidateActivityRouteCache(context.Background(), id)
 
 	Response.Success[any](c, "删除活动成功", nil)
 }

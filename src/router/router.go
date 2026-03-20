@@ -22,7 +22,7 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
-	api := router.Group("/api/v1", middleware.TraceMiddleware())
+	api := router.Group("/api/v1", middleware.TraceMiddleware(), middleware.NullFilterMiddleware())
 
 	userGroup := api.Group("user")
 	{
@@ -43,7 +43,7 @@ func SetupRouter() *gin.Engine {
 		activityGroup.GET("list", activityService.GetActivities)
 		activityGroup.PUT("update", activityService.UpdateActivity)
 		activityGroup.DELETE("delete", activityService.DeleteActivity)
-		activityGroup.POST("route/query", activityService.QueryActivityRoute)
+		activityGroup.POST("route/calc", activityService.CalcActivityRoute)
 	}
 
 	return router

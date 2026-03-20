@@ -45,6 +45,7 @@ func InitRedis() error {
 	defer cancel()
 
 	if err := client.Ping(ctx).Err(); err != nil {
+		logger.Sugar.Info("Redis 连接失败", err)
 		return fmt.Errorf("Redis 连接失败: %w", err)
 	}
 
