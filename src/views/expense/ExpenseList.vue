@@ -45,8 +45,8 @@ const fetchExpenses = async () => {
   loading.value = true
   try {
     const res = await expenseApi.getList(params.value)
-    expenses.value = res.data?.records || []
-    total.value = res.data?.total || 0
+    expenses.value = res?.records || []
+    total.value = res?.total || 0
   } catch {
     // 错误已处理
   } finally {
@@ -57,7 +57,7 @@ const fetchExpenses = async () => {
 const fetchTrips = async () => {
   try {
     const res = await tripApi.getList({ size: 100 })
-    trips.value = res.data?.records || []
+    trips.value = res?.records || []
   } catch {
     // 错误已处理
   }
@@ -150,9 +150,7 @@ onMounted(() => {
             <el-button type="default" :icon="DataAnalysis" @click="goToStatistics">
               费用统计
             </el-button>
-            <el-button type="primary" :icon="Plus" @click="handleAdd">
-              添加费用
-            </el-button>
+            <el-button type="primary" :icon="Plus" @click="handleAdd"> 添加费用 </el-button>
           </div>
         </div>
       </template>
@@ -201,9 +199,7 @@ onMounted(() => {
         </el-table-column>
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
-            <el-button type="primary" text :icon="Edit" @click="handleEdit(row)">
-              编辑
-            </el-button>
+            <el-button type="primary" text :icon="Edit" @click="handleEdit(row)"> 编辑 </el-button>
             <el-button type="danger" text :icon="Delete" @click="handleDelete(row.id)">
               删除
             </el-button>
@@ -238,7 +234,7 @@ onMounted(() => {
         <el-form-item label="类型" required>
           <el-select v-model="form.type" placeholder="请选择类型">
             <el-option
-              v-for="item in typeOptions.filter(i => i.value)"
+              v-for="item in typeOptions.filter((i) => i.value)"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -263,9 +259,7 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="formLoading" @click="handleSubmit">
-          确定
-        </el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleSubmit"> 确定 </el-button>
       </template>
     </el-dialog>
   </div>

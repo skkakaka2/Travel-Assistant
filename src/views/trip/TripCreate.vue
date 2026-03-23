@@ -27,7 +27,7 @@ const fetchingEndCoords = ref(false)
 const fetchVehicles = async () => {
   try {
     const res = await userApi.getVehicles()
-    vehicles.value = res.data || []
+    vehicles.value = res || []
   } catch {
     // 错误已处理
   }
@@ -36,7 +36,7 @@ const fetchVehicles = async () => {
 const fetchHomeLocations = async () => {
   try {
     const res = await userApi.getHomeLocations()
-    homeLocations.value = res.data || []
+    homeLocations.value = res || []
   } catch {
     // 错误已处理
   }
@@ -47,9 +47,9 @@ const handleStartLocationChange = async () => {
   fetchingStartCoords.value = true
   try {
     const res = await mapApi.geocode(form.value.startLocation)
-    if (res.data) {
-      form.value.startLongitude = res.data.longitude
-      form.value.startLatitude = res.data.latitude
+    if (res) {
+      form.value.startLongitude = res.longitude
+      form.value.startLatitude = res.latitude
     }
   } catch {
     // 错误已处理
@@ -63,9 +63,9 @@ const handleEndLocationChange = async () => {
   fetchingEndCoords.value = true
   try {
     const res = await mapApi.geocode(form.value.endLocation)
-    if (res.data) {
-      form.value.endLongitude = res.data.longitude
-      form.value.endLatitude = res.data.latitude
+    if (res) {
+      form.value.endLongitude = res.longitude
+      form.value.endLatitude = res.latitude
     }
   } catch {
     // 错误已处理
@@ -140,10 +140,7 @@ onMounted(() => {
               placeholder="请输入起点地址"
               @blur="handleStartLocationChange"
             />
-            <el-button
-              :loading="fetchingStartCoords"
-              @click="handleStartLocationChange"
-            >
+            <el-button :loading="fetchingStartCoords" @click="handleStartLocationChange">
               获取坐标
             </el-button>
           </div>
@@ -170,10 +167,7 @@ onMounted(() => {
               placeholder="请输入终点地址"
               @blur="handleEndLocationChange"
             />
-            <el-button
-              :loading="fetchingEndCoords"
-              @click="handleEndLocationChange"
-            >
+            <el-button :loading="fetchingEndCoords" @click="handleEndLocationChange">
               获取坐标
             </el-button>
           </div>
@@ -195,9 +189,7 @@ onMounted(() => {
 
         <el-form-item>
           <el-button @click="router.back()">取消</el-button>
-          <el-button type="primary" :loading="loading" @click="handleSubmit">
-            创建行程
-          </el-button>
+          <el-button type="primary" :loading="loading" @click="handleSubmit"> 创建行程 </el-button>
         </el-form-item>
       </el-form>
     </el-card>

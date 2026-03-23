@@ -38,8 +38,8 @@ const fetchActivities = async () => {
   loading.value = true
   try {
     const res = await activityApi.getList(params.value)
-    activities.value = res.data?.records || []
-    total.value = res.data?.total || 0
+    activities.value = res?.records || []
+    total.value = res?.total || 0
   } catch {
     // 错误已处理
   } finally {
@@ -97,9 +97,7 @@ onMounted(() => {
         <div class="card-header">
           <span>活动列表</span>
           <div>
-            <el-button type="default" :icon="User" @click="goToMyActivities">
-              我的活动
-            </el-button>
+            <el-button type="default" :icon="User" @click="goToMyActivities"> 我的活动 </el-button>
           </div>
         </div>
       </template>
@@ -178,20 +176,10 @@ onMounted(() => {
             <el-button type="primary" text :icon="View" @click="handleView(activity.id)">
               详情
             </el-button>
-            <el-button
-              v-if="!activity.joined"
-              type="success"
-              text
-              @click="handleJoin(activity.id)"
-            >
+            <el-button v-if="!activity.joined" type="success" text @click="handleJoin(activity.id)">
               报名参加
             </el-button>
-            <el-button
-              v-else
-              type="warning"
-              text
-              @click="handleQuit(activity.id)"
-            >
+            <el-button v-else type="warning" text @click="handleQuit(activity.id)">
               退出活动
             </el-button>
           </div>

@@ -25,7 +25,7 @@ const fetchVehicles = async () => {
   loading.value = true
   try {
     const res = await userApi.getVehicles()
-    vehicles.value = res.data || []
+    vehicles.value = res || []
   } catch {
     // 错误已处理
   } finally {
@@ -36,7 +36,7 @@ const fetchVehicles = async () => {
 const fetchAllVehicles = async () => {
   try {
     const res = await vehicleApi.getList({ size: 100 })
-    allVehicles.value = res.data?.records || []
+    allVehicles.value = res?.records || []
   } catch {
     // 错误已处理
   }
@@ -95,7 +95,7 @@ const handleSubmitVehicle = async () => {
       ElMessage.success('更新成功')
     } else {
       const res = await vehicleApi.create(form.value)
-      await userApi.bindVehicle(res.data.id)
+      await userApi.bindVehicle(res.id)
       ElMessage.success('添加并绑定成功')
     }
     createDialogVisible.value = false
@@ -124,9 +124,7 @@ onMounted(() => {
         <div class="card-header">
           <span>车辆管理</span>
           <div>
-            <el-button type="default" :icon="Link" @click="openBindDialog">
-              绑定车辆
-            </el-button>
+            <el-button type="default" :icon="Link" @click="openBindDialog"> 绑定车辆 </el-button>
             <el-button type="primary" :icon="Plus" @click="handleCreateVehicle">
               添加车辆
             </el-button>
@@ -162,12 +160,7 @@ onMounted(() => {
             >
               设为默认
             </el-button>
-            <el-button
-              type="danger"
-              text
-              :icon="Unlink"
-              @click="handleUnbind(row.vehicleId)"
-            >
+            <el-button type="danger" text :icon="Unlink" @click="handleUnbind(row.vehicleId)">
               解绑
             </el-button>
           </template>
@@ -180,15 +173,11 @@ onMounted(() => {
       <el-table :data="allVehicles" stripe max-height="400">
         <el-table-column prop="model" label="车辆型号" />
         <el-table-column prop="fuelConsumption" label="油耗" width="100">
-          <template #default="{ row }">
-            {{ row.fuelConsumption || '-' }} L/100km
-          </template>
+          <template #default="{ row }"> {{ row.fuelConsumption || '-' }} L/100km </template>
         </el-table-column>
         <el-table-column label="操作" width="100">
           <template #default="{ row }">
-            <el-button type="primary" text @click="handleBind(row.id)">
-              绑定
-            </el-button>
+            <el-button type="primary" text @click="handleBind(row.id)"> 绑定 </el-button>
           </template>
         </el-table-column>
       </el-table>

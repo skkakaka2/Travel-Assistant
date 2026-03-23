@@ -28,7 +28,7 @@ const fetchActivity = async () => {
   loading.value = true
   try {
     const res = await activityApi.get(activityId)
-    activity.value = res.data
+    activity.value = res
   } catch {
     // 错误已处理
   } finally {
@@ -85,7 +85,9 @@ onMounted(() => {
           <span>{{ activity?.title || '活动详情' }}</span>
           <div class="actions">
             <el-button
-              v-if="activity && !activity.joined && (activity.status === 0 || activity.status === 1)"
+              v-if="
+                activity && !activity.joined && (activity.status === 0 || activity.status === 1)
+              "
               type="success"
               @click="handleJoin"
             >

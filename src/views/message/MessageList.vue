@@ -28,8 +28,8 @@ const fetchMessages = async () => {
   loading.value = true
   try {
     const res = await messageApi.getList(params.value)
-    messages.value = res.data?.records || []
-    total.value = res.data?.total || 0
+    messages.value = res?.records || []
+    total.value = res?.total || 0
   } catch {
     // 错误已处理
   } finally {
@@ -40,7 +40,7 @@ const fetchMessages = async () => {
 const fetchUnreadCount = async () => {
   try {
     const res = await messageApi.getUnreadCount()
-    unreadCount.value = res.data || 0
+    unreadCount.value = res || 0
   } catch {
     // 错误已处理
   }
@@ -88,7 +88,7 @@ const handleDelete = async (id: number) => {
 const handleMarkAsRead = async (id: number) => {
   try {
     await messageApi.markAsRead(id)
-    const msg = messages.value.find(m => m.id === id)
+    const msg = messages.value.find((m) => m.id === id)
     if (msg) msg.isRead = true
     unreadCount.value = Math.max(0, unreadCount.value - 1)
     ElMessage.success('已标记为已读')
@@ -100,7 +100,7 @@ const handleMarkAsRead = async (id: number) => {
 const handleMarkAllAsRead = async () => {
   try {
     await messageApi.markAllAsRead()
-    messages.value.forEach(m => m.isRead = true)
+    messages.value.forEach((m) => (m.isRead = true))
     unreadCount.value = 0
     ElMessage.success('已全部标记为已读')
   } catch {

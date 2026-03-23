@@ -17,15 +17,9 @@ const profileForm = reactive({
 })
 
 const rules: FormRules = {
-  nickname: [
-    { max: 50, message: '昵称最多 50 个字符', trigger: 'blur' },
-  ],
-  phone: [
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' },
-  ],
-  email: [
-    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' },
-  ],
+  nickname: [{ max: 50, message: '昵称最多 50 个字符', trigger: 'blur' }],
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
+  email: [{ type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }],
 }
 
 onMounted(() => {
@@ -43,7 +37,7 @@ const handleSubmit = async () => {
   loading.value = true
   try {
     const res = await userApi.updateProfile(profileForm)
-    userStore.user = res.data
+    userStore.user = res
     ElMessage.success('更新成功')
   } catch {
     // 错误已处理
@@ -83,9 +77,7 @@ const handleUploadSuccess: UploadProps['onSuccess'] = async (response) => {
               accept="image/*"
               :on-success="handleUploadSuccess"
             >
-              <el-button type="primary" text :icon="Upload">
-                更换头像
-              </el-button>
+              <el-button type="primary" text :icon="Upload"> 更换头像 </el-button>
             </el-upload>
           </div>
           <div class="user-info">
@@ -101,12 +93,7 @@ const handleUploadSuccess: UploadProps['onSuccess'] = async (response) => {
             <span>基本信息</span>
           </template>
 
-          <el-form
-            ref="formRef"
-            :model="profileForm"
-            :rules="rules"
-            label-width="80px"
-          >
+          <el-form ref="formRef" :model="profileForm" :rules="rules" label-width="80px">
             <el-form-item label="昵称" prop="nickname">
               <el-input
                 v-model="profileForm.nickname"

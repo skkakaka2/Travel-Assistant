@@ -37,8 +37,8 @@ const fetchTrips = async () => {
   loading.value = true
   try {
     const res = await tripApi.getList(params.value)
-    trips.value = res.data?.records || []
-    total.value = res.data?.total || 0
+    trips.value = res?.records || []
+    total.value = res?.total || 0
   } catch {
     // 错误已处理
   } finally {
@@ -127,9 +127,7 @@ onMounted(() => {
       <template #header>
         <div class="card-header">
           <span>行程列表</span>
-          <el-button type="primary" :icon="Plus" @click="handleCreate">
-            创建行程
-          </el-button>
+          <el-button type="primary" :icon="Plus" @click="handleCreate"> 创建行程 </el-button>
         </div>
       </template>
 

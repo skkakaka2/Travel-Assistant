@@ -16,7 +16,7 @@ const fetchStatistics = async () => {
   loading.value = true
   try {
     const res = await expenseApi.getStatistics()
-    statistics.value = res.data
+    statistics.value = res
   } catch {
     // 错误已处理
   } finally {
@@ -33,7 +33,7 @@ const fetchPeriodStatistics = async () => {
       dayjs(dateRange.value[0]).startOf('day').toISOString(),
       dayjs(dateRange.value[1]).endOf('day').toISOString()
     )
-    statistics.value = res.data
+    statistics.value = res
   } catch {
     // 错误已处理
   } finally {
@@ -108,7 +108,9 @@ onMounted(() => {
           </el-col>
           <el-col :xs="12" :sm="8" :md="4">
             <div class="stat-card maintenance">
-              <div class="stat-value">¥{{ statistics?.maintenanceAmount?.toFixed(2) || '0.00' }}</div>
+              <div class="stat-value">
+                ¥{{ statistics?.maintenanceAmount?.toFixed(2) || '0.00' }}
+              </div>
               <div class="stat-label">维修费</div>
             </div>
           </el-col>

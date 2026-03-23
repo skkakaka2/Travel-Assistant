@@ -31,7 +31,7 @@ instance.interceptors.response.use(
   (response: AxiosResponse<Result>) => {
     const { data } = response
     if (data.code === 200) {
-      return data as any
+      return data.data as any
     } else {
       ElMessage.error(data.message || '请求失败')
       return Promise.reject(new Error(data.message || '请求失败'))
@@ -65,16 +65,16 @@ instance.interceptors.response.use(
 
 // 封装请求方法
 export const request = {
-  get<T>(url: string, config?: AxiosRequestConfig): Promise<Result<T>> {
+  get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return instance.get(url, config)
   },
-  post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<Result<T>> {
+  post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     return instance.post(url, data, config)
   },
-  put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<Result<T>> {
+  put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     return instance.put(url, data, config)
   },
-  delete<T>(url: string, config?: AxiosRequestConfig): Promise<Result<T>> {
+  delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return instance.delete(url, config)
   },
 }

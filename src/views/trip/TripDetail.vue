@@ -27,7 +27,7 @@ const fetchTrip = async () => {
   loading.value = true
   try {
     const res = await tripApi.get(tripId)
-    trip.value = res.data
+    trip.value = res
   } catch {
     // 错误已处理
   } finally {

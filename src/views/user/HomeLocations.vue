@@ -26,7 +26,7 @@ const fetchLocations = async () => {
   loading.value = true
   try {
     const res = await userApi.getHomeLocations()
-    locations.value = res.data || []
+    locations.value = res || []
   } catch {
     // 错误已处理
   } finally {
@@ -107,9 +107,7 @@ onMounted(() => {
       <template #header>
         <div class="card-header">
           <span>家庭位置管理</span>
-          <el-button type="primary" :icon="Plus" @click="handleAdd">
-            添加位置
-          </el-button>
+          <el-button type="primary" :icon="Plus" @click="handleAdd"> 添加位置 </el-button>
         </div>
       </template>
 
@@ -137,9 +135,7 @@ onMounted(() => {
             >
               设为默认
             </el-button>
-            <el-button type="primary" text :icon="Edit" @click="handleEdit(row)">
-              编辑
-            </el-button>
+            <el-button type="primary" text :icon="Edit" @click="handleEdit(row)"> 编辑 </el-button>
             <el-button type="danger" text :icon="Delete" @click="handleDelete(row.id)">
               删除
             </el-button>
@@ -168,9 +164,7 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="formLoading" @click="handleSubmit">
-          确定
-        </el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleSubmit"> 确定 </el-button>
       </template>
     </el-dialog>
   </div>

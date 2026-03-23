@@ -47,8 +47,8 @@ const fetchActivities = async () => {
       activityApi.getMyJoined(),
       activityApi.getMyCreated(),
     ])
-    joinedActivities.value = joinedRes.data || []
-    createdActivities.value = createdRes.data || []
+    joinedActivities.value = joinedRes || []
+    createdActivities.value = createdRes || []
   } catch {
     // 错误已处理
   } finally {
@@ -154,9 +154,7 @@ onMounted(() => {
       <template #header>
         <div class="card-header">
           <span>我的活动</span>
-          <el-button type="primary" :icon="Plus" @click="handleCreate">
-            创建活动
-          </el-button>
+          <el-button type="primary" :icon="Plus" @click="handleCreate"> 创建活动 </el-button>
         </div>
       </template>
 
@@ -183,9 +181,7 @@ onMounted(() => {
             </el-table-column>
             <el-table-column label="操作" width="150">
               <template #default="{ row }">
-                <el-button type="primary" text @click="viewDetail(row.id)">
-                  详情
-                </el-button>
+                <el-button type="primary" text @click="viewDetail(row.id)"> 详情 </el-button>
                 <el-button
                   v-if="row.status === 0 || row.status === 1"
                   type="warning"
@@ -216,9 +212,7 @@ onMounted(() => {
             </el-table-column>
             <el-table-column label="操作" width="200">
               <template #default="{ row }">
-                <el-button type="primary" text @click="viewDetail(row.id)">
-                  详情
-                </el-button>
+                <el-button type="primary" text @click="viewDetail(row.id)"> 详情 </el-button>
                 <el-button
                   v-if="row.status === 0"
                   type="primary"
@@ -289,9 +283,7 @@ onMounted(() => {
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="formLoading" @click="handleSubmit">
-          确定
-        </el-button>
+        <el-button type="primary" :loading="formLoading" @click="handleSubmit"> 确定 </el-button>
       </template>
     </el-dialog>
   </div>

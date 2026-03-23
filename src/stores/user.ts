@@ -11,9 +11,9 @@ export const useUserStore = defineStore('user', () => {
 
   async function login(data: LoginRequest) {
     const res = await authApi.login(data)
-    token.value = res.data.token
-    user.value = res.data.user
-    localStorage.setItem('token', res.data.token)
+    token.value = res.token
+    user.value = res.user
+    localStorage.setItem('token', res.token)
     return res
   }
 
@@ -26,7 +26,7 @@ export const useUserStore = defineStore('user', () => {
     if (!token.value) return
     try {
       const res = await userApi.getProfile()
-      user.value = res.data
+      user.value = res
     } catch {
       logout()
     }
