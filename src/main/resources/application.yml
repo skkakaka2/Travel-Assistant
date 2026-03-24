@@ -5,7 +5,7 @@ spring:
 
   # 配置文件激活：dev 表示开发环境
   profiles:
-    active: home
+    active: dev
 
   # Jackson JSON 配置
   jackson:

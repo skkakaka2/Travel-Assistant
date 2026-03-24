@@ -1,23 +1,16 @@
 package com.travel.assistant.modules.user.controller;
 
 import com.travel.assistant.common.result.Result;
-import com.travel.assistant.common.utils.UserContextHolder;
-import com.travel.assistant.modules.user.dto.HomeLocationRequest;
 import com.travel.assistant.modules.user.dto.LoginRequest;
 import com.travel.assistant.modules.user.dto.RegisterRequest;
-import com.travel.assistant.modules.user.dto.UpdateUserRequest;
 import com.travel.assistant.modules.user.service.UserService;
-import com.travel.assistant.modules.user.vo.HomeLocationVO;
 import com.travel.assistant.modules.user.vo.LoginVO;
 import com.travel.assistant.modules.user.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 认证控制器
@@ -25,9 +18,10 @@ import java.util.List;
  * 处理注册、登录等认证相关接口
  * 
  * 注解说明：
+ * 
  * @RestController：标记这是一个 RESTful 控制器
- *   相当于 @Controller + @ResponseBody
- *   所有方法返回值都会自动转为 JSON
+ *                        相当于 @Controller + @ResponseBody
+ *                        所有方法返回值都会自动转为 JSON
  * @RequestMapping：定义接口路径前缀
  * @Tag：OpenAPI 文档标签，用于分组
  * @RequiredArgsConstructor：Lombok 生成构造函数，用于依赖注入
