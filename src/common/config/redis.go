@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"travel-assistant/src/common/logger"
@@ -383,3 +384,14 @@ func InvalidateCache(ctx context.Context, keys ...string) {
 // ==================== 错误定义 ====================
 
 var ErrCacheMiss = errors.New("cache miss")
+
+// GetTTLWithJitter 获取带随机抖动的 TTL，防止缓存雪崩
+// baseTTL: 基础过期时间
+// maxJitter: 最大随机抖动时间
+func GetTTLWithJitter(baseTTL, maxJitter time.Duration) time.Duration {
+	if maxJitter <= 0 {
+		return baseTTL
+	}
+	jitter := time.Duration(rand.Int63n(int64(maxJitter)))
+	return baseTTL + jitter
+}
