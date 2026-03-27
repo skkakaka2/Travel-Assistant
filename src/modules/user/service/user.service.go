@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"travel-assistant/src/common/Response"
 	"travel-assistant/src/common/config"
-	"travel-assistant/src/modules/user/entity"
+	userentity "travel-assistant/src/modules/user/entity"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -16,20 +16,10 @@ type RegisterRequest struct {
 	Phone    string `json:"phone" binding:"omitempty,len=11,numeric"` // 可选，11位数字
 }
 
-type LoginRequest struct {
-	Username string `json:"username" binding:"required,min=3,max=20"` // 必填，3-20位字母数字
-	Password string `json:"password" binding:"required,min=6,max=20"` // 必填，6-20位
-}
-
 type RegisterResponse struct {
 	ID       uint   `json:"id"`
 	Username string `json:"userName"`
 	Phone    string `json:"phone"`
-}
-
-type LoginResponse struct {
-	Token string            `json:"token"`
-	User  entity.UserEntity `json:"user"`
 }
 
 type UpdateUserRequest struct {
@@ -57,7 +47,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	user := entity.UserEntity{
+	user := userentity.UserEntity{
 		Username: request.Username,
 		Password: request.Password,
 		Phone:    request.Phone,
@@ -75,46 +65,6 @@ func Register(c *gin.Context) {
 	Response.Success(c, "注册成功", user)
 }
 
-// @Summary 登录
-// @Description 登录
-// @Tags User
-// @Accept json
-// @Produce json
-// @Param request body LoginRequest true "登录请求"
-// @Success 200 {object} entity.UserEntity "登录成功"
-// @Router /api/v1/user/login [post]
-func Login(c *gin.Context) {
-	request := LoginRequest{}
-	if !Response.BindJSON(c, &request) {
-		return
-	}
-
-	user := entity.UserEntity{
-		Username: request.Username,
-		Password: request.Password,
-	}
-
-	result := config.DB.Where("username = ?", request.Username).First(&user)
-
-	if result.Error != nil {
-		Response.Error(c, http.StatusInternalServerError, result.Error.Error())
-		return
-	}
-	if !config.SecurityUtils.ComparePassword(user.Password, request.Password) {
-		Response.Error(c, http.StatusUnauthorized, "密码错误")
-		return
-	}
-
-	token := config.SecurityUtils.GenerateToken(user.ID, user.Username)
-
-	c.SetCookie("travel_assistant_token", token, 60*60*24*30, "/", "", false, true)
-
-	Response.Success(c, "登录成功", LoginResponse{
-		Token: token,
-		User:  user,
-	})
-}
-
 // @Summary 更新用户
 // @Description 更新用户
 // @Tags User
@@ -130,7 +80,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	user := entity.UserEntity{}
+	user := userentity.UserEntity{}
 	userId, exists := c.Get("userId")
 	if !exists {
 		Response.Error(c, http.StatusUnauthorized, "未登录")

@@ -1,6 +1,6 @@
-package entity
+package userentity
 
-import "travel-assistant/src/modules/common/entity"
+import commonentity "travel-assistant/src/modules/common/entity"
 
 type UserEntity struct {
 	ID       uint   `gorm:"primaryKey" json:"id"`
@@ -21,7 +21,7 @@ type UserEntity struct {
 	HomeLongitude float64 `gorm:"type:decimal(10,8)" json:"homeLongitude"`
 	HomeLatitude  float64 `gorm:"type:decimal(10,8)" json:"homeLatitude"`
 
-	entity.CommonEntity
+	commonentity.CommonEntity
 }
 
 func (UserEntity) TableName() string {

@@ -1,4 +1,4 @@
-package service
+package activityservice
 
 import (
 	"context"
@@ -7,10 +7,10 @@ import (
 	"travel-assistant/src/common"
 	"travel-assistant/src/common/Response"
 	"travel-assistant/src/common/config"
-	"travel-assistant/src/modules/activity/entity"
-	commonService "travel-assistant/src/modules/common/service"
-	tripEntity "travel-assistant/src/modules/trip/entity"
-	tripService "travel-assistant/src/modules/trip/service"
+	activityentity "travel-assistant/src/modules/activity/entity"
+	commonservice "travel-assistant/src/modules/common/service"
+	tripentity "travel-assistant/src/modules/trip/entity"
+	tripservice "travel-assistant/src/modules/trip/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -53,7 +53,7 @@ type GetActivitiesQuery struct {
 // @Accept json
 // @Produce json
 // @Param request body CreateActivityRequest true "创建活动请求"
-// @Success 200 {object} entity.ActivityEntity "创建活动成功"
+// @Success 200 {object} activityentity.ActivityEntity "创建活动成功"
 // @Router /api/v1/activity/create [post]
 func CreateActivity(c *gin.Context) {
 	request := CreateActivityRequest{}
@@ -62,38 +62,38 @@ func CreateActivity(c *gin.Context) {
 	}
 
 	// 校验活动日期是否在行程范围内，并获取行程信息
-	trip, ok := commonService.ValidateActivityInTrip(c, request.TripID, request.ActivityDate)
+	trip, ok := commonservice.ValidateActivityInTrip(c, request.TripID, request.ActivityDate)
 	if !ok {
 		return
 	}
 
 	// 校验权限
-	if !commonService.CheckTripOwnership(c, trip) {
+	if !commonservice.CheckTripOwnership(c, trip) {
 		return
 	}
 
 	// 校验时间格式
-	if !commonService.ValidateActivityTime(c, request.StartTime, request.EndTime) {
+	if !commonservice.ValidateActivityTime(c, request.StartTime, request.EndTime) {
 		return
 	}
 
-	activity := entity.ActivityEntity{}
+	activity := activityentity.ActivityEntity{}
 	request.Cost = request.HotelCost + request.TransportCost
 	copier.Copy(&activity, &request)
 
 	if err := common.WithTransection(c, func(tx *gorm.DB) error {
 		costs := []int{}
 		costSum := 0
-		if err := tx.Model(&entity.ActivityEntity{}).Create(&activity).Error; err != nil {
+		if err := tx.Model(&activityentity.ActivityEntity{}).Create(&activity).Error; err != nil {
 			return err
 		}
-		if err := tx.Model(&entity.ActivityEntity{}).Where("trip_id=?", request.TripID).Pluck("cost", &costs).Error; err != nil {
+		if err := tx.Model(&activityentity.ActivityEntity{}).Where("trip_id=?", request.TripID).Pluck("cost", &costs).Error; err != nil {
 			return err
 		}
 		for i := range costs {
 			costSum += costs[i]
 		}
-		if err := tx.Model(&tripEntity.TripEntity{}).Where("id=?", request.TripID).Update("cost", costSum).Error; err != nil {
+		if err := tx.Model(&tripentity.TripEntity{}).Where("id=?", request.TripID).Update("cost", costSum).Error; err != nil {
 			return err
 		}
 		return nil
@@ -102,7 +102,7 @@ func CreateActivity(c *gin.Context) {
 		return
 	}
 
-	if _, err := tripService.CheckTripCostIsOverBudget(request.TripID); err != nil {
+	if _, err := tripservice.CheckTripCostIsOverBudget(request.TripID); err != nil {
 		Response.Error(c, http.StatusInternalServerError, "创建活动失败: "+err.Error())
 		return
 	}
@@ -117,7 +117,7 @@ func CreateActivity(c *gin.Context) {
 // @Produce json
 // @Param tripId query int true "行程ID"
 // @Param date query string false "日期筛选(yyyy-MM-dd)"
-// @Success 200 {array} entity.ActivityEntity "获取活动列表成功"
+// @Success 200 {array} activityentity.ActivityEntity "获取活动列表成功"
 // @Router /api/v1/activity/list [get]
 func GetActivities(c *gin.Context) {
 	query := GetActivitiesQuery{}
@@ -126,14 +126,14 @@ func GetActivities(c *gin.Context) {
 	}
 
 	// 校验行程是否存在
-	trip := tripEntity.TripEntity{}
+	trip := tripentity.TripEntity{}
 	if err := config.DB.First(&trip, query.TripID).Error; err != nil {
 		Response.Error(c, http.StatusBadRequest, "行程不存在")
 		return
 	}
 
 	// 校验权限
-	if !commonService.CheckTripOwnership(c, &trip) {
+	if !commonservice.CheckTripOwnership(c, &trip) {
 		return
 	}
 
@@ -149,7 +149,7 @@ func GetActivities(c *gin.Context) {
 	}
 
 	// 按日期和时间排序
-	var activities []entity.ActivityEntity
+	var activities []activityentity.ActivityEntity
 	if err := db.Order("activity_date ASC, start_time ASC").Find(&activities).Error; err != nil {
 		Response.Error(c, http.StatusInternalServerError, "获取活动列表失败: "+err.Error())
 		return
@@ -164,7 +164,7 @@ func GetActivities(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body UpdateActivityRequest true "更新活动请求"
-// @Success 200 {object} entity.ActivityEntity "更新活动成功"
+// @Success 200 {object} activityentity.ActivityEntity "更新活动成功"
 // @Router /api/v1/activity/update [put]
 func UpdateActivity(c *gin.Context) {
 	request := UpdateActivityRequest{}
@@ -173,39 +173,39 @@ func UpdateActivity(c *gin.Context) {
 	}
 
 	// 查询原活动
-	activity := entity.ActivityEntity{}
+	activity := activityentity.ActivityEntity{}
 	if err := config.DB.First(&activity, request.ID).Error; err != nil {
 		Response.Error(c, http.StatusBadRequest, "活动不存在")
 		return
 	}
 
 	// 校验行程是否存在
-	trip := tripEntity.TripEntity{}
+	trip := tripentity.TripEntity{}
 	if err := config.DB.First(&trip, request.TripID).Error; err != nil {
 		Response.Error(c, http.StatusBadRequest, "行程不存在")
 		return
 	}
 
 	// 校验权限
-	if !commonService.CheckTripOwnership(c, &trip) {
+	if !commonservice.CheckTripOwnership(c, &trip) {
 		return
 	}
 
 	// 如果更改了日期，校验新日期是否在行程范围内
 	if request.ActivityDate != activity.ActivityDate {
-		_, ok := commonService.ValidateActivityInTrip(c, request.TripID, request.ActivityDate)
+		_, ok := commonservice.ValidateActivityInTrip(c, request.TripID, request.ActivityDate)
 		if !ok {
 			return
 		}
 	}
 
 	// 校验时间格式
-	if !commonService.ValidateActivityTime(c, request.StartTime, request.EndTime) {
+	if !commonservice.ValidateActivityTime(c, request.StartTime, request.EndTime) {
 		return
 	}
 
 	// 更新活动
-	updates := entity.ActivityEntity{}
+	updates := activityentity.ActivityEntity{}
 	copier.Copy(&updates, &request)
 
 	if err := config.DB.Model(&activity).Where("id = ?", request.ID).Updates(&updates).Error; err != nil {
@@ -213,7 +213,7 @@ func UpdateActivity(c *gin.Context) {
 		return
 	}
 
-	if _, err := tripService.CheckTripCostIsOverBudget(request.TripID); err != nil {
+	if _, err := tripservice.CheckTripCostIsOverBudget(request.TripID); err != nil {
 		Response.Error(c, http.StatusInternalServerError, "更新活动失败: "+err.Error())
 		return
 	}
@@ -242,20 +242,20 @@ func DeleteActivity(c *gin.Context) {
 	}
 
 	// 查询活动
-	activity := entity.ActivityEntity{}
+	activity := activityentity.ActivityEntity{}
 	if err := config.DB.First(&activity, id).Error; err != nil {
 		Response.Error(c, http.StatusBadRequest, "活动不存在")
 		return
 	}
 
 	// 查询行程并校验权限
-	trip := tripEntity.TripEntity{}
+	trip := tripentity.TripEntity{}
 	if err := config.DB.First(&trip, activity.TripID).Error; err != nil {
 		Response.Error(c, http.StatusInternalServerError, "行程数据异常")
 		return
 	}
 
-	if !commonService.CheckTripOwnership(c, &trip) {
+	if !commonservice.CheckTripOwnership(c, &trip) {
 		return
 	}
 

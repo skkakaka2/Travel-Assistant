@@ -1,4 +1,4 @@
-package entity
+package commonentity
 
 import "time"
 

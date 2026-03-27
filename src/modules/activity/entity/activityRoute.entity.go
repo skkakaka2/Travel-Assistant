@@ -1,6 +1,6 @@
-package entity
+package activityentity
 
-import "travel-assistant/src/modules/common/entity"
+import commonentity "travel-assistant/src/modules/common/entity"
 
 type ActivityRouteEntity struct {
 	ID uint `gorm:"primaryKey" json:"id"`
@@ -12,7 +12,7 @@ type ActivityRouteEntity struct {
 	Distance      float64 `gorm:"type:decimal(10,1);not null" json:"distance"`
 	Duration      int     `gorm:"type:int;not null" json:"duration"`
 
-	entity.CommonEntity
+	commonentity.CommonEntity
 }
 
 func (ActivityRouteEntity) TableName() string {

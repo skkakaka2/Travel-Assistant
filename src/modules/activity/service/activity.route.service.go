@@ -1,4 +1,4 @@
-package service
+package activityservice
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 	"travel-assistant/src/common"
 	"travel-assistant/src/common/Response"
 	"travel-assistant/src/common/config"
-	"travel-assistant/src/modules/activity/entity"
+	activityentity "travel-assistant/src/modules/activity/entity"
 
 	"github.com/gin-gonic/gin"
 )
@@ -67,13 +67,13 @@ func CalcActivityRoute(c *gin.Context) {
 		return
 	}
 
-	startActivity := entity.ActivityEntity{}
+	startActivity := activityentity.ActivityEntity{}
 	if err := config.DB.Where("id = ?", request.StartActivityID).First(&startActivity).Error; err != nil {
 		Response.Error(c, http.StatusNotFound, "起点活动不存在")
 		return
 	}
 
-	endActivity := entity.ActivityEntity{}
+	endActivity := activityentity.ActivityEntity{}
 	if err := config.DB.Where("id = ?", request.EndActivityID).First(&endActivity).Error; err != nil {
 		Response.Error(c, http.StatusNotFound, "终点活动不存在")
 		return
@@ -88,14 +88,14 @@ func CalcActivityRoute(c *gin.Context) {
 
 	if !request.ForceRefresh {
 		if config.Rdb != nil {
-			var cachedRoute entity.ActivityRouteEntity
+			var cachedRoute activityentity.ActivityRouteEntity
 			if err := config.Rdb.Get(ctx, cacheKey, &cachedRoute); err == nil {
 				Response.Success(c, "获取路线规划成功（Redis缓存）", cachedRoute)
 				return
 			}
 		}
 
-		existingRoute := entity.ActivityRouteEntity{}
+		existingRoute := activityentity.ActivityRouteEntity{}
 		err := config.DB.Where("start_activity_id = ? AND end_activity_id = ?", request.StartActivityID, request.EndActivityID).First(&existingRoute).Error
 		if err == nil {
 			if config.Rdb != nil {
@@ -112,7 +112,7 @@ func CalcActivityRoute(c *gin.Context) {
 		return
 	}
 
-	route := entity.ActivityRouteEntity{
+	route := activityentity.ActivityRouteEntity{
 		StartActivityID: request.StartActivityID,
 		EndActivityID:   request.EndActivityID,
 		TripID:          startActivity.TripID,
@@ -120,7 +120,7 @@ func CalcActivityRoute(c *gin.Context) {
 		Duration:        durationMin,
 	}
 
-	existingRoute := entity.ActivityRouteEntity{}
+	existingRoute := activityentity.ActivityRouteEntity{}
 	err = config.DB.Where("start_activity_id = ? AND end_activity_id = ?", request.StartActivityID, request.EndActivityID).First(&existingRoute).Error
 
 	if err == nil {
@@ -149,7 +149,7 @@ func InvalidateActivityRouteCache(ctx context.Context, activityID uint) {
 		return
 	}
 
-	var routes []entity.ActivityRouteEntity
+	var routes []activityentity.ActivityRouteEntity
 	if err := config.DB.Where("start_activity_id = ? OR end_activity_id = ?", activityID, activityID).Find(&routes).Error; err != nil {
 		return
 	}

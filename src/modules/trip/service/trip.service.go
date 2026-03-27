@@ -1,11 +1,11 @@
-package service
+package tripservice
 
 import (
 	"net/http"
 	"time"
 	"travel-assistant/src/common/Response"
 	"travel-assistant/src/common/config"
-	"travel-assistant/src/modules/trip/entity"
+	tripentity "travel-assistant/src/modules/trip/entity"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
@@ -31,7 +31,7 @@ type GetTripByPaginationQuery struct {
 }
 
 type GetTripByPaginationResponse struct {
-	Trips []entity.TripEntity `json:"trips"`
+	Trips []tripentity.TripEntity `json:"trips"`
 }
 
 // validateTripDates 校验行程日期，返回解析后的开始日期和结束日期，校验失败时返回错误并写入响应
@@ -75,7 +75,7 @@ func CreateTrip(c *gin.Context) {
 
 	userID := c.GetUint("userId")
 
-	trip := entity.TripEntity{}
+	trip := tripentity.TripEntity{}
 	copier.Copy(&trip, &request)
 	trip.Creator = userID
 
@@ -103,14 +103,14 @@ func GetTripByPagination(c *gin.Context) {
 		return
 	}
 	total := int64(0)
-	trips := []entity.TripEntity{}
+	trips := []tripentity.TripEntity{}
 	result := config.DB.Offset(int((request.Page - 1) * request.PageSize)).Limit(int(request.PageSize)).Find(&trips).Count(&total)
 	if result.Error != nil {
 		Response.Error(c, http.StatusInternalServerError, "获取行程分页失败: "+result.Error.Error())
 		return
 	}
 
-	Response.SuccessWithPage(c, "获取行程分页成功", Response.SuccessWithPageResponse[[]entity.TripEntity]{
+	Response.SuccessWithPage(c, "获取行程分页成功", Response.SuccessWithPageResponse[[]tripentity.TripEntity]{
 		List:     trips,
 		Total:    int(total),
 		Page:     request.Page,
@@ -132,7 +132,7 @@ func UpdateTrip(c *gin.Context) {
 		return
 	}
 
-	trip := entity.TripEntity{}
+	trip := tripentity.TripEntity{}
 	if err := config.DB.Model(&trip).Where("id = ?", request.ID).First(&trip).Error; err != nil {
 		Response.Error(c, http.StatusInternalServerError, "行程不存在: "+err.Error())
 		return
@@ -171,7 +171,7 @@ func DeleteTrip(c *gin.Context) {
 		return
 	}
 
-	trip := entity.TripEntity{}
+	trip := tripentity.TripEntity{}
 
 	if err := config.DB.Model(&trip).Where("id = ?", id).First(&trip).Error; err != nil {
 		Response.Error(c, http.StatusInternalServerError, "行程不存在: "+err.Error())
@@ -187,7 +187,7 @@ func DeleteTrip(c *gin.Context) {
 }
 
 func CheckTripCostIsOverBudget(tripId uint) (success bool, err error) {
-	var trip = entity.TripEntity{}
+	var trip = tripentity.TripEntity{}
 	if err := config.DB.First(&trip, tripId).Error; err != nil {
 		return false, err
 	}

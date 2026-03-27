@@ -1,9 +1,8 @@
-package entity
+package tripentity
 
 import (
-	"travel-assistant/src/modules/common/entity"
-
-	activity "travel-assistant/src/modules/activity/entity"
+	activityentity "travel-assistant/src/modules/activity/entity"
+	commonentity "travel-assistant/src/modules/common/entity"
 )
 
 type TripEntity struct {
@@ -20,9 +19,9 @@ type TripEntity struct {
 	EndDate      string `gorm:"type:varchar(255);not null" json:"endDate"`
 	Creator      uint   `gorm:"type:int(255);not null" json:"creator"`
 	// 关联关系 - 行程有多个活动
-	Activities []activity.ActivityEntity `gorm:"foreignKey:TripID;references:ID;constraint:OnDelete:CASCADE" json:"activities,omitempty"`
+	Activities []activityentity.ActivityEntity `gorm:"foreignKey:TripID;references:ID;constraint:OnDelete:CASCADE" json:"activities,omitempty"`
 
-	entity.CommonEntity
+	commonentity.CommonEntity
 }
 
 func (TripEntity) TableName() string {

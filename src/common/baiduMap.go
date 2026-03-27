@@ -9,7 +9,7 @@ import (
 
 	"travel-assistant/src/common/config"
 	"travel-assistant/src/common/logger"
-	"travel-assistant/src/modules/activity/entity"
+	activityentity "travel-assistant/src/modules/activity/entity"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -52,13 +52,13 @@ func (b *BaiduMapType) GetRoutesHandler(ctx context.Context, StartActivityID, En
 // GetRoutes 获取两个活动之间的路线规划（距离：公里，时间：分钟）
 func (b *BaiduMapType) GetRoutes(ctx context.Context, startActivityID, endActivityID uint) (distanceKm float64, durationMin int, err error) {
 	// 查询起点活动
-	startActivity := entity.ActivityEntity{}
+	startActivity := activityentity.ActivityEntity{}
 	if err := config.DB.WithContext(ctx).First(&startActivity, startActivityID).Error; err != nil {
 		return 0, 0, fmt.Errorf("查询起点活动失败: %w", err)
 	}
 
 	// 查询终点活动
-	endActivity := entity.ActivityEntity{}
+	endActivity := activityentity.ActivityEntity{}
 	if err := config.DB.WithContext(ctx).First(&endActivity, endActivityID).Error; err != nil {
 		return 0, 0, fmt.Errorf("查询终点活动失败: %w", err)
 	}

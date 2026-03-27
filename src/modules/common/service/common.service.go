@@ -1,18 +1,18 @@
-package service
+package commonservice
 
 import (
 	"net/http"
 	"time"
 	"travel-assistant/src/common/Response"
 	"travel-assistant/src/common/config"
-	tripEntity "travel-assistant/src/modules/trip/entity"
+	tripentity "travel-assistant/src/modules/trip/entity"
 
 	"github.com/gin-gonic/gin"
 )
 
 // validateActivityDate 校验活动日期是否在行程范围内
-func ValidateActivityInTrip(c *gin.Context, tripId uint, activityDate string) (*tripEntity.TripEntity, bool) {
-	trip := tripEntity.TripEntity{}
+func ValidateActivityInTrip(c *gin.Context, tripId uint, activityDate string) (*tripentity.TripEntity, bool) {
+	trip := tripentity.TripEntity{}
 	if err := config.DB.First(&trip, tripId).Error; err != nil {
 		Response.Error(c, http.StatusBadRequest, "行程不存在")
 		return nil, false
@@ -72,7 +72,7 @@ func ValidateActivityTime(c *gin.Context, startTime, endTime string) bool {
 }
 
 // checkTripOwnership 校验用户是否有权限操作该行程
-func CheckTripOwnership(c *gin.Context, trip *tripEntity.TripEntity) bool {
+func CheckTripOwnership(c *gin.Context, trip *tripentity.TripEntity) bool {
 	userID := c.GetUint("userId")
 	if trip.Creator != userID {
 		Response.Error(c, http.StatusForbidden, "无权操作该行程的活动")
