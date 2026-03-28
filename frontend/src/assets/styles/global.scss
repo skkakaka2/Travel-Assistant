@@ -1,0 +1,107 @@
+@use './variables.scss' as *;
+
+// 全局样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+// 亮色模式
+html.light {
+  body {
+    background-color: $bg-color-light;
+    color: $text-color-light;
+  }
+}
+
+// 暗色模式
+html.dark {
+  body {
+    background-color: $bg-color-dark;
+    color: $text-color-dark;
+  }
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+// Element Plus 主题覆盖
+.el-button--primary {
+  background: $gradient-primary !important;
+  border-color: $primary-color !important;
+  
+  &:hover {
+    background: $primary-light !important;
+    border-color: $primary-light !important;
+  }
+}
+
+.el-card {
+  border-radius: $radius-md !important;
+  box-shadow: $shadow-sm !important;
+}
+
+// 自定义卡片样式
+.card-gradient-header {
+  .el-card__header {
+    background: $gradient-header;
+    color: white;
+    border-radius: $radius-md $radius-md 0 0;
+    padding: 16px 20px;
+  }
+}
+
+// 渐变边框
+.gradient-border {
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box,
+              $gradient-primary border-box;
+}
+
+// 圆角按钮
+.btn-rounded {
+  border-radius: $radius-lg !important;
+  padding: 12px 32px !important;
+}
+
+// 空状态样式
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+  
+  .empty-text {
+    font-size: 16px;
+    color: $text-color-secondary-light;
+    margin-bottom: 20px;
+  }
+}
+
+// 响应式隐藏
+@media (max-width: $breakpoint-sm) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: $breakpoint-md) {
+  .hide-desktop {
+    display: none !important;
+  }
+}

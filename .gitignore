@@ -21,3 +21,7 @@ release.properties
 *.jar
 *.war
 *.ear
+
+frontend/node_modules/
+frontend/dist/
+frontend/package-lock.json
