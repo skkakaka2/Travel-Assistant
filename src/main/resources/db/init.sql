@@ -64,13 +64,7 @@ CREATE TABLE IF NOT EXISTS t_trip (
     vehicle_id BIGINT COMMENT '车辆ID',
     title VARCHAR(100) COMMENT '行程标题',
     start_location VARCHAR(255) COMMENT '起点名称',
-    start_longitude DECIMAL(10, 7) COMMENT '起点经度',
-    start_latitude DECIMAL(10, 7) COMMENT '起点纬度',
     end_location VARCHAR(255) COMMENT '终点名称',
-    end_longitude DECIMAL(10, 7) COMMENT '终点经度',
-    end_latitude DECIMAL(10, 7) COMMENT '终点纬度',
-    distance DECIMAL(10, 2) COMMENT '行程距离(公里)',
-    duration INT COMMENT '行程时长(分钟)',
     status TINYINT DEFAULT 0 COMMENT '状态：0未开始 1进行中 2已完成 3已取消',
     start_time DATETIME COMMENT '实际开始时间',
     end_time DATETIME COMMENT '实际结束时间',
@@ -155,7 +149,7 @@ CREATE TABLE IF NOT EXISTS t_message (
 INSERT INTO t_user (username, password, nickname, phone)
 VALUES (
         'test',
-        '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5EH',
+        '$2b$10$FQ0fLsq42.azu2YtUTFP4e9j1GmfnTDMV1MrhUkrRGxvRjMlVXhY6',
         '测试用户',
         '13800138000'
     );

@@ -37,39 +37,14 @@ public class Trip extends BaseEntity {
     private String startLocation;
 
     /**
-     * 起点经度
-     */
-    private BigDecimal startLongitude;
-
-    /**
-     * 起点纬度
-     */
-    private BigDecimal startLatitude;
-
-    /**
      * 终点名称
      */
     private String endLocation;
 
     /**
-     * 终点经度
+     * 旅行人数
      */
-    private BigDecimal endLongitude;
-
-    /**
-     * 终点纬度
-     */
-    private BigDecimal endLatitude;
-
-    /**
-     * 行程距离（公里）
-     */
-    private BigDecimal distance;
-
-    /**
-     * 行程时长（分钟）
-     */
-    private Integer duration;
+    private Integer travelersCount;
 
     /**
      * 状态：0未开始 1进行中 2已完成 3已取消

@@ -109,18 +109,6 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ErrorCode.USER_DISABLED);
         }
 
-        if (user.getUsername().equals("test")) {
-            if (user.getPassword().equals(user.getPassword())) {
-                String token = jwtUtils.generateToken(user.getId(), user.getUsername());
-                UserVO userVO = convertToVO(user);
-                log.info("用户登录成功: userId={}, username={}", user.getId(), user.getUsername());
-
-                return LoginVO.of(token, userVO);
-            } else {
-                throw new BusinessException(ErrorCode.LOGIN_FAILED);
-            }
-        }
-
         // 4. 验证密码
         if (!passwordUtils.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessException(ErrorCode.LOGIN_FAILED);

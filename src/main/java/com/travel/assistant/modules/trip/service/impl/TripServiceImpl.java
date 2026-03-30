@@ -5,8 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.travel.assistant.common.enums.ErrorCode;
 import com.travel.assistant.common.exception.BusinessException;
 import com.travel.assistant.common.utils.UserContextHolder;
-import com.travel.assistant.modules.map.service.MapService;
-import com.travel.assistant.modules.map.vo.RouteResult;
 import com.travel.assistant.modules.trip.dto.CreateTripRequest;
 import com.travel.assistant.modules.trip.entity.Trip;
 import com.travel.assistant.modules.trip.mapper.TripMapper;
@@ -20,8 +18,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +32,6 @@ public class TripServiceImpl implements TripService {
 
     private final TripMapper tripMapper;
     private final VehicleMapper vehicleMapper;
-    private final MapService mapService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -48,30 +43,8 @@ public class TripServiceImpl implements TripService {
         trip.setTitle(request.getTitle());
         trip.setVehicleId(request.getVehicleId());
         trip.setStartLocation(request.getStartLocation());
-        trip.setStartLongitude(request.getStartLongitude());
-        trip.setStartLatitude(request.getStartLatitude());
         trip.setEndLocation(request.getEndLocation());
-        trip.setEndLongitude(request.getEndLongitude());
-        trip.setEndLatitude(request.getEndLatitude());
         trip.setStatus(0);
-
-        // 如果有坐标，调用地图API计算路线
-        if (request.getStartLongitude() != null && request.getEndLongitude() != null) {
-            try {
-                RouteResult route = mapService.routePlanning(
-                        request.getStartLongitude(), request.getStartLatitude(),
-                        request.getEndLongitude(), request.getEndLatitude());
-                
-                BigDecimal distance = new BigDecimal(route.getDistance())
-                        .divide(new BigDecimal(1000), 2, RoundingMode.HALF_UP);
-                Integer duration = route.getDuration() / 60;
-                
-                trip.setDistance(distance);
-                trip.setDuration(duration);
-            } catch (Exception e) {
-                log.warn("路线规划失败，跳过距离计算: {}", e.getMessage());
-            }
-        }
 
         tripMapper.insert(trip);
         log.info("创建行程成功: tripId={}, userId={}", trip.getId(), userId);
@@ -96,28 +69,7 @@ public class TripServiceImpl implements TripService {
         trip.setTitle(request.getTitle());
         trip.setVehicleId(request.getVehicleId());
         trip.setStartLocation(request.getStartLocation());
-        trip.setStartLongitude(request.getStartLongitude());
-        trip.setStartLatitude(request.getStartLatitude());
         trip.setEndLocation(request.getEndLocation());
-        trip.setEndLongitude(request.getEndLongitude());
-        trip.setEndLatitude(request.getEndLatitude());
-
-        if (request.getStartLongitude() != null && request.getEndLongitude() != null) {
-            try {
-                RouteResult route = mapService.routePlanning(
-                        request.getStartLongitude(), request.getStartLatitude(),
-                        request.getEndLongitude(), request.getEndLatitude());
-                
-                BigDecimal distance = new BigDecimal(route.getDistance())
-                        .divide(new BigDecimal(1000), 2, RoundingMode.HALF_UP);
-                Integer duration = route.getDuration() / 60;
-                
-                trip.setDistance(distance);
-                trip.setDuration(duration);
-            } catch (Exception e) {
-                log.warn("路线规划失败: {}", e.getMessage());
-            }
-        }
 
         tripMapper.updateById(trip);
         log.info("更新行程成功: tripId={}", id);
