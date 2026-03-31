@@ -5,6 +5,7 @@ import (
 	"travel-assistant/src/common/middleware"
 	activityservice "travel-assistant/src/modules/activity/service"
 	authservice "travel-assistant/src/modules/auth/service"
+	reviewservice "travel-assistant/src/modules/review/service"
 	tripservice "travel-assistant/src/modules/trip/service"
 	userservice "travel-assistant/src/modules/user/service"
 
@@ -45,6 +46,14 @@ func SetupRouter() *gin.Engine {
 		activityGroup.PUT("update", activityservice.UpdateActivity)
 		activityGroup.DELETE("delete", activityservice.DeleteActivity)
 		activityGroup.POST("route/calc", activityservice.CalcActivityRoute)
+	}
+	reviewGroup := api.Group("review", middleware.Auth())
+	{
+		reviewGroup.GET("trips/available", reviewservice.GetAvailableTrips)
+		reviewGroup.GET("trips/completed", reviewservice.GetCompletedReviews)
+		reviewGroup.POST("create", reviewservice.CreateReview)
+		reviewGroup.GET("get", reviewservice.GetReviewDetail)
+		reviewGroup.GET("stats", reviewservice.GetUserStats)
 	}
 
 	return router

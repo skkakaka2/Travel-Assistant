@@ -59,7 +59,7 @@ func validateTripDates(c *gin.Context, startDateStr, endDateStr string) (time.Ti
 // @Accept json
 // @Produce json
 // @Param request body CreateTripRequest true "创建行程请求"
-// @Success 200 {object} entity.TripEntity "创建行程成功"
+// @Success 200 {object} tripentity.TripEntity "创建行程成功"
 // @Router /api/v1/trip/create [post]
 func CreateTrip(c *gin.Context) {
 	request := CreateTripRequest{}
@@ -124,7 +124,7 @@ func GetTripByPagination(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body UpdateTripRequest true "更新行程请求"
-// @Success 200 {object} entity.TripEntity "更新行程成功"
+// @Success 200 {object} tripentity.TripEntity "更新行程成功"
 // @Router /api/v1/trip/update [put]
 func UpdateTrip(c *gin.Context) {
 	request := UpdateTripRequest{}
@@ -163,7 +163,7 @@ func UpdateTrip(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id query int true "行程ID"
-// @Success 200 {object} entity.TripEntity "删除行程成功"
+// @Success 200 {object} tripentity.TripEntity "删除行程成功"
 // @Router /api/v1/trip/delete [delete]
 func DeleteTrip(c *gin.Context) {
 	id := uint(0)

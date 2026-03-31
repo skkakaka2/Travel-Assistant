@@ -68,7 +68,7 @@ type QueryTripRouteRequest struct {
 // @Accept json
 // @Produce json
 // @Param request body CalcActivityRouteRequest true "计算活动路线请求"
-// @Success 200 {object} entity.ActivityRouteEntity "计算路线成功"
+// @Success 200 {object} activityentity.ActivityRouteEntity "计算路线成功"
 // @Router /api/v1/activity/route/calc [post]
 func CalcActivityRoute(c *gin.Context) {
 	request := CalcActivityRouteRequest{}

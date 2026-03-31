@@ -25,7 +25,7 @@ type LoginResponse struct {
 // @Accept json
 // @Produce json
 // @Param request body LoginRequest true "登录请求"
-// @Success 200 {object} entity.UserEntity "登录成功"
+// @Success 200 {object} userentity.UserEntity "登录成功"
 // @Router /api/v1/user/login [post]
 func Login(c *gin.Context) {
 	request := LoginRequest{}

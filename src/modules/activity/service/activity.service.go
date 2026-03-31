@@ -25,7 +25,7 @@ type CreateActivityRequest struct {
 	StartTime    string `json:"startTime" binding:"required,datetime=15:04"`
 	EndTime      string `json:"endTime" binding:"required,datetime=15:04"`
 	Location     string `json:"location"`
-	Cost         uint   `json:"cost" binding:"required,min=0"`
+	Cost         uint   `json:"cost" binding:"omitempty,min=0"`
 
 	Longitude float64 `json:"longitude" binding:"required"`
 	Latitude  float64 `json:"latitude" binding:"required"`

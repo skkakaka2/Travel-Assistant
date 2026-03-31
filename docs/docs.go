@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateActivityRequest"
+                            "$ref": "#/definitions/activityservice.CreateActivityRequest"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "创建活动成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.ActivityEntity"
+                            "$ref": "#/definitions/activityentity.ActivityEntity"
                         }
                     }
                 }
@@ -121,7 +121,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entity.ActivityEntity"
+                                "$ref": "#/definitions/activityentity.ActivityEntity"
                             }
                         }
                     }
@@ -148,7 +148,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CalcActivityRouteRequest"
+                            "$ref": "#/definitions/activityservice.CalcActivityRouteRequest"
                         }
                     }
                 ],
@@ -156,7 +156,7 @@ const docTemplate = `{
                     "200": {
                         "description": "计算路线成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.ActivityRouteEntity"
+                            "$ref": "#/definitions/activityentity.ActivityRouteEntity"
                         }
                     }
                 }
@@ -182,7 +182,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.UpdateActivityRequest"
+                            "$ref": "#/definitions/activityservice.UpdateActivityRequest"
                         }
                     }
                 ],
@@ -190,7 +190,148 @@ const docTemplate = `{
                     "200": {
                         "description": "更新活动成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.ActivityEntity"
+                            "$ref": "#/definitions/activityentity.ActivityEntity"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/review/create": {
+            "post": {
+                "description": "创建行程复盘，包含酒店评分",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "创建复盘",
+                "parameters": [
+                    {
+                        "description": "创建复盘请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/reviewservice.CreateReviewRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建成功",
+                        "schema": {
+                            "$ref": "#/definitions/reviewservice.ReviewDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/review/get": {
+            "get": {
+                "description": "获取指定行程的复盘详情",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "获取复盘详情",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "行程ID",
+                        "name": "tripId",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "$ref": "#/definitions/reviewservice.ReviewDetailResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/review/stats": {
+            "get": {
+                "description": "获取用户所有复盘的统计数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "获取用户复盘统计",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "$ref": "#/definitions/reviewservice.UserStatsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/review/trips/available": {
+            "get": {
+                "description": "获取已结束且未复盘的行程列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "获取可复盘行程",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/tripentity.TripEntity"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/review/trips/completed": {
+            "get": {
+                "description": "获取已完成复盘的行程列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "获取已完成复盘",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/reviewservice.ReviewDetailResponse"
+                            }
                         }
                     }
                 }
@@ -216,7 +357,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateTripRequest"
+                            "$ref": "#/definitions/tripservice.CreateTripRequest"
                         }
                     }
                 ],
@@ -224,7 +365,7 @@ const docTemplate = `{
                     "200": {
                         "description": "创建行程成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.TripEntity"
+                            "$ref": "#/definitions/tripentity.TripEntity"
                         }
                     }
                 }
@@ -256,7 +397,7 @@ const docTemplate = `{
                     "200": {
                         "description": "删除行程成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.TripEntity"
+                            "$ref": "#/definitions/tripentity.TripEntity"
                         }
                     }
                 }
@@ -295,7 +436,7 @@ const docTemplate = `{
                     "200": {
                         "description": "获取行程分页成功",
                         "schema": {
-                            "$ref": "#/definitions/service.GetTripByPaginationResponse"
+                            "$ref": "#/definitions/tripservice.GetTripByPaginationResponse"
                         }
                     }
                 }
@@ -321,7 +462,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.UpdateTripRequest"
+                            "$ref": "#/definitions/tripservice.UpdateTripRequest"
                         }
                     }
                 ],
@@ -329,7 +470,7 @@ const docTemplate = `{
                     "200": {
                         "description": "更新行程成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.TripEntity"
+                            "$ref": "#/definitions/tripentity.TripEntity"
                         }
                     }
                 }
@@ -355,7 +496,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.LoginRequest"
+                            "$ref": "#/definitions/auth.LoginRequest"
                         }
                     }
                 ],
@@ -363,7 +504,7 @@ const docTemplate = `{
                     "200": {
                         "description": "登录成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.UserEntity"
+                            "$ref": "#/definitions/userentity.UserEntity"
                         }
                     }
                 }
@@ -431,7 +572,7 @@ const docTemplate = `{
                     "200": {
                         "description": "更新用户成功",
                         "schema": {
-                            "$ref": "#/definitions/entity.UserEntity"
+                            "$ref": "#/definitions/userentity.UserEntity"
                         }
                     }
                 }
@@ -439,7 +580,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "entity.ActivityEntity": {
+        "activityentity.ActivityEntity": {
             "type": "object",
             "properties": {
                 "activityDate": {
@@ -511,7 +652,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.ActivityRouteEntity": {
+        "activityentity.ActivityRouteEntity": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -542,14 +683,399 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.TripEntity": {
+        "activityservice.CalcActivityRouteRequest": {
+            "type": "object",
+            "required": [
+                "endActivityId",
+                "startActivityId"
+            ],
+            "properties": {
+                "endActivityId": {
+                    "type": "integer"
+                },
+                "forceRefresh": {
+                    "type": "boolean"
+                },
+                "startActivityId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "activityservice.CreateActivityRequest": {
+            "type": "object",
+            "required": [
+                "activityDate",
+                "endTime",
+                "latitude",
+                "longitude",
+                "startTime",
+                "title",
+                "tripId"
+            ],
+            "properties": {
+                "activityDate": {
+                    "type": "string"
+                },
+                "cost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endTime": {
+                    "type": "string"
+                },
+                "hotel": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelAddress": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "startTime": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "transportCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "transportType": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "tripId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "activityservice.UpdateActivityRequest": {
+            "type": "object",
+            "required": [
+                "activityDate",
+                "endTime",
+                "id",
+                "latitude",
+                "longitude",
+                "startTime",
+                "title",
+                "tripId"
+            ],
+            "properties": {
+                "activityDate": {
+                    "type": "string"
+                },
+                "cost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "description": {
+                    "type": "string"
+                },
+                "endTime": {
+                    "type": "string"
+                },
+                "hotel": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelAddress": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "hotelCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "startTime": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "transportCost": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "transportType": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "tripId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "auth.LoginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "description": "必填，6-20位",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 6
+                },
+                "username": {
+                    "description": "必填，3-20位字母数字",
+                    "type": "string",
+                    "maxLength": 20,
+                    "minLength": 3
+                }
+            }
+        },
+        "reviewentity.HotelReviewEntity": {
+            "type": "object",
+            "properties": {
+                "activityId": {
+                    "description": "关联活动（酒店信息来源）",
+                    "type": "integer"
+                },
+                "comment": {
+                    "description": "评价内容",
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "hotelName": {
+                    "description": "酒店名称（快照）",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "overallRating": {
+                    "description": "评分维度",
+                    "type": "integer"
+                },
+                "priceRating": {
+                    "description": "价格性价比 1-5",
+                    "type": "integer"
+                },
+                "tripReviewId": {
+                    "description": "关联复盘",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "reviewentity.TripReviewEntity": {
+            "type": "object",
+            "properties": {
+                "activityCost": {
+                    "description": "活动门票花费",
+                    "type": "integer"
+                },
+                "budgetDiff": {
+                    "description": "预算差异 = Budget - TotalCost",
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "hotelCost": {
+                    "description": "酒店花费",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "overallComment": {
+                    "description": "行程总结",
+                    "type": "string"
+                },
+                "overallRating": {
+                    "description": "用户填写",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "0=待复盘, 1=已完成",
+                    "type": "integer"
+                },
+                "totalCost": {
+                    "description": "花费统计（从 Activity 自动汇总）",
+                    "type": "integer"
+                },
+                "transportCost": {
+                    "description": "交通花费",
+                    "type": "integer"
+                },
+                "tripId": {
+                    "description": "关联行程",
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "reviewservice.CostBreakdownDetail": {
+            "type": "object",
+            "properties": {
+                "activity": {
+                    "type": "integer"
+                },
+                "budget": {
+                    "type": "integer"
+                },
+                "diff": {
+                    "type": "integer"
+                },
+                "diffPercent": {
+                    "type": "number"
+                },
+                "hotel": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "transport": {
+                    "type": "integer"
+                }
+            }
+        },
+        "reviewservice.CreateReviewRequest": {
+            "type": "object",
+            "required": [
+                "overallRating",
+                "tripId"
+            ],
+            "properties": {
+                "hotelReviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/reviewservice.HotelReviewInput"
+                    }
+                },
+                "overallComment": {
+                    "type": "string",
+                    "maxLength": 500
+                },
+                "overallRating": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                },
+                "tripId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "reviewservice.HotelReviewInput": {
+            "type": "object",
+            "required": [
+                "activityId",
+                "overallRating",
+                "priceRating"
+            ],
+            "properties": {
+                "activityId": {
+                    "type": "integer"
+                },
+                "comment": {
+                    "type": "string",
+                    "maxLength": 300
+                },
+                "overallRating": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                },
+                "priceRating": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                }
+            }
+        },
+        "reviewservice.ReviewDetailResponse": {
+            "type": "object",
+            "properties": {
+                "costBreakdown": {
+                    "$ref": "#/definitions/reviewservice.CostBreakdownDetail"
+                },
+                "hotelReviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/reviewentity.HotelReviewEntity"
+                    }
+                },
+                "tripReview": {
+                    "$ref": "#/definitions/reviewentity.TripReviewEntity"
+                }
+            }
+        },
+        "reviewservice.UserStatsResponse": {
+            "type": "object",
+            "properties": {
+                "avgHotelRating": {
+                    "type": "number"
+                },
+                "avgOverallRating": {
+                    "type": "number"
+                },
+                "avgPriceRating": {
+                    "type": "number"
+                },
+                "totalOverspent": {
+                    "description": "总超支金额",
+                    "type": "integer"
+                },
+                "totalReviews": {
+                    "type": "integer"
+                },
+                "totalSaved": {
+                    "description": "总节省金额（预算-实际）",
+                    "type": "integer"
+                }
+            }
+        },
+        "tripentity.TripEntity": {
             "type": "object",
             "properties": {
                 "activities": {
                     "description": "关联关系 - 行程有多个活动",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.ActivityEntity"
+                        "$ref": "#/definitions/activityentity.ActivityEntity"
                     }
                 },
                 "budget": {
@@ -592,143 +1118,7 @@ const docTemplate = `{
                 }
             }
         },
-        "entity.UserEntity": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "car": {
-                    "type": "string"
-                },
-                "carNumber": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "home": {
-                    "type": "string"
-                },
-                "homeAddress": {
-                    "type": "string"
-                },
-                "homeLatitude": {
-                    "type": "number"
-                },
-                "homeLongitude": {
-                    "type": "number"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "perKilometerCost": {
-                    "description": "每公里油费",
-                    "type": "integer"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "updatedAt": {
-                    "type": "string"
-                },
-                "userName": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.CalcActivityRouteRequest": {
-            "type": "object",
-            "required": [
-                "endActivityId",
-                "startActivityId"
-            ],
-            "properties": {
-                "endActivityId": {
-                    "type": "integer"
-                },
-                "forceRefresh": {
-                    "type": "boolean"
-                },
-                "startActivityId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "service.CreateActivityRequest": {
-            "type": "object",
-            "required": [
-                "activityDate",
-                "cost",
-                "endTime",
-                "latitude",
-                "longitude",
-                "startTime",
-                "title",
-                "tripId"
-            ],
-            "properties": {
-                "activityDate": {
-                    "type": "string"
-                },
-                "cost": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "description": {
-                    "type": "string"
-                },
-                "endTime": {
-                    "type": "string"
-                },
-                "hotel": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "hotelAddress": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "hotelCost": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "location": {
-                    "type": "string"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "startTime": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "transportCost": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "transportType": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "tripId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "service.CreateTripRequest": {
+        "tripservice.CreateTripRequest": {
             "type": "object",
             "required": [
                 "budget",
@@ -764,89 +1154,18 @@ const docTemplate = `{
                 }
             }
         },
-        "service.GetTripByPaginationResponse": {
+        "tripservice.GetTripByPaginationResponse": {
             "type": "object",
             "properties": {
                 "trips": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/entity.TripEntity"
+                        "$ref": "#/definitions/tripentity.TripEntity"
                     }
                 }
             }
         },
-        "service.UpdateActivityRequest": {
-            "type": "object",
-            "required": [
-                "activityDate",
-                "cost",
-                "endTime",
-                "id",
-                "latitude",
-                "longitude",
-                "startTime",
-                "title",
-                "tripId"
-            ],
-            "properties": {
-                "activityDate": {
-                    "type": "string"
-                },
-                "cost": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "description": {
-                    "type": "string"
-                },
-                "endTime": {
-                    "type": "string"
-                },
-                "hotel": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "hotelAddress": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "hotelCost": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "latitude": {
-                    "type": "number"
-                },
-                "location": {
-                    "type": "string"
-                },
-                "longitude": {
-                    "type": "number"
-                },
-                "startTime": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "transportCost": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "transportType": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "tripId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "service.UpdateTripRequest": {
+        "tripservice.UpdateTripRequest": {
             "type": "object",
             "required": [
                 "budget",
@@ -883,27 +1202,6 @@ const docTemplate = `{
                 "userCount": {
                     "type": "integer",
                     "minimum": 1
-                }
-            }
-        },
-        "user.LoginRequest": {
-            "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
-            "properties": {
-                "password": {
-                    "description": "必填，6-20位",
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 6
-                },
-                "username": {
-                    "description": "必填，3-20位字母数字",
-                    "type": "string",
-                    "maxLength": 20,
-                    "minLength": 3
                 }
             }
         },
@@ -977,6 +1275,57 @@ const docTemplate = `{
                 },
                 "phone": {
                     "description": "可选，11位数字",
+                    "type": "string"
+                }
+            }
+        },
+        "userentity.UserEntity": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "car": {
+                    "type": "string"
+                },
+                "carNumber": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "home": {
+                    "type": "string"
+                },
+                "homeAddress": {
+                    "type": "string"
+                },
+                "homeLatitude": {
+                    "type": "number"
+                },
+                "homeLongitude": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "perKilometerCost": {
+                    "description": "每公里油费",
+                    "type": "integer"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "userName": {
                     "type": "string"
                 }
             }

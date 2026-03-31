@@ -71,7 +71,7 @@ func Register(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body UpdateUserRequest true "更新用户请求"
-// @Success 200 {object} entity.UserEntity "更新用户成功"
+// @Success 200 {object} userentity.UserEntity "更新用户成功"
 // @Router /api/v1/user/update [put]
 func UpdateUser(c *gin.Context) {
 	request := UpdateUserRequest{}

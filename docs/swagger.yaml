@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  entity.ActivityEntity:
+  activityentity.ActivityEntity:
     properties:
       activityDate:
         description: 活动日期(yyyy-MM-dd)
@@ -52,7 +52,7 @@ definitions:
       updatedAt:
         type: string
     type: object
-  entity.ActivityRouteEntity:
+  activityentity.ActivityRouteEntity:
     properties:
       createdAt:
         type: string
@@ -73,12 +73,286 @@ definitions:
       updatedAt:
         type: string
     type: object
-  entity.TripEntity:
+  activityservice.CalcActivityRouteRequest:
+    properties:
+      endActivityId:
+        type: integer
+      forceRefresh:
+        type: boolean
+      startActivityId:
+        type: integer
+    required:
+    - endActivityId
+    - startActivityId
+    type: object
+  activityservice.CreateActivityRequest:
+    properties:
+      activityDate:
+        type: string
+      cost:
+        minimum: 0
+        type: integer
+      description:
+        type: string
+      endTime:
+        type: string
+      hotel:
+        maxLength: 255
+        type: string
+      hotelAddress:
+        maxLength: 255
+        type: string
+      hotelCost:
+        minimum: 0
+        type: integer
+      latitude:
+        type: number
+      location:
+        type: string
+      longitude:
+        type: number
+      startTime:
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      transportCost:
+        minimum: 0
+        type: integer
+      transportType:
+        maxLength: 255
+        type: string
+      tripId:
+        type: integer
+    required:
+    - activityDate
+    - endTime
+    - latitude
+    - longitude
+    - startTime
+    - title
+    - tripId
+    type: object
+  activityservice.UpdateActivityRequest:
+    properties:
+      activityDate:
+        type: string
+      cost:
+        minimum: 0
+        type: integer
+      description:
+        type: string
+      endTime:
+        type: string
+      hotel:
+        maxLength: 255
+        type: string
+      hotelAddress:
+        maxLength: 255
+        type: string
+      hotelCost:
+        minimum: 0
+        type: integer
+      id:
+        type: integer
+      latitude:
+        type: number
+      location:
+        type: string
+      longitude:
+        type: number
+      startTime:
+        type: string
+      title:
+        maxLength: 255
+        type: string
+      transportCost:
+        minimum: 0
+        type: integer
+      transportType:
+        maxLength: 255
+        type: string
+      tripId:
+        type: integer
+    required:
+    - activityDate
+    - endTime
+    - id
+    - latitude
+    - longitude
+    - startTime
+    - title
+    - tripId
+    type: object
+  auth.LoginRequest:
+    properties:
+      password:
+        description: 必填，6-20位
+        maxLength: 20
+        minLength: 6
+        type: string
+      username:
+        description: 必填，3-20位字母数字
+        maxLength: 20
+        minLength: 3
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  reviewentity.HotelReviewEntity:
+    properties:
+      activityId:
+        description: 关联活动（酒店信息来源）
+        type: integer
+      comment:
+        description: 评价内容
+        type: string
+      createdAt:
+        type: string
+      hotelName:
+        description: 酒店名称（快照）
+        type: string
+      id:
+        type: integer
+      overallRating:
+        description: 评分维度
+        type: integer
+      priceRating:
+        description: 价格性价比 1-5
+        type: integer
+      tripReviewId:
+        description: 关联复盘
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  reviewentity.TripReviewEntity:
+    properties:
+      activityCost:
+        description: 活动门票花费
+        type: integer
+      budgetDiff:
+        description: 预算差异 = Budget - TotalCost
+        type: integer
+      createdAt:
+        type: string
+      hotelCost:
+        description: 酒店花费
+        type: integer
+      id:
+        type: integer
+      overallComment:
+        description: 行程总结
+        type: string
+      overallRating:
+        description: 用户填写
+        type: integer
+      status:
+        description: 0=待复盘, 1=已完成
+        type: integer
+      totalCost:
+        description: 花费统计（从 Activity 自动汇总）
+        type: integer
+      transportCost:
+        description: 交通花费
+        type: integer
+      tripId:
+        description: 关联行程
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  reviewservice.CostBreakdownDetail:
+    properties:
+      activity:
+        type: integer
+      budget:
+        type: integer
+      diff:
+        type: integer
+      diffPercent:
+        type: number
+      hotel:
+        type: integer
+      total:
+        type: integer
+      transport:
+        type: integer
+    type: object
+  reviewservice.CreateReviewRequest:
+    properties:
+      hotelReviews:
+        items:
+          $ref: '#/definitions/reviewservice.HotelReviewInput'
+        type: array
+      overallComment:
+        maxLength: 500
+        type: string
+      overallRating:
+        maximum: 5
+        minimum: 1
+        type: integer
+      tripId:
+        type: integer
+    required:
+    - overallRating
+    - tripId
+    type: object
+  reviewservice.HotelReviewInput:
+    properties:
+      activityId:
+        type: integer
+      comment:
+        maxLength: 300
+        type: string
+      overallRating:
+        maximum: 5
+        minimum: 1
+        type: integer
+      priceRating:
+        maximum: 5
+        minimum: 1
+        type: integer
+    required:
+    - activityId
+    - overallRating
+    - priceRating
+    type: object
+  reviewservice.ReviewDetailResponse:
+    properties:
+      costBreakdown:
+        $ref: '#/definitions/reviewservice.CostBreakdownDetail'
+      hotelReviews:
+        items:
+          $ref: '#/definitions/reviewentity.HotelReviewEntity'
+        type: array
+      tripReview:
+        $ref: '#/definitions/reviewentity.TripReviewEntity'
+    type: object
+  reviewservice.UserStatsResponse:
+    properties:
+      avgHotelRating:
+        type: number
+      avgOverallRating:
+        type: number
+      avgPriceRating:
+        type: number
+      totalOverspent:
+        description: 总超支金额
+        type: integer
+      totalReviews:
+        type: integer
+      totalSaved:
+        description: 总节省金额（预算-实际）
+        type: integer
+    type: object
+  tripentity.TripEntity:
     properties:
       activities:
         description: 关联关系 - 行程有多个活动
         items:
-          $ref: '#/definitions/entity.ActivityEntity'
+          $ref: '#/definitions/activityentity.ActivityEntity'
         type: array
       budget:
         description: 预算
@@ -107,102 +381,7 @@ definitions:
       userCount:
         type: integer
     type: object
-  entity.UserEntity:
-    properties:
-      avatar:
-        type: string
-      car:
-        type: string
-      carNumber:
-        type: string
-      createdAt:
-        type: string
-      email:
-        type: string
-      home:
-        type: string
-      homeAddress:
-        type: string
-      homeLatitude:
-        type: number
-      homeLongitude:
-        type: number
-      id:
-        type: integer
-      perKilometerCost:
-        description: 每公里油费
-        type: integer
-      phone:
-        type: string
-      status:
-        type: integer
-      updatedAt:
-        type: string
-      userName:
-        type: string
-    type: object
-  service.CalcActivityRouteRequest:
-    properties:
-      endActivityId:
-        type: integer
-      forceRefresh:
-        type: boolean
-      startActivityId:
-        type: integer
-    required:
-    - endActivityId
-    - startActivityId
-    type: object
-  service.CreateActivityRequest:
-    properties:
-      activityDate:
-        type: string
-      cost:
-        minimum: 0
-        type: integer
-      description:
-        type: string
-      endTime:
-        type: string
-      hotel:
-        maxLength: 255
-        type: string
-      hotelAddress:
-        maxLength: 255
-        type: string
-      hotelCost:
-        minimum: 0
-        type: integer
-      latitude:
-        type: number
-      location:
-        type: string
-      longitude:
-        type: number
-      startTime:
-        type: string
-      title:
-        maxLength: 255
-        type: string
-      transportCost:
-        minimum: 0
-        type: integer
-      transportType:
-        maxLength: 255
-        type: string
-      tripId:
-        type: integer
-    required:
-    - activityDate
-    - cost
-    - endTime
-    - latitude
-    - longitude
-    - startTime
-    - title
-    - tripId
-    type: object
-  service.CreateTripRequest:
+  tripservice.CreateTripRequest:
     properties:
       budget:
         minimum: 0
@@ -229,66 +408,14 @@ definitions:
     - title
     - userCount
     type: object
-  service.GetTripByPaginationResponse:
+  tripservice.GetTripByPaginationResponse:
     properties:
       trips:
         items:
-          $ref: '#/definitions/entity.TripEntity'
+          $ref: '#/definitions/tripentity.TripEntity'
         type: array
     type: object
-  service.UpdateActivityRequest:
-    properties:
-      activityDate:
-        type: string
-      cost:
-        minimum: 0
-        type: integer
-      description:
-        type: string
-      endTime:
-        type: string
-      hotel:
-        maxLength: 255
-        type: string
-      hotelAddress:
-        maxLength: 255
-        type: string
-      hotelCost:
-        minimum: 0
-        type: integer
-      id:
-        type: integer
-      latitude:
-        type: number
-      location:
-        type: string
-      longitude:
-        type: number
-      startTime:
-        type: string
-      title:
-        maxLength: 255
-        type: string
-      transportCost:
-        minimum: 0
-        type: integer
-      transportType:
-        maxLength: 255
-        type: string
-      tripId:
-        type: integer
-    required:
-    - activityDate
-    - cost
-    - endTime
-    - id
-    - latitude
-    - longitude
-    - startTime
-    - title
-    - tripId
-    type: object
-  service.UpdateTripRequest:
+  tripservice.UpdateTripRequest:
     properties:
       budget:
         minimum: 0
@@ -317,22 +444,6 @@ definitions:
     - startDate
     - title
     - userCount
-    type: object
-  user.LoginRequest:
-    properties:
-      password:
-        description: 必填，6-20位
-        maxLength: 20
-        minLength: 6
-        type: string
-      username:
-        description: 必填，3-20位字母数字
-        maxLength: 20
-        minLength: 3
-        type: string
-    required:
-    - password
-    - username
     type: object
   user.RegisterRequest:
     properties:
@@ -387,6 +498,40 @@ definitions:
         description: 可选，11位数字
         type: string
     type: object
+  userentity.UserEntity:
+    properties:
+      avatar:
+        type: string
+      car:
+        type: string
+      carNumber:
+        type: string
+      createdAt:
+        type: string
+      email:
+        type: string
+      home:
+        type: string
+      homeAddress:
+        type: string
+      homeLatitude:
+        type: number
+      homeLongitude:
+        type: number
+      id:
+        type: integer
+      perKilometerCost:
+        description: 每公里油费
+        type: integer
+      phone:
+        type: string
+      status:
+        type: integer
+      updatedAt:
+        type: string
+      userName:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -412,14 +557,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/service.CreateActivityRequest'
+          $ref: '#/definitions/activityservice.CreateActivityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 创建活动成功
           schema:
-            $ref: '#/definitions/entity.ActivityEntity'
+            $ref: '#/definitions/activityentity.ActivityEntity'
       summary: 创建活动
       tags:
       - Activity
@@ -464,7 +609,7 @@ paths:
           description: 获取活动列表成功
           schema:
             items:
-              $ref: '#/definitions/entity.ActivityEntity'
+              $ref: '#/definitions/activityentity.ActivityEntity'
             type: array
       summary: 获取活动列表
       tags:
@@ -480,14 +625,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/service.CalcActivityRouteRequest'
+          $ref: '#/definitions/activityservice.CalcActivityRouteRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 计算路线成功
           schema:
-            $ref: '#/definitions/entity.ActivityRouteEntity'
+            $ref: '#/definitions/activityentity.ActivityRouteEntity'
       summary: 计算并保存活动路线
       tags:
       - Activity
@@ -502,17 +647,109 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/service.UpdateActivityRequest'
+          $ref: '#/definitions/activityservice.UpdateActivityRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 更新活动成功
           schema:
-            $ref: '#/definitions/entity.ActivityEntity'
+            $ref: '#/definitions/activityentity.ActivityEntity'
       summary: 更新活动
       tags:
       - Activity
+  /api/v1/review/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建行程复盘，包含酒店评分
+      parameters:
+      - description: 创建复盘请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/reviewservice.CreateReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建成功
+          schema:
+            $ref: '#/definitions/reviewservice.ReviewDetailResponse'
+      summary: 创建复盘
+      tags:
+      - Review
+  /api/v1/review/get:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定行程的复盘详情
+      parameters:
+      - description: 行程ID
+        in: query
+        name: tripId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            $ref: '#/definitions/reviewservice.ReviewDetailResponse'
+      summary: 获取复盘详情
+      tags:
+      - Review
+  /api/v1/review/stats:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户所有复盘的统计数据
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            $ref: '#/definitions/reviewservice.UserStatsResponse'
+      summary: 获取用户复盘统计
+      tags:
+      - Review
+  /api/v1/review/trips/available:
+    get:
+      consumes:
+      - application/json
+      description: 获取已结束且未复盘的行程列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            items:
+              $ref: '#/definitions/tripentity.TripEntity'
+            type: array
+      summary: 获取可复盘行程
+      tags:
+      - Review
+  /api/v1/review/trips/completed:
+    get:
+      consumes:
+      - application/json
+      description: 获取已完成复盘的行程列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            items:
+              $ref: '#/definitions/reviewservice.ReviewDetailResponse'
+            type: array
+      summary: 获取已完成复盘
+      tags:
+      - Review
   /api/v1/trip/create:
     post:
       consumes:
@@ -524,14 +761,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/service.CreateTripRequest'
+          $ref: '#/definitions/tripservice.CreateTripRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 创建行程成功
           schema:
-            $ref: '#/definitions/entity.TripEntity'
+            $ref: '#/definitions/tripentity.TripEntity'
       summary: 创建行程
       tags:
       - Trip
@@ -552,7 +789,7 @@ paths:
         "200":
           description: 删除行程成功
           schema:
-            $ref: '#/definitions/entity.TripEntity'
+            $ref: '#/definitions/tripentity.TripEntity'
       summary: 删除行程
       tags:
       - Trip
@@ -578,7 +815,7 @@ paths:
         "200":
           description: 获取行程分页成功
           schema:
-            $ref: '#/definitions/service.GetTripByPaginationResponse'
+            $ref: '#/definitions/tripservice.GetTripByPaginationResponse'
       summary: 获取行程分页
       tags:
       - Trip
@@ -593,14 +830,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/service.UpdateTripRequest'
+          $ref: '#/definitions/tripservice.UpdateTripRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 更新行程成功
           schema:
-            $ref: '#/definitions/entity.TripEntity'
+            $ref: '#/definitions/tripentity.TripEntity'
       summary: 更新行程
       tags:
       - Trip
@@ -615,14 +852,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.LoginRequest'
+          $ref: '#/definitions/auth.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 登录成功
           schema:
-            $ref: '#/definitions/entity.UserEntity'
+            $ref: '#/definitions/userentity.UserEntity'
       summary: 登录
       tags:
       - User
@@ -666,7 +903,7 @@ paths:
         "200":
           description: 更新用户成功
           schema:
-            $ref: '#/definitions/entity.UserEntity'
+            $ref: '#/definitions/userentity.UserEntity'
       summary: 更新用户
       tags:
       - User

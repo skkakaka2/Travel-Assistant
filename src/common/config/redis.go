@@ -299,8 +299,15 @@ func (r *RedisClient) WithPipeline(ctx context.Context, fn func(pipe redis.Pipel
 // Lock 获取分布式锁（简单实现，生产环境建议用 Redisson 或 Redlock）
 func (r *RedisClient) Lock(ctx context.Context, key string, ttl time.Duration) (bool, error) {
 	// NX: 只在键不存在时设置，XX: 只在键存在时设置
-	// EX: 设置秒级过期时间
-	return r.client.SetNX(ctx, key, "1", ttl).Result()
+	// 使用 SetArgs 设置 NX 和过期时间，替代已废弃的 SetNX
+	res, err := r.client.SetArgs(ctx, key, "1", redis.SetArgs{
+		Mode: "NX",
+		TTL:  ttl,
+	}).Result()
+	if err != nil {
+		return false, err
+	}
+	return res == "OK", nil
 }
 
 // Unlock 释放分布式锁
