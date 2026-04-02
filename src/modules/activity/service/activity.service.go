@@ -77,6 +77,10 @@ func CreateActivity(c *gin.Context) {
 		return
 	}
 
+	if !commonservice.ValidateActivityTimeConflict(c, request.TripID, request.ActivityDate, request.StartTime, request.EndTime, 0) {
+		return
+	}
+
 	activity := activityentity.ActivityEntity{}
 	request.Cost = request.HotelCost + request.TransportCost
 	copier.Copy(&activity, &request)
@@ -191,8 +195,8 @@ func UpdateActivity(c *gin.Context) {
 		return
 	}
 
-	// 如果更改了日期，校验新日期是否在行程范围内
-	if request.ActivityDate != activity.ActivityDate {
+	// 如果更改了行程或日期，校验活动日期是否仍在行程范围内
+	if request.TripID != activity.TripID || request.ActivityDate != activity.ActivityDate {
 		_, ok := commonservice.ValidateActivityInTrip(c, request.TripID, request.ActivityDate)
 		if !ok {
 			return
@@ -204,6 +208,9 @@ func UpdateActivity(c *gin.Context) {
 		return
 	}
 
+	if !commonservice.ValidateActivityTimeConflict(c, request.TripID, request.ActivityDate, request.StartTime, request.EndTime, request.ID) {
+		return
+	}
 	// 更新活动
 	updates := activityentity.ActivityEntity{}
 	copier.Copy(&updates, &request)

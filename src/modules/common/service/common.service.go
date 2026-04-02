@@ -5,6 +5,7 @@ import (
 	"time"
 	"travel-assistant/src/common/Response"
 	"travel-assistant/src/common/config"
+	activityentity "travel-assistant/src/modules/activity/entity"
 	tripentity "travel-assistant/src/modules/trip/entity"
 
 	"github.com/gin-gonic/gin"
@@ -66,6 +67,30 @@ func ValidateActivityTime(c *gin.Context, startTime, endTime string) bool {
 			Response.Error(c, http.StatusBadRequest, "开始时间不能晚于或等于结束时间")
 			return false
 		}
+	}
+
+	return true
+}
+
+// ValidateActivityTimeConflict 校验同一行程同一天内是否存在时间冲突
+func ValidateActivityTimeConflict(c *gin.Context, tripID uint, activityDate, startTime, endTime string, excludeActivityID uint) bool {
+	db := config.DB.Model(&activityentity.ActivityEntity{}).
+		Where("trip_id = ? AND activity_date = ?", tripID, activityDate).
+		Where("start_time < ? AND end_time > ?", endTime, startTime)
+
+	if excludeActivityID != 0 {
+		db = db.Where("id <> ?", excludeActivityID)
+	}
+
+	var count int64
+	if err := db.Count(&count).Error; err != nil {
+		Response.Error(c, http.StatusInternalServerError, "校验活动时间冲突失败: "+err.Error())
+		return false
+	}
+
+	if count > 0 {
+		Response.Error(c, http.StatusBadRequest, "活动时间与同一行程中的其他活动冲突")
+		return false
 	}
 
 	return true
